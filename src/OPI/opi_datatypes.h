@@ -9,6 +9,32 @@
 #include <cmath>
 namespace OPI
 {
+	//! Addition operator for Orbit
+	OPI_CUDA_PREFIX inline Orbit operator+(const Orbit& a, const Orbit& b)
+	{
+		Orbit out;
+		out.semi_major_axis = a.semi_major_axis + b.semi_major_axis;
+		out.eccentricity = a.eccentricity + b.eccentricity;
+		out.inclination = a.inclination + b.inclination;
+		out.raan = a.raan + b.raan;
+		out.arg_of_perigee = a.arg_of_perigee + b.arg_of_perigee;
+		out.mean_anomaly = a.mean_anomaly + b.mean_anomaly;
+		return out;
+	}
+
+	//! Subtraction operator for Orbit
+	OPI_CUDA_PREFIX inline Orbit operator-(const Orbit& a, const Orbit& b)
+	{
+		Orbit out;
+		out.semi_major_axis = a.semi_major_axis - b.semi_major_axis;
+		out.eccentricity = a.eccentricity - b.eccentricity;
+		out.inclination = a.inclination - b.inclination;
+		out.raan = a.raan - b.raan;
+		out.arg_of_perigee = a.arg_of_perigee - b.arg_of_perigee;
+		out.mean_anomaly = a.mean_anomaly - b.mean_anomaly;
+		return out;
+	}
+
 	//! Addition operator for Vector3
 	OPI_CUDA_PREFIX inline Vector3 operator+(const Vector3& a, const Vector3& b)
 	{
@@ -19,7 +45,7 @@ namespace OPI
 		return out;
 	}
 
-	//! Substraction operator for Vector3
+	//! Subtraction operator for Vector3
 	OPI_CUDA_PREFIX inline Vector3 operator-(const Vector3& a, const Vector3& b)
 	{
 		Vector3 out;
