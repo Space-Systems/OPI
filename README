@@ -1,0 +1,18 @@
+
+OPI - Orbital Propagation Interface
+-----------------------------------
+
+OPI is an interface with the goal to facilitate the implementation of orbital
+propagators into different applications.
+
+To calculate orbital motion, many different software programs exist emphasizing
+on different aspects such as execution speed or accuracy. They often require
+different input parameters and are written in different languages. This makes
+comparing or exchanging them a challenging task. OPI aims at simplifying this
+by providing a common way of handling propagation. Propagators using OPI are
+designed as plugins/shared libraries that can be loaded by a host program via
+the interface.
+
+OPI currently supports C, C++ and Fortran, as well as CUDA for propagators.
+Hosts and plugins don't have to be written in the same language in order to
+collaborate.

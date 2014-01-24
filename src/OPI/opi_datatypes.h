@@ -1,0 +1,91 @@
+#ifndef OPI_DATA_TYPES_H
+#define OPI_DATA_TYPES_H
+
+#ifndef OPI_CUDA_PREFIX
+#define OPI_CUDA_PREFIX
+#endif
+
+#include "OPI/opi_types.h"
+#include <cmath>
+namespace OPI
+{
+	//! Addition operator for Vector3
+	OPI_CUDA_PREFIX inline Vector3 operator+(const Vector3& a, const Vector3& b)
+	{
+		Vector3 out;
+		out.x = a.x + b.x;
+		out.y = a.y + b.y;
+		out.z = a.z + b.z;
+		return out;
+	}
+
+	//! Substraction operator for Vector3
+	OPI_CUDA_PREFIX inline Vector3 operator-(const Vector3& a, const Vector3& b)
+	{
+		Vector3 out;
+		out.x = a.x - b.x;
+		out.y = a.y - b.y;
+		out.z = a.z - b.z;
+		return out;
+	}
+
+	OPI_CUDA_PREFIX inline Vector3 operator+(const Vector3& a, float b)
+	{
+		Vector3 out;
+		out.x = a.x + b;
+		out.y = a.y + b;
+		out.z = a.z + b;
+		return out;
+	}
+
+	OPI_CUDA_PREFIX inline Vector3 operator-(const Vector3& a, float b)
+	{
+		Vector3 out;
+		out.x = a.x - b;
+		out.y = a.y - b;
+		out.z = a.z - b;
+		return out;
+	}
+
+	//! Multiplies a vector times a float
+	OPI_CUDA_PREFIX inline Vector3 operator*(const Vector3& a, float b)
+	{
+		Vector3 out;
+		out.x = a.x * b;
+		out.y = a.y * b;
+		out.z = a.z * b;
+		return out;
+	}
+
+	//! Calculetes the length²
+	OPI_CUDA_PREFIX inline float lengthSquare(const Vector3& v)
+	{
+		return v.x * v.x + v.y * v.y + v.z * v.z;
+	}
+
+	//! Calculates the length
+	OPI_CUDA_PREFIX inline float length(const Vector3 v)
+	{
+		return sqrt(lengthSquare(v));
+	}
+
+	//! Returns the smallest element
+	OPI_CUDA_PREFIX inline float smallest(const Vector3& v)
+	{
+		if(v.x < v.y)
+			return v.x < v.z ? v.x : v.z;
+		else
+			return v.y < v.z ? v.y : v.z;
+	}
+
+	//! Returns the highest element
+	OPI_CUDA_PREFIX inline float highest(const Vector3& v)
+	{
+		if(v.x > v.y)
+			return v.x > v.z ? v.x : v.z;
+		else
+			return v.y > v.z ? v.y : v.z;
+	}
+}
+
+#endif
