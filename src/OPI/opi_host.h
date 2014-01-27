@@ -11,7 +11,7 @@ namespace OPI
 {
 	class CustomPropagator;
 	class Propagator;
-	class PropagatorModule;
+	class PerturbationModule;
 	class PropagatorIntegrator;
 	class DistanceQuery;
 	class Plugin;
@@ -43,7 +43,7 @@ namespace OPI
 			bool hasCUDASupport() const;
 
 			//! Load all plugins found in the given directory.
-			/** A plugin can be a Propagator, CustomPropagator, PropagatorModule, PropagatorIntegrator,
+			/** A plugin can be a Propagator, CustomPropagator, PerturbationModule, PropagatorIntegrator,
 			 * DistanceQuery, CollisionDetection (including the C and Fortran equivalents thereof),
 			 * the CUDA support plugin supplied by OPI, or any other shared object that implements the
 			 * Module interface.
@@ -95,17 +95,17 @@ namespace OPI
 			//! Adds an empty CustomPropagator with the given name to the list of available Propagators.
 			/** A CustomPropagator works exactly like a Propagator, but is put together from
 			 * components (Modules and Integrators) chosen by the Host.
-			 * \see CustomPropagator, PropagatorModule, PropagatorIntegrator
+			 * \see CustomPropagator, PerturbationModule, PropagatorIntegrator
 			 * \returns a new instance of a CustomPropagator.
 			 */
 			CustomPropagator* createCustomPropagator(const std::string& name);
 
 			//! Find a propagator module by name, returns 0 (null pointer) if not found
-			PropagatorModule* getPropagatorModule(const std::string& name) const;
+			PerturbationModule* getPerturbationModule(const std::string& name) const;
 			//! Find a propagator module by index, returns 0 (null pointer) if not found
-			PropagatorModule* getPropagatorModule(int index) const;
+			PerturbationModule* getPerturbationModule(int index) const;
 			//! Returns the number of known modules
-			int getPropagatorModuleCount() const;
+			int getPerturbationModuleCount() const;
 
 			//! Find a propagator integrator by name, returns 0 (null pointer) if not found
 			PropagatorIntegrator* getPropagatorIntegrator(const std::string& name) const;

@@ -13,7 +13,7 @@ namespace OPI
 
 	}
 
-	void CustomPropagator::addModule(PropagatorModule *module)
+	void CustomPropagator::addModule(PerturbationModule *module)
 	{
 		modules.push_back(module);
 	}

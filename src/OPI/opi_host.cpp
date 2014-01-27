@@ -26,7 +26,7 @@ namespace OPI
 
 			std::vector<Plugin*> pluginlist;
 			std::vector<Propagator*> propagagorlist;
-			std::vector<PropagatorModule*> modulelist;
+			std::vector<PerturbationModule*> modulelist;
 			std::vector<PropagatorIntegrator*> integratorlist;
 			std::vector<DistanceQuery*> querylist;
 			std::vector<CollisionDetection*> detectionlist;
