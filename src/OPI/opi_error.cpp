@@ -11,7 +11,7 @@ namespace OPI
 			case CUDA_REQUIRED:
 				return "CUDA Required";
 			case CUDA_OLDVERSION:
-				return "CUDA version to old";
+				return "CUDA version too old";
 			case INVALID_ARGUMENT:
 				return "Invalid argument";
 			case UNKNOWN_VARIABLE:

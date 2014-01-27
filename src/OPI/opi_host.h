@@ -22,35 +22,84 @@ namespace OPI
 	//! Internal implementation data for the Host
 	class HostImpl;
 
-	//! \brief The Host loads and manages plugins
-	//! \ingroup CPP_API_GROUP
+	/*!
+	 * \brief The Host loads and manages one or multiple Propagator Plugins.
+	 *
+	 * \ingroup CPP_API_GROUP
+	 * Usually, the Host program is your main application (or part thereof) that serves a specific purpose
+	 * for which orbital propagation is required; for example, a re-entry simulation, an animated
+	 * visualization of space debris, or a small tool that simply compares different propagators.
+	 * When using C++, an instance of the Host class would be the part of your application responsible
+	 * for orbital propagation. The Host keeps a list of available propagators (usually loaded from
+	 * shared objects) and provides access to them.
+	 */
 	class OPI_API_EXPORT Host
 	{
 		public:
 			Host();
 			~Host();
 
-			//! Check if CUDA is supported
+			//! Check whether CUDA is supported on the current hardware.
 			bool hasCUDASupport() const;
-			//! Load plugins from plugindir
+
+			//! Load all plugins found in the given directory.
+			/** A plugin can be a Propagator, CustomPropagator, PropagatorModule, PropagatorIntegrator,
+			 * DistanceQuery, CollisionDetection (including the C and Fortran equivalents thereof),
+			 * the CUDA support plugin supplied by OPI, or any other shared object that implements the
+			 * Module interface.
+			 * \returns an ErrorCode containing information on any errors that occurred during the operation.
+			 */
 			ErrorCode loadPlugins(const std::string& plugindir);
 
-			//! Sets an error callback for this host
+			//! Sets an error callback for this host.
 			void setErrorCallback(OPI_ErrorCallback callback, void* privatedata);
 
 			//! Returns the number of available cuda devices
 			int getCudaDeviceCount() const;
-			//! Get a propagator by name
-			Propagator* getPropagator(const std::string& name) const;
-			//! Get a propagator by index
+
+			//! Get a Propagator by index.
+			/** After loading the available plugins this function can
+			 * be used to get the Propagator with the given index. Indices are assigned in the order
+			 * in which the plugins are loaded, starting from zero. A common use case for this function
+			 * is to generate a list of available Propagators and let the user select one of them by
+			 * its name.
+			 * \see Host::loadPlugins
+			 * \returns an instance of the Propagator with the given name; NULL if no such Propagator exists.
+			 */
 			Propagator* getPropagator(int index) const;
-			//! Returns the number of propagators
+
+			//! Get a specific propagator by name.
+			/** After loading the available plugins use this function
+			 * to retrieve a specific Propagator with a known designator.
+			 * \see Host::loadPlugins
+			 * \returns an instance of the Propagator with the given name; NULL if no such Propagator exists.
+			 */
+			Propagator* getPropagator(const std::string& name) const;
+
+			//! Returns the number of propagators.
+			/** After loading the plugins, this function returns the number of valid Propagators that
+			 * were found among them.
+			 * \see Host::loadPlugins
+			 * \returns the number of Propagator plugins available; zero if none were found.
+			 */
 			int getPropagatorCount() const;
-			//! Adds and registers a Propagator which is not implemented by a plugin (cpp-api only)
+
+			//! Adds and registers a Propagator which is not implemented by a plugin (C++-API only).
+			/** If both Propagator and Host are written in C++, this function can be used to
+			 * add a statically compiled Propagator to the Host's list of available propagators.
+			 * Useful if Host and Propagator should be the same application (which would partly
+			 * defeat the purpose of this API, but hey - it's your work :-P).
+			 */
 			void addPropagator(Propagator* propagator);
 
-			//! Creates a custom propagator with the passed name
+			//! Adds an empty CustomPropagator with the given name to the list of available Propagators.
+			/** A CustomPropagator works exactly like a Propagator, but is put together from
+			 * components (Modules and Integrators) chosen by the Host.
+			 * \see CustomPropagator, PropagatorModule, PropagatorIntegrator
+			 * \returns a new instance of a CustomPropagator.
+			 */
 			CustomPropagator* createCustomPropagator(const std::string& name);
+
 			//! Find a propagator module by name, returns 0 (null pointer) if not found
 			PropagatorModule* getPropagatorModule(const std::string& name) const;
 			//! Find a propagator module by index, returns 0 (null pointer) if not found

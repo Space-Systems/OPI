@@ -13,8 +13,16 @@ namespace OPI
 	//! Contains the propagation implementation data
 	class PropagatorImpl;
 
-	//! \brief This interface class defines the way to operate on the
-	//! \ingroup CPP_API_GROUP
+	/*!
+	 * \brief This class represents a propagator loadable by a Host, usually as a shared object.
+	 *
+	 * \ingroup CPP_API_GROUP
+	 * The Propagator takes as input a list of orbital objects and calculates their position at a given
+	 * time. It is implemented as a Module loaded and managed by a Host application that uses its
+	 * results for its specific purpose. The interface provides methods to initialize and configure the
+	 * Propagator, and to forward Object and time data.
+	 * \see Module, Host
+	 */
 	class OPI_API_EXPORT Propagator:
 			public Module
 	{
