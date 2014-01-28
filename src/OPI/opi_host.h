@@ -94,7 +94,7 @@ namespace OPI
 
 			//! Adds an empty CustomPropagator with the given name to the list of available Propagators.
 			/** A CustomPropagator works exactly like a Propagator, but is put together from
-			 * components (Modules and Integrators) chosen by the Host.
+			 * components (Perturbation Modules and Integrators) chosen by the Host.
 			 * \see CustomPropagator, PerturbationModule, PropagatorIntegrator
 			 * \returns a new instance of a CustomPropagator.
 			 */
