@@ -35,6 +35,32 @@ namespace OPI
 		return out;
 	}
 
+	//! Scalar Multiplication operator for Orbit
+	OPI_CUDA_PREFIX inline Orbit operator*(const Orbit& a, const float& b)
+	{
+		Orbit out;
+		out.semi_major_axis = a.semi_major_axis * b;
+		out.eccentricity = a.eccentricity * b;
+		out.inclination = a.inclination * b;
+		out.raan = a.raan * b;
+		out.arg_of_perigee = a.arg_of_perigee * b;
+		out.mean_anomaly = a.mean_anomaly * b;
+		return out;
+	}
+
+	//! Scalar Division operator for Orbit
+	OPI_CUDA_PREFIX inline Orbit operator/(const Orbit& a, const float& b)
+	{
+		Orbit out;
+		out.semi_major_axis = a.semi_major_axis / b;
+		out.eccentricity = a.eccentricity / b;
+		out.inclination = a.inclination / b;
+		out.raan = a.raan / b;
+		out.arg_of_perigee = a.arg_of_perigee / b;
+		out.mean_anomaly = a.mean_anomaly / b;
+		return out;
+	}
+
 	//! Addition operator for Vector3
 	OPI_CUDA_PREFIX inline Vector3 operator+(const Vector3& a, const Vector3& b)
 	{
