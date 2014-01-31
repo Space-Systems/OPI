@@ -17,7 +17,6 @@ endif()
 # add module path
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
-
 # find cuda libraries
 option(ENABLE_CUDA_SUPPORT "Enable cuda_support" ON)
 if(ENABLE_CUDA_SUPPORT)

@@ -13,6 +13,10 @@ BEGIN_STRUCTURE( Orbit )
   STRUCTURE_VARIABLE(float arg_of_perigee)
   COMMENT( "Mean anomaly")
   STRUCTURE_VARIABLE(float mean_anomaly)
+  COMMENT( "Beginning of life" )
+  STRUCTURE_VARIABLE(float bol)
+  COMMENT( "End of life" )
+  STRUCTURE_VARIABLE(float eol)
 END_STRUCTURE( Orbit )
 
 
