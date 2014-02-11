@@ -45,7 +45,7 @@ namespace OPI
 		private:
 			//! Implementation of pair detection
 			virtual ErrorCode runDetectPairs(ObjectData& data, DistanceQuery* query, IndexPairList& pairs_out, float time_passed) = 0;
-			CollisionDetectionImpl* data;
+			Pimpl<CollisionDetectionImpl> data;
 	};
 }
 

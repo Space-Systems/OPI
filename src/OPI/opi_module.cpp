@@ -77,14 +77,12 @@ namespace OPI
 
 	Module::Module()
 	{
-		data = new ModuleImpl();
 		data->host = 0;
 		data->enabled = false;
 	}
 
 	Module::~Module()
 	{
-		delete data;
 	}
 
 	ErrorCode Module::enable()

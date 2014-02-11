@@ -20,6 +20,7 @@
 #include <vector>
 #include "opi_common.h"
 #include "opi_error.h"
+#include "opi_pimpl_helper.h"
 
 struct cudaDeviceProp;
 
@@ -166,7 +167,7 @@ namespace OPI
 		private:
 			//! Load a specific plugin
 			void loadPlugin(Plugin* plugin);
-			HostImpl* impl;
+			Pimpl<HostImpl> impl;
 	};
 }
 

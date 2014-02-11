@@ -18,10 +18,16 @@
 
 namespace OPI
 {
+	struct CustomPropagatorImpl
+	{
+		std::vector<PerturbationModule*> modules;
+		PropagatorIntegrator* integrator;
+	};
+
 	CustomPropagator::CustomPropagator(const std::string &name)
 	{
 		setName(name);
-		integrator = 0;
+		impl->integrator = 0;
 	}
 
 	CustomPropagator::~CustomPropagator()
@@ -31,12 +37,12 @@ namespace OPI
 
 	void CustomPropagator::addModule(PerturbationModule *module)
 	{
-		modules.push_back(module);
+		impl->modules.push_back(module);
 	}
 
-	void CustomPropagator::setIntegrator(PropagatorIntegrator *_integrator)
+	void CustomPropagator::setIntegrator(PropagatorIntegrator *integrator)
 	{
-		integrator = _integrator;
+		impl->integrator = integrator;
 	}
 
 	ErrorCode CustomPropagator::runPropagation(ObjectData& data, float years, float seconds, float dt )

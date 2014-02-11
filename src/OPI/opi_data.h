@@ -19,6 +19,7 @@
 #include "opi_common.h"
 #include "opi_error.h"
 #include "opi_datatypes.h"
+#include "opi_pimpl_helper.h"
 #include <string>
 namespace OPI
 {
@@ -73,7 +74,7 @@ namespace OPI
 
 		private:
 			//! Private implementation data
-			ObjectRawData* data;
+			Pimpl<ObjectRawData> data;
 	};
 }
 

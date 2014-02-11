@@ -33,12 +33,10 @@ namespace OPI
 
 	CollisionDetection::CollisionDetection()
 	{
-		data = new CollisionDetectionImpl();
 	}
 
 	CollisionDetection::~CollisionDetection()
 	{
-		delete data;
 	}
 
 	ErrorCode CollisionDetection::detectPairs(ObjectData &data, DistanceQuery *query, IndexPairList &pairs_out, float time_passed)

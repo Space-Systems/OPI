@@ -33,12 +33,10 @@ namespace OPI
 
 	Propagator::Propagator()
 	{
-		data = new PropagatorImpl();
 	}
 
 	Propagator::~Propagator()
 	{
-		delete data;
 	}
 
 	ErrorCode Propagator::propagate(ObjectData& objectdata, float years, float seconds, float dt)

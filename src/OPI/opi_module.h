@@ -19,6 +19,7 @@
 #include "opi_common.h"
 #include "opi_data.h"
 #include "opi_error.h"
+#include "opi_pimpl_helper.h"
 #include <string>
 namespace OPI
 {
@@ -105,7 +106,7 @@ namespace OPI
 			void setHost(OPI::Host* newhost);
 			friend class Host;
 			//! \endcond
-			ModuleImpl* data;
+			Pimpl<ModuleImpl> data;
 	};
 }
 

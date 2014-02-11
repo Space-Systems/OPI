@@ -20,6 +20,7 @@
 #include "opi_data.h"
 #include "opi_error.h"
 #include "opi_module.h"
+#include "opi_pimpl_helper.h"
 #include <string>
 namespace OPI
 {
@@ -61,7 +62,7 @@ namespace OPI
 			virtual ErrorCode runIndexedPropagation(ObjectData& data, IndexList& indices, float years, float seconds, float dt );
 
 		private:
-			PropagatorImpl* data;
+			Pimpl<PropagatorImpl> data;
 	};
 }
 

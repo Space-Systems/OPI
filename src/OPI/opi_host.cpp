@@ -55,8 +55,6 @@ namespace OPI
 
 	Host::Host()
 	{
-		impl = new HostImpl;
-
 		impl->errorCallback = 0;
 		impl->lastError = NO_ERROR;
 		impl->errorCallbackParameter = 0;
@@ -95,7 +93,6 @@ namespace OPI
 		for(size_t i = 0; i < impl->pluginlist.size(); ++i)
 			delete impl->pluginlist[i];
 
-		delete impl;
 	}
 
 	void Host::setErrorCallback(OPI_ErrorCallback callback, void* privatedata)

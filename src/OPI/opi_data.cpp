@@ -60,16 +60,15 @@ namespace OPI
 	 * \endcond
 	 */
 
-	ObjectData::ObjectData(Host& host, int size)
+	ObjectData::ObjectData(Host& host, int size):
+		data(host)
 	{
-		data = new ObjectRawData(host);
 		data->size = 0;
 		resize(size);
 	}
 
 	ObjectData::~ObjectData()
 	{
-		delete data;
 	}
 
 	/**

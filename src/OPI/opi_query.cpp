@@ -27,12 +27,10 @@ namespace OPI
 
 	DistanceQuery::DistanceQuery()
 	{
-		impl = new DistanceQueryImpl;
 	}
 
 	DistanceQuery::~DistanceQuery()
 	{
-		delete impl;
 	}
 
 	ErrorCode DistanceQuery::rebuild(ObjectData &data)

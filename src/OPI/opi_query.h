@@ -20,6 +20,7 @@
 #include "opi_data.h"
 #include "opi_error.h"
 #include "opi_module.h"
+#include "opi_pimpl_helper.h"
 #ifdef __cplusplus
 #include <string>
 namespace OPI
@@ -55,7 +56,7 @@ namespace OPI
 			virtual void runDebugDraw();
 
 		private:
-			DistanceQueryImpl* impl;
+			Pimpl<DistanceQueryImpl> impl;
 	};
 }
 #endif
