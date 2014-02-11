@@ -16,6 +16,8 @@ set( OPI_SOURCE_FILES
   opi_collisiondetection.cpp
   opi_module.cpp
 
+  opi_perturbation_module.cpp
+
   internal/opi_propagator_plugin.cpp
   internal/opi_query_plugin.cpp
   internal/opi_plugin.cpp
@@ -43,6 +45,7 @@ set( OPI_LIBRARY_HEADER
   # plugin types
   opi_propagator.h
   opi_query.h
+  opi_perturbation_module.h
 
   # helper templates
   opi_pimpl_helper.h

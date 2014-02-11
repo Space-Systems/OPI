@@ -26,6 +26,7 @@ namespace OPI
 {
 	class ObjectData;
 	class IndexList;
+	class PerturbationModule;
 
 	//! Contains the propagation implementation data
 	class PropagatorImpl;
@@ -38,6 +39,9 @@ namespace OPI
 	 * time. It is implemented as a Module loaded and managed by a Host application that uses its
 	 * results for its specific purpose. The interface provides methods to initialize and configure the
 	 * Propagator, and to forward Object and time data.
+	 *
+	 * A Propagator implementation has to implement the runPropagation function and can an optional
+	 * implementation for runIndexPropagation
 	 * \see Module, Host
 	 */
 	class OPI_API_EXPORT Propagator:
@@ -52,13 +56,31 @@ namespace OPI
 			//! Starts the index-based propagation for the given time frame
 			ErrorCode propagate(ObjectData& data, IndexList& indices, float years, float seconds, float dt);
 
+			//! Assigns a module to this propagator
+			/**
+			 * It depends on the used Propagator if the assigned modules will be used
+			 */
+			PerturbationModule* assignPerturbationModule(const std::string& name);
+			//! Returns true if the propagator is able to use Perturbation Modules
+			bool usesModules() const;
+
+			//! Returns the assigned Perturbation modules
+			PerturbationModule* getPerturbationModule(int index);
+
+			//! Returns the number of assigned Perturbation modules
+			int getPerturbationModuleCount() const;
+
 			//! Check if this propagator is able to propagate backwards
 			virtual bool backwardPropagation();
 
 		protected:
+			//! Defines that this propagator (can) use Perturbation Modules
+			void useModules();
 			//! The actual propagation implementation
+			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
 			virtual ErrorCode runPropagation(ObjectData& data, float years, float seconds, float dt ) = 0;
 			//! Override this to implement an index-based propagation
+			//! The C Namespace equivalent for this function is OPI_Plugin_propagateIndexed
 			virtual ErrorCode runIndexedPropagation(ObjectData& data, IndexList& indices, float years, float seconds, float dt );
 
 		private:

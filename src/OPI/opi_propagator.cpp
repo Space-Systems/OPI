@@ -16,17 +16,23 @@
  */
 #include "opi_propagator.h"
 #include "opi_host.h"
-
+#include "opi_perturbation_module.h"
+#include <vector>
 namespace OPI
 {
-
-
 	/**
 	 * \cond INTERNAL_DOCUMENTATION
 	 */
 	class PropagatorImpl
 	{
 		public:
+			PropagatorImpl():
+				allowPerturbationModules(false)
+			{
+			}
+
+			bool allowPerturbationModules;
+			std::vector<PerturbationModule*> perturbationModules;
 	};
 
 	//! \endcond
@@ -37,6 +43,26 @@ namespace OPI
 
 	Propagator::~Propagator()
 	{
+	}
+
+	void Propagator::useModules()
+	{
+		data->allowPerturbationModules = true;
+	}
+
+	bool Propagator::usesModules() const
+	{
+		return data->allowPerturbationModules;
+	}
+
+	PerturbationModule* Propagator::getPerturbationModule(int index)
+	{
+		return data->perturbationModules[index];
+	}
+
+	int Propagator::getPerturbationModuleCount() const
+	{
+		return data->perturbationModules.size();
 	}
 
 	ErrorCode Propagator::propagate(ObjectData& objectdata, float years, float seconds, float dt)
