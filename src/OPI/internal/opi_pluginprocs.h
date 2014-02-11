@@ -39,6 +39,9 @@ namespace OPI
 	//! plugin enable function
 	typedef ErrorCode (*pluginDisableFunction)(OPI_Module module);
 
+	// generic interface functions
+	typedef void (*pluginInitFunction)(OPI_Module module);
+
 	// cpp propagator interface function
 	typedef Propagator* (*pluginPropagatorFunction)(OPI_Host host);
 	// c interface propagation function

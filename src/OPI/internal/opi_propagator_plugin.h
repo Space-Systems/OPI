@@ -42,6 +42,7 @@ namespace OPI
 			// propagate proc
 			pluginPropagateFunction proc_propagate;
 			pluginPropagateFunctionIndexed proc_propagate_indexed;
+			pluginInitFunction proc_init;
 
 	};
 

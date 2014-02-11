@@ -27,6 +27,11 @@ namespace OPI
 		plugin = _plugin;
 
 		DynLib* handle = plugin->getHandle();
+		proc_init = (pluginInitFunction)(handle->loadFunction("OPI_Plugin_init", true));
+		if(proc_init)
+		{
+			proc_init(this);
+		}
 		proc_propagate = (pluginPropagateFunction)(handle->loadFunction("OPI_Plugin_propagate", true));
 		proc_propagate_indexed = (pluginPropagateFunctionIndexed)(handle->loadFunction("OPI_Plugin_propagateIndexed", true));
 		setName(plugin->getName());
