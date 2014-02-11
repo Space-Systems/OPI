@@ -71,6 +71,12 @@ namespace OPI
 			void registerProperty(const std::string& name, float* location);
 			//! registers a property
 			void registerProperty(const std::string& name, std::string* location);
+			//! creates a new property of type int, the memory will be managed by OPI
+			void createProperty(const std::string& name, int value);
+			//! creates a new property of type int, the memory will be managed by OPI
+			void createProperty(const std::string& name, float value);
+			//! creates a new property of type string, the memory will be managed by OPI
+			void createProperty(const std::string &name, const std::string& value);
 			//! Sets a property
 			void setProperty(const std::string& name, int value);
 			//! Sets a property
@@ -82,17 +88,23 @@ namespace OPI
 			//! Gets the value of a given property
 			float getPropertyFloat(const std::string& name);
 			//! Gets the value of a given property
-			std::string getPropertyString(const std::string& name);
+			const std::string& getPropertyString(const std::string& name);
 
 			//! Returns the amount of registered properties
 			int getPropertyCount() const;
 			//! Returns the name of the property identified by the given index
-			std::string getPropertyName(int index) const;
+			const std::string& getPropertyName(int index) const;
 
 			//! Checks if a property is registered
 			bool hasProperty(const std::string& name) const;
 			//! Returns the type of a property
 			PropertyType getPropertyType(const std::string& name) const;
+
+			//! Sets a private module-internal data pointer
+			void setPrivateData(void* private_data);
+			//! Returns the module-internal data pointer
+			void* getPrivateData();
+
 		protected:
 			//! Returns the Host of this propagator
 			Host* getHost() const;

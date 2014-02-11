@@ -28,6 +28,7 @@ namespace OPI
 	{
 		struct Property
 		{
+			// enum describing the property base type
 			char type;
 			union
 			{
@@ -35,26 +36,83 @@ namespace OPI
 				float* v_float;
 				std::string* v_string;
 			} ptr;
+			// true if the object is allocated by OPI
+			bool allocated;
 			Property():
 				type(TYPE_UNKNOWN)
 			{
 				ptr.v_int = 0;
+				allocated = false;
 			}
 
 			Property(int* value):
 				type(TYPE_INTEGER)
 			{
 				ptr.v_int = value;
+				allocated = false;
 			}
+			Property(int value):
+				type(TYPE_INTEGER)
+			{
+				ptr.v_int = new int;
+				*ptr.v_int = value;
+				allocated = true;
+			}
+
 			Property(float* value):
 				type(TYPE_FLOAT)
 			{
 				ptr.v_float = value;
+				allocated = false;
+			}
+
+			Property(float value):
+				type(TYPE_FLOAT)
+			{
+				ptr.v_float = new float;
+				*ptr.v_float = value;
+				allocated = true;
 			}
 			Property(std::string* value):
 				type(TYPE_STRING)
 			{
 				ptr.v_string = value;
+				allocated = false;
+			}
+			Property(const std::string& value):
+				type(TYPE_STRING)
+			{
+				ptr.v_string = new std::string;
+				*ptr.v_string = value;
+				allocated = true;
+			}
+			~Property()
+			{
+				if(allocated)
+				{
+					if(type == TYPE_INTEGER)
+						delete ptr.v_int;
+					else if(type == TYPE_FLOAT)
+						delete ptr.v_float;
+					else if(type == TYPE_STRING)
+						delete ptr.v_string;
+				}
+			}
+			Property(const Property& other)
+			{
+				if(other.allocated)
+				{
+					if(other.type == TYPE_INTEGER)
+						ptr.v_int = new int(*(other.ptr.v_int));
+					else if(other.type == TYPE_FLOAT)
+						ptr.v_float = new float(*(other.ptr.v_float));
+					else if(other.type == TYPE_STRING)
+						ptr.v_string = new std::string(*(other.ptr.v_string));
+				}
+				else
+					ptr = other.ptr;
+				allocated = other.allocated;
+				type = other.type;
 			}
 		};
 	}
@@ -67,6 +125,7 @@ namespace OPI
 			std::string author;
 			std::string description;
 			std::map<std::string, Property> properties;
+			void* privateData;
 	};
 
 	void Module::setHost(Host *newhost)
@@ -173,6 +232,21 @@ namespace OPI
 	void Module::registerProperty(const std::string &name, std::string *location)
 	{
 		data->properties.insert(std::make_pair(name, Property(location)));
+	}
+
+	void Module::createProperty(const std::string &name, int value)
+	{
+		data->properties.insert(std::make_pair(name, Property(value)));
+	}
+
+	void Module::createProperty(const std::string &name, float value)
+	{
+		data->properties.insert(std::make_pair(name, Property(value)));
+	}
+
+	void Module::createProperty(const std::string &name, const std::string& value)
+	{
+		data->properties.insert(std::make_pair(name, Property(value)));
 	}
 
 	void Module::setProperty(const std::string &name, int value)
@@ -311,8 +385,10 @@ namespace OPI
 		return 0.0f;
 	}
 
-	std::string Module::getPropertyString(const std::string &name)
+	const std::string& Module::getPropertyString(const std::string &name)
 	{
+		static std::string internal_bufferstring;
+		internal_bufferstring = "";
 		if(data->properties.count(name) > 0)
 		{
 			Property& property = data->properties[name];
@@ -325,24 +401,34 @@ namespace OPI
 				{
 					std::stringstream stream;
 					stream <<  *(property.ptr.v_int);
-					return stream.str();
+					internal_bufferstring = stream.str();
 					break;
 				}
 				case TYPE_FLOAT:
 				{
 					std::stringstream stream;
 					stream <<  *(property.ptr.v_float);
-					return stream.str();
+					internal_bufferstring = stream.str();
 					break;
 				}
 				case TYPE_STRING:
 				{
-					return *(property.ptr.v_string);
+					internal_bufferstring =  *(property.ptr.v_string);
 					break;
 				}
 			}
-		}
-		return "";
+		}		
+		return internal_bufferstring;
+	}
+
+	void Module::setPrivateData(void* private_data)
+	{
+		data->privateData = private_data;
+	}
+
+	void* Module::getPrivateData()
+	{
+		return data->privateData;
 	}
 
 	int Module::getPropertyCount() const
@@ -350,10 +436,11 @@ namespace OPI
 		return data->properties.size();
 	}
 
-	std::string Module::getPropertyName(int index) const
+	const std::string& Module::getPropertyName(int index) const
 	{
+		static std::string dummystring = "";
 		if((index < 0)||(index >= (int)(data->properties.size())))
-			return "";
+			return dummystring;
 		std::map<std::string, Property>::iterator itr = data->properties.begin();
 		for(int i=0; i < index; i++)
 			itr++;

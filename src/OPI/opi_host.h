@@ -165,6 +165,7 @@ namespace OPI
 			void sendError(ErrorCode code) const;
 			//! \endcond
 		private:
+			Host(const Host& other);
 			//! Load a specific plugin
 			void loadPlugin(Plugin* plugin);
 			Pimpl<HostImpl> impl;

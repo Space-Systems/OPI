@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	}
 
 	// fetch a specific propagator
-	OPI::Propagator* propagator = host.getPropagator("CPP Example Propagator");
+	OPI::Propagator* propagator = host.getPropagator("Fortran Example Propagator");
 	propagator->setProperty("int",13);
 	propagator->setProperty("float", 3.141f);
 	propagator->setProperty("string", "abcde");
