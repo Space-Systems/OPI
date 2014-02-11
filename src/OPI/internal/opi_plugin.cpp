@@ -17,6 +17,7 @@
 #include "opi_plugin.h"
 #include "dynlib.h"
 #include <iostream>
+#include <cstring>
 namespace OPI
 {
 	/// @cond INTERNAL_DOCUMENTATION
@@ -26,8 +27,11 @@ namespace OPI
 		// load information function from library
 		pluginInfoFunction func = (pluginInfoFunction)handle->loadFunction("OPI_Plugin_info");
 		info.name = "Unset plugin name";
+		info.name_len = strlen(info.name);
 		info.author = "Unset plugin author";
+		info.author_len = strlen(info.author);
 		info.desc = "Unset plugin desc";
+		info.desc_len = strlen(info.desc);
 		info.type = OPI_UNKNOWN_PLUGIN;
 		if(func)
 		{
