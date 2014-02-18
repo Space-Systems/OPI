@@ -18,3 +18,6 @@ Hosts and plugins don't have to be written in the same language in order to
 collaborate. OPI itself is written in C++, with auto-generated bindings for
 C and Fortran. For CUDA, it supplies a plugin that scans for capable devices
 and helps to initialize CUDA-enables propagators.
+
+Please note that this software is still in an early stage and the interface
+functions are subject to change. Your feedback is appreciated.
