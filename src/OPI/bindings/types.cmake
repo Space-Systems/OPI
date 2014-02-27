@@ -74,7 +74,7 @@ BEGIN_ENUM(DataType)
 END_ENUM(DataType)
 
 COMMENT("This type contains all available device types")
-BEGIN_ENUM(Device)
+BEGIN_ENUM_AS_INT(Device)
   ENUM_VALUE(DEVICE_NOT_SET -1)
   ENUM_VALUE(DEVICE_HOST 0)
   ENUM_VALUE(DEVICE_CUDA 1)
