@@ -34,17 +34,49 @@ int main(int argc, char* argv[])
 	}
 
 	// fetch a specific propagator
-	OPI::Propagator* propagator = host.getPropagator("Fortran Example Propagator");
-	propagator->setProperty("int",13);
-	propagator->setProperty("float", 3.141f);
-	propagator->setProperty("string", "abcde");
+	OPI::Propagator* propagator = host.getPropagator("CPP Example Propagator");
 
 	std::cout << "Propagator properties:" << std::endl;
 	for(int i = 0; i < propagator->getPropertyCount(); ++i)
 	{
 		std::string name = propagator->getPropertyName(i);
-		std::cout << name << ": " << propagator->getPropertyString(name) << std::endl;
+		std::cout << name;
+		switch(propagator->getPropertyType(i))
+		{
+			case OPI::TYPE_UNKNOWN:
+				break;
+			case OPI::TYPE_INTEGER:
+				std::cout << "(TYPE_INTEGER) value: " << propagator->getPropertyInt(i);
+				break;
+			case OPI::TYPE_FLOAT:
+				std::cout << "(TYPE_FLOAT) value: " << propagator->getPropertyFloat(i);
+				break;
+			case OPI::TYPE_DOUBLE:
+				std::cout << "(TYPE_DOUBLE) value: " << propagator->getPropertyDouble(i);
+				break;
+			case OPI::TYPE_STRING:
+				std::cout << "(TYPE_STRING) value: " << propagator->getPropertyString(i);
+				break;
+			case OPI::TYPE_INTEGER_ARRAY:
+				std::cout << "(TYPE_INTEGER_ARRAY) values: " << propagator->getPropertyInt(i, 0);
+				for(int j = 1; j < propagator->getPropertySize(i); ++j)
+					std::cout << ", " << propagator->getPropertyInt(i, j);
+				break;
+			case OPI::TYPE_FLOAT_ARRAY:
+				std::cout << "(TYPE_FLOAT_ARRAY) values: " << propagator->getPropertyFloat(i, 0);
+				for(int j = 1; j < propagator->getPropertySize(i); ++j)
+					std::cout << ", " << propagator->getPropertyFloat(i, j);
+				break;
+			case OPI::TYPE_DOUBLE_ARRAY:
+				std::cout << "(TYPE_DOUBLE_ARRAY) values: " << propagator->getPropertyDouble(i, 0);
+				for(int j = 1; j < propagator->getPropertySize(i); ++j)
+					std::cout << ", " << propagator->getPropertyDouble(i, j);
+				break;
+		}
+		std::cout << std::endl;
 	}
+
+	return 0;
 	if(propagator)
 	{
 		std::cout << "Using propagator: " << propagator->getName() << std::endl;
@@ -70,6 +102,7 @@ int main(int argc, char* argv[])
 		// refresh data pointer for orbital data again
 		// this will automatically sync the data between different devices
 		orbit = data.getOrbit();
+
 		for(int i = 0; i < data.getSize(); ++i)
 		{
 			std::cout << orbit[i].inclination

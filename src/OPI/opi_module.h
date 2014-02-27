@@ -65,40 +65,84 @@ namespace OPI
 			//! Gets the patch version of this module
 			int getVersionPatch() const;
 
+			// property access functions
 			//! registers a property
 			void registerProperty(const std::string& name, int* location);
 			//! registers a property
 			void registerProperty(const std::string& name, float* location);
 			//! registers a property
+			void registerProperty(const std::string& name, double* location);
+			//! registers a property
+			void registerProperty(const std::string& name, int* location, int size);
+			//! registers a property
+			void registerProperty(const std::string& name, float* location, int size);
+			//! registers a property
+			void registerProperty(const std::string& name, double* location, int size);
+			//! registers a property
 			void registerProperty(const std::string& name, std::string* location);
+
 			//! creates a new property of type int, the memory will be managed by OPI
 			void createProperty(const std::string& name, int value);
-			//! creates a new property of type int, the memory will be managed by OPI
+			//! creates a new property of type float, the memory will be managed by OPI
 			void createProperty(const std::string& name, float value);
+			//! creates a new property of type double, the memory will be managed by OPI
+			void createProperty(const std::string& name, double value);
 			//! creates a new property of type string, the memory will be managed by OPI
 			void createProperty(const std::string &name, const std::string& value);
-			//! Sets a property
-			void setProperty(const std::string& name, int value);
-			//! Sets a property
-			void setProperty(const std::string& name, float value);
-			//! Sets a property
-			void setProperty(const std::string& name, const std::string& value);
-			//! Gets the value of a given property
-			int getPropertyInt(const std::string& name);
-			//! Gets the value of a given property
-			float getPropertyFloat(const std::string& name);
-			//! Gets the value of a given property
-			const std::string& getPropertyString(const std::string& name);
+			//! creates a new property array of type int, the memory will be managed by OPI
+			void createProperty(const std::string& name, int* value, int size);
+			//! creates a new property array of type float, the memory will be managed by OPI
+			void createProperty(const std::string& name, float* value, int size);
+			//! creates a new property array of type double, the memory will be managed by OPI
+			void createProperty(const std::string& name, double* value, int size);
 
+			//! Sets a property
+			ErrorCode setProperty(const std::string& name, int value);
+			//! Sets a property
+			ErrorCode setProperty(const std::string& name, float value);
+			//! Sets a property
+			ErrorCode setProperty(const std::string& name, double value);
+			//! Sets a property
+			ErrorCode setProperty(const std::string& name, const std::string& value);
+			//! Sets a property
+			ErrorCode setProperty(const std::string& name, int* value, int n);
+			//! Sets a property
+			ErrorCode setProperty(const std::string& name, float* value, int n);
+			//! Sets a property
+			ErrorCode setProperty(const std::string& name, double* value, int n);
+			//! Gets the value of a given property
+			int getPropertyInt(const std::string& name, int element = 0);
+			//! Gets the value of a given property
+			int getPropertyInt(int index, int element = 0);
+			//! Gets the value of a given property
+			float getPropertyFloat(const std::string& name, int element = 0);
+			//! Gets the value of a given property
+			float getPropertyFloat(int index, int element = 0);
+			//! Gets the value of a given property
+			double getPropertyDouble(const std::string& name, int element = 0);
+			//! Gets the value of a given property
+			double getPropertyDouble(int index, int element = 0);
+			//! Gets the value of a given property
+			const std::string& getPropertyString(const std::string& name, int element = 0);
+			//! Gets the value of a given property
+			const std::string& getPropertyString(int index, int element = 0);
+
+			// property information functions
 			//! Returns the amount of registered properties
 			int getPropertyCount() const;
 			//! Returns the name of the property identified by the given index
 			const std::string& getPropertyName(int index) const;
-
 			//! Checks if a property is registered
 			bool hasProperty(const std::string& name) const;
 			//! Returns the type of a property
 			PropertyType getPropertyType(const std::string& name) const;
+			//! Returns the type of the property identified by the given index
+			PropertyType getPropertyType(int index) const;
+			//! Returns the size of the property
+			int getPropertySize(const std::string& name) const;
+			//! Returns the size of the property
+			int getPropertySize(int index) const;
+
 
 			//! Sets a private module-internal data pointer
 			void setPrivateData(void* private_data);

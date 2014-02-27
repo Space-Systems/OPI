@@ -17,10 +17,21 @@ class TestPropagator:
 		{
 			testproperty_int = 0;
 			testproperty_float = 0.0f;
+			testproperty_double = 42.0;
 			testproperty_string = "test";
+			for(int i = 0; i < 5; ++i)
+				testproperty_int_array[i] = i;
+			testproperty_float_array[0] = 4.0f;
+			testproperty_float_array[1] = 2.0f;
+			for(int i = 0; i < 4; ++i)
+				testproperty_double_array[i] = 9.0 * i;
 			registerProperty("int", &testproperty_int);
 			registerProperty("float", &testproperty_float);
+			registerProperty("double", &testproperty_double);
 			registerProperty("string", &testproperty_string);
+			registerProperty("int_array", testproperty_int_array, 5);
+			registerProperty("float_array", testproperty_float_array, 2);
+			registerProperty("double_array", testproperty_double_array, 4);
 		}
 
 		virtual ~TestPropagator()
@@ -44,6 +55,10 @@ class TestPropagator:
 	private:
 		int testproperty_int;
 		float testproperty_float;
+		double testproperty_double;
+		int testproperty_int_array[5];
+		float testproperty_float_array[2];
+		double testproperty_double_array[4];
 		std::string testproperty_string;
 };
 

@@ -24,10 +24,6 @@ namespace OPI
 		{
 			case NO_ERROR:
 				return "No error";
-			case CUDA_REQUIRED:
-				return "CUDA Required";
-			case CUDA_OLDVERSION:
-				return "CUDA version too old";
 			case INVALID_ARGUMENT:
 				return "Invalid argument";
 			case UNKNOWN_VARIABLE:
@@ -36,18 +32,27 @@ namespace OPI
 				return "Index out of range";
 			case INVALID_TYPE:
 				return "Invalid type";
-			case NOT_IMPLEMENTED:
-				return "Not implemented";
 			case DIRECTORY_NOT_FOUND:
 				return "Directory not found";
 			case INVALID_DEVICE:
 				return "Invalid device";
+			case INVALID_PROPERTY:
+				return "Invalid property";
+			case INCOMPATIBLE_TYPES:
+				return "INCOMPATIBLE_TYPES";
+			case NOT_IMPLEMENTED:
+				return "Not implemented";
+			case CUDA_REQUIRED:
+				return "CUDA Required";
+			case CUDA_OLDVERSION:
+				return "CUDA version too old";
 			case UNKNOWN_ERROR:
-			default:
-				return "Unknown error";
-		}
-	}
+				break;
+//			default:
 
+		}
+		return "Unknown error";
+	}
 }
 
 extern "C"

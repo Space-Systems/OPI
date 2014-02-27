@@ -47,7 +47,7 @@ program opi_host_fortran_test
     write(*,*) 'Propagator Properties:'
     do i= 1, OPI_Module_getPropertyCount(propagator), 1
       write(*,*) '# ', i, ': ', OPI_Module_getPropertyName(propagator, i -1), " value: ", &
-      OPI_Module_getPropertyString(propagator, "string")
+      OPI_Module_getPropertyString(propagator, i -1)
     end do
     ! run propagation of our test propagator
     status = OPI_Propagator_propagate(propagator, data, 0., 0., 0.)
