@@ -125,7 +125,24 @@ namespace OPI
 		return out;
 	}
 
-	//! Calculetes the length²
+	//! Dot product for vector3
+	OPI_CUDA_PREFIX inline float operator*(const Vector3& a, const Vector3& b)
+	{
+		float out;
+		out = a.x * b.x + a.y * b.y + a.z * b.z;
+		return out;
+	}
+
+	OPI_CUDA_PREFIX inline Vector3 cross(const Vector3& a, const Vector3& b)
+	{
+		Vector3 out;
+		out.x = a.y * b.z - a.z * b.y;
+		out.y = a.z * b.x - a.x * b.z;
+		out.z = a.x * b.y - a.y * b.x;
+		return out;
+	}
+
+	//! Calculates the length²
 	OPI_CUDA_PREFIX inline float lengthSquare(const Vector3& v)
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
