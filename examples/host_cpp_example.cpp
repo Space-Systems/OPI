@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
 		data.update(OPI::DATA_ORBIT);
 
 		// run a propagation
-		propagator->propagate(data, 0, 0, 0 );
+		propagator->propagate(data, 0, 0);
 
 		// remove some objects
 		OPI::IndexList list(host);

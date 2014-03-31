@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 	if(propagator)
 	{
 		// run normal propagation
-		OPI_Propagator_propagateAll(propagator, data, 0, 0, 0);
+		OPI_Propagator_propagateAll(propagator, data, 0, 0);
 
 		// retrieve orbital data
 		orbitals = OPI_ObjectData_getOrbit(data);

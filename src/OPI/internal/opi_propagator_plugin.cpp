@@ -54,17 +54,17 @@ namespace OPI
 		return plugin->disable();
 	}
 
-	ErrorCode PropagatorPlugin::runPropagation(ObjectData& data, float years, float seconds, float dt)
+	ErrorCode PropagatorPlugin::runPropagation(ObjectData& data, double julian_day, float dt)
 	{
 		if(proc_propagate)
-			return proc_propagate(this, (void*)(&data), years, seconds, dt);
+			return proc_propagate(this, (void*)(&data), julian_day, dt);
 		return NOT_IMPLEMENTED;
 	}
 
-	ErrorCode PropagatorPlugin::runIndexedPropagation(ObjectData& data, int *indices, int index_size, float years, float seconds, float dt)
+	ErrorCode PropagatorPlugin::runIndexedPropagation(ObjectData& data, int *indices, int index_size, double julian_day, float dt)
 	{
 		if(proc_propagate_indexed)
-			return proc_propagate_indexed(this, &data, indices, index_size, years, seconds, dt);
+			return proc_propagate_indexed(this, &data, indices, index_size, julian_day, dt);
 		return NOT_IMPLEMENTED;
 	}
 

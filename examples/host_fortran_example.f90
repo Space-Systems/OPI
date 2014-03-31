@@ -50,7 +50,7 @@ program opi_host_fortran_test
       OPI_Module_getPropertyString(propagator, i -1)
     end do
     ! run propagation of our test propagator
-    status = OPI_Propagator_propagate(propagator, data, 0., 0., 0.)
+    status = OPI_Propagator_propagate(propagator, data, 0.d0, 0.0)
 
     ! retrieve orbital data values
     orbit => OPI_ObjectData_getOrbit(data)

@@ -65,14 +65,14 @@ namespace OPI
 		return data->perturbationModules.size();
 	}
 
-	ErrorCode Propagator::propagate(ObjectData& objectdata, float years, float seconds, float dt)
+	ErrorCode Propagator::propagate(ObjectData& objectdata, double julian_day, float dt)
 	{
 		ErrorCode status = NO_ERROR;
 		// ensure this propagator is enabled
 		status = enable();
 		// an error occured?
 		if(status == NO_ERROR)
-			status = runPropagation(objectdata, years, seconds, dt);
+			status = runPropagation(objectdata, julian_day, dt);
 		getHost()->sendError(status);
 		return status;
 	}
@@ -81,12 +81,12 @@ namespace OPI
 	 * If the runPropagation method for index-based propagation is not overloaded (returning OPI_NOT_IMPLEMENTED)
 	 * this function will perform a normal propagation instead.
 	 */
-	ErrorCode Propagator::propagate(ObjectData& objectdata, IndexList& indices, float years, float seconds, float dt)
+	ErrorCode Propagator::propagate(ObjectData& objectdata, IndexList& indices, double julian_day, float dt)
 	{
 		ErrorCode status = NO_ERROR;
-		status = runIndexedPropagation(objectdata, indices, years, seconds, dt);
+		status = runIndexedPropagation(objectdata, indices, julian_day, dt);
 		if(status == NOT_IMPLEMENTED)
-			status = propagate(objectdata, years, seconds, dt);
+			status = propagate(objectdata, julian_day, dt);
 		getHost()->sendError(status);
 		return status;
 	}
@@ -96,7 +96,7 @@ namespace OPI
 		return true;
 	}
 
-	ErrorCode Propagator::runIndexedPropagation(ObjectData& data, IndexList& indices, float years, float seconds, float dt)
+	ErrorCode Propagator::runIndexedPropagation(ObjectData& data, IndexList& indices, double julian_day, float dt)
 	{
 		return NOT_IMPLEMENTED;
 	}

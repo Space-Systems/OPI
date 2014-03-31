@@ -36,9 +36,9 @@ namespace OPI
 			/**
 			 * The calculated pertubation forces will be added to the values present in data_out
 			 */
-			ErrorCode calculate(ObjectData& data_in, ObjectData& data_out, float years, float seconds, float dt );
+			ErrorCode calculate(ObjectData& data_in, ObjectData& data_out, double julian_day, float dt );
 		protected:
-			virtual ErrorCode runCalculation(ObjectData& data_in, ObjectData& data_out, float years, float seconds, float dt );
+			virtual ErrorCode runCalculation(ObjectData& data_in, ObjectData& data_out, double julian_day, float dt );
 	};
 }
 

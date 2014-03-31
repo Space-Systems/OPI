@@ -52,9 +52,9 @@ namespace OPI
 			virtual ~Propagator();
 
 			//! Starts the propagation for the given time frame
-			ErrorCode propagate(ObjectData& data, float years, float seconds, float dt );
+			ErrorCode propagate(ObjectData& data, double julian_day, float dt );
 			//! Starts the index-based propagation for the given time frame
-			ErrorCode propagate(ObjectData& data, IndexList& indices, float years, float seconds, float dt);
+			ErrorCode propagate(ObjectData& data, IndexList& indices, double julian_day, float dt);
 
 			//! Assigns a module to this propagator
 			/**
@@ -78,10 +78,10 @@ namespace OPI
 			void useModules();
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
-			virtual ErrorCode runPropagation(ObjectData& data, float years, float seconds, float dt ) = 0;
+			virtual ErrorCode runPropagation(ObjectData& data, double julian_day, float dt ) = 0;
 			//! Override this to implement an index-based propagation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagateIndexed
-			virtual ErrorCode runIndexedPropagation(ObjectData& data, IndexList& indices, float years, float seconds, float dt );
+			virtual ErrorCode runIndexedPropagation(ObjectData& data, IndexList& indices, double julian_day, float dt );
 
 		private:
 			Pimpl<PropagatorImpl> data;

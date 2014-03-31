@@ -37,7 +37,7 @@ class TestPropagator:
 
 		}
 
-		virtual OPI::ErrorCode runPropagation(OPI::ObjectData& data, float years, float seconds, float dt )
+		virtual OPI::ErrorCode runPropagation(OPI::ObjectData& data, double julian_day, float dt )
 		{
 
 			int deviceCount;
