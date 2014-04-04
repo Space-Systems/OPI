@@ -115,6 +115,16 @@ namespace OPI
 		return out;
 	}
 
+	//! Divides a vector by a float
+	OPI_CUDA_PREFIX inline Vector3 operator/(const Vector3& a, float b)
+	{
+		Vector3 out;
+		out.x = a.x / b;
+		out.y = a.y / b;
+		out.z = a.z / b;
+		return out;
+	}
+
 	//! Multiplies a vector times a float
 	OPI_CUDA_PREFIX inline Vector3 operator*(const Vector3& a, float b)
 	{
