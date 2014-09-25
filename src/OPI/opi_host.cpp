@@ -186,8 +186,16 @@ namespace OPI
 				else
 					propagator = new PropagatorPlugin(plugin);
 				// if the propagator was created, add it to the list
-				if(propagator)
-					addPropagator(propagator);
+
+				if(propagator) {
+					if (hasCUDASupport() || !propagator->requiresCUDA()) {
+						addPropagator(propagator);
+					}
+					else {
+						std::cout << "[OPI] Skipping propagator " << propagator->getName()
+							<< " because it requires CUDA." << std::endl;
+					}
+				}
 				break;
 			}
 			// a distance query plugin

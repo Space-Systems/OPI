@@ -68,6 +68,11 @@ namespace OPI
 		return NOT_IMPLEMENTED;
 	}
 
+	bool PropagatorPlugin::requiresCUDA()
+	{
+		return false;
+	}
+
 	/**
 	 * \endcond INTERNAL_DOCUMENTATION
 	 */

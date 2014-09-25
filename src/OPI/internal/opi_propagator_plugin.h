@@ -37,6 +37,7 @@ namespace OPI
 			virtual ErrorCode disable();
 			virtual ErrorCode runPropagation(ObjectData& data, double julian_day, float dt );
 			virtual ErrorCode runIndexedPropagation(ObjectData& data, int* indices, int index_size, double julian_day, float dt );
+			virtual bool requiresCUDA();
 		private:
 			Plugin* plugin;
 			// propagate proc

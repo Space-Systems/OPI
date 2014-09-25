@@ -95,6 +95,11 @@ namespace OPI
 	{
 		return true;
 	}
+	
+	bool Propagator::requiresCUDA()
+	{
+		return false;
+	}
 
 	ErrorCode Propagator::runIndexedPropagation(ObjectData& data, IndexList& indices, double julian_day, float dt)
 	{

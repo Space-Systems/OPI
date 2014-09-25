@@ -49,4 +49,9 @@ namespace OPI
 	{
 		return NO_ERROR;
 	}
+
+	bool CustomPropagator::requiresCUDA()
+	{
+		return false;
+	}
 }
