@@ -36,6 +36,7 @@ class CudaSupportImpl:
 		virtual void shutdown();
 		virtual void selectDevice(int device);
 		virtual int getCurrentDevice();
+		virtual std::string getCurrentDeviceName();
 		virtual int getDeviceCount();
 		virtual cudaDeviceProp* getDeviceProperties(int device);
 	private:
@@ -125,7 +126,7 @@ void CudaSupportImpl::selectDevice(int device)
 
 int CudaSupportImpl::getCurrentDevice()
 {
-	int device;
+	int device = -1;
 	cudaGetDevice(&device);
 	return device;
 }
@@ -142,6 +143,24 @@ cudaDeviceProp* CudaSupportImpl::getDeviceProperties(int device)
 	if((device >= 0) && (device < getDeviceCount()))
 		 return &CUDAProperties[device];
 	return 0;
+}
+
+std::string CudaSupportImpl::getCurrentDeviceName()
+{
+	int device = getCurrentDevice();
+	if((device >= 0) && (device < getDeviceCount())) {
+		// Build the return string. Currently, all CUDA devices
+		// are made by Nvidia, there seems to be no data field
+		// for a manufacturer's name in the properties struct.
+		std::string result = "NVIDIA ";
+		result += (const char*)&CUDAProperties[device].name;
+		if (&CUDAProperties[device].ECCEnabled)
+			result += " (ECC enabled)";
+		return result;
+	}
+	else {
+		return std::string("No CUDA device selected.");
+	}
 }
 
 

@@ -71,8 +71,11 @@ namespace OPI
 			//! Sets an error callback for this host.
 			void setErrorCallback(OPI_ErrorCallback callback, void* privatedata);
 
-			//! Returns the number of available cuda devices
+			//! Returns the number of available CUDA devices
 			int getCudaDeviceCount() const;
+
+			//! Returns the name of the currently selected CUDA device.
+			std::string getCurrentCudaDeviceName() const;
 
 			//! Get a Propagator by index.
 			/** After loading the available plugins this function can

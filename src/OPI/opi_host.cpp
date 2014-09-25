@@ -258,6 +258,14 @@ namespace OPI
 		return impl->cudaSupport->getDeviceCount();
 	}
 
+	std::string Host::getCurrentCudaDeviceName() const
+	{
+		if(!impl->cudaSupport) {
+			return std::string("No CUDA device available.");
+		}
+		return impl->cudaSupport->getCurrentDeviceName();
+	}
+
 	void Host::addPropagator(Propagator *propagator)
 	{
 		propagator->setHost(this);
