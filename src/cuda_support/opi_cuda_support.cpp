@@ -18,6 +18,7 @@
 
 #include <cuda_runtime.h>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -152,11 +153,13 @@ std::string CudaSupportImpl::getCurrentDeviceName()
 		// Build the return string. Currently, all CUDA devices
 		// are made by Nvidia, there seems to be no data field
 		// for a manufacturer's name in the properties struct.
-		std::string result = "NVIDIA ";
-		result += (const char*)&CUDAProperties[device].name;
+		std::stringstream result;
+		result << "NVIDIA ";
+		result << (const char*)&CUDAProperties[device].name;
+		result << " @ " << (CUDAProperties[device].clockRate)/1000 << "MHz";
 		if (&CUDAProperties[device].ECCEnabled)
-			result += " (ECC enabled)";
-		return result;
+			result << " (ECC enabled)";
+		return result.str();
 	}
 	else {
 		return std::string("No CUDA device selected.");
