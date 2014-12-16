@@ -22,3 +22,29 @@ and helps to initialize CUDA-enabled propagators.
 
 Please note that this software is still in an early stage and the interface
 functions are subject to change. Your feedback is appreciated.
+
+
+
+BUILD INSTRUCTIONS
+------------------
+
+Building OPI has currently only been tested on Linux systems (recent versions
+of Debian, Ubuntu and OpenSuSE) but Windows and OSX should be compatible.
+OPI uses CMake as a build system, so simply follow the usual instructions
+(in-place builds are not allowed):
+
+mkdir build
+cd build
+cmake .. #or 'cmake-gui ..' - whichever you prefer
+make
+make install
+make doc #optional, to build the API documentation - requires Doxygen
+
+You can set the CMAKE_INSTALL_PREFIX variable to a custom directory of you
+don't want a system-wide install. In that case, you must make sure that the
+lib directory is in your library path at runtime by setting the LD_LIBRARY_PATH
+variable accordingly. If you require support for CUDA propagators, make sure
+the CUDA SDK is installed and can be found by CMake.
+
+To start using OPI, take a look at the documentation and the example code
+provided with the library. If you have any questions, feel free to contact us.
