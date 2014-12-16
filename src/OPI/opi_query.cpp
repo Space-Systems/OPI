@@ -33,7 +33,7 @@ namespace OPI
 	{
 	}
 
-	ErrorCode DistanceQuery::rebuild(ObjectData &data)
+	ErrorCode DistanceQuery::rebuild(Population &data)
 	{
 		if(data.getSize() == 0)
 			return NO_ERROR;
@@ -48,7 +48,7 @@ namespace OPI
 		return status;
 	}
 
-	ErrorCode DistanceQuery::queryCubicPairs(ObjectData &data, IndexPairList& pairs, float cube_size)
+	ErrorCode DistanceQuery::queryCubicPairs(Population &data, IndexPairList& pairs, float cube_size)
 	{
 		if(data.getSize() == 0)
 			return NO_ERROR;

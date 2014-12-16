@@ -16,13 +16,13 @@
  */
 #ifndef OPI_COLLISION_DETECTION_H
 #define OPI_COLLISION_DETECTION_H
-#include "opi_data.h"
+#include "opi_population.h"
 #include "opi_error.h"
 #include "opi_module.h"
 #include <string>
 namespace OPI
 {
-	class ObjectData;
+	class Population;
 	class IndexList;
 	class IndexPairList;
 	class DistanceQuery;
@@ -41,10 +41,10 @@ namespace OPI
 			virtual ~CollisionDetection();
 
 			//! Detect colliding pairs and store them in pairs_out, use the specified query object
-			ErrorCode detectPairs(ObjectData& data, DistanceQuery* query, IndexPairList& pairs_out, float time_passed);
+			ErrorCode detectPairs(Population& data, DistanceQuery* query, IndexPairList& pairs_out, float time_passed);
 		private:
 			//! Implementation of pair detection
-			virtual ErrorCode runDetectPairs(ObjectData& data, DistanceQuery* query, IndexPairList& pairs_out, float time_passed) = 0;
+			virtual ErrorCode runDetectPairs(Population& data, DistanceQuery* query, IndexPairList& pairs_out, float time_passed) = 0;
 			Pimpl<CollisionDetectionImpl> data;
 	};
 }

@@ -16,7 +16,7 @@
  */
 #ifndef OPI_HOST_PLUGIN_PROCS_H
 #define OPI_HOST_PLUGIN_PROCS_H
-#include "../opi_data.h"
+#include "../opi_population.h"
 #include "../opi_error.h"
 #include "../opi_plugininfo.h"
 
@@ -32,7 +32,7 @@ namespace OPI
 
 	extern "C"
 	{
-	typedef void* OPI_ObjectData;
+	typedef void* OPI_Population;
 	typedef void (*pluginInfoFunction)(PluginInfo* info);
 	//! plugin disable function
 	typedef ErrorCode (*pluginEnableFunction)(OPI_Module module);
@@ -45,10 +45,10 @@ namespace OPI
 	// cpp propagator interface function
 	typedef Propagator* (*pluginPropagatorFunction)(OPI_Host host);
 	// c interface propagation function
-	typedef ErrorCode (*pluginPropagateFunction)(OPI_Propagator propagator, OPI_ObjectData data, double julian_day, float dt);
+	typedef ErrorCode (*pluginPropagateFunction)(OPI_Propagator propagator, OPI_Population data, double julian_day, float dt);
 
 	// c interface propagation function
-	typedef ErrorCode (*pluginPropagateFunctionIndexed)(OPI_Propagator propagator, OPI_ObjectData data, int* indices, int index_size, double julian_day, float dt);
+	typedef ErrorCode (*pluginPropagateFunctionIndexed)(OPI_Propagator propagator, OPI_Population data, int* indices, int index_size, double julian_day, float dt);
 
 	// cpp distance query interface function
 	typedef DistanceQuery* (*pluginDistanceQueryFunction)(OPI_Host host);

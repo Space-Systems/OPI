@@ -39,7 +39,7 @@ namespace OPI
 	{
 	}
 
-	ErrorCode CollisionDetection::detectPairs(ObjectData &data, DistanceQuery *query, IndexPairList &pairs_out, float time_passed)
+	ErrorCode CollisionDetection::detectPairs(Population &data, DistanceQuery *query, IndexPairList &pairs_out, float time_passed)
 	{
 		ErrorCode status = NO_ERROR;
 		// ensure this propagator is enabled

@@ -53,7 +53,7 @@ program opi_host_fortran_test
     status = OPI_Propagator_propagate(propagator, data, 0.d0, 0.0)
 
     ! retrieve orbital data values
-    orbit => OPI_ObjectData_getOrbit(data)
+    orbit => OPI_Population_getOrbit(data)
     ! print inclination values
     do i = 1, 200, 1
       write(*,*) orbit(i)%inclination

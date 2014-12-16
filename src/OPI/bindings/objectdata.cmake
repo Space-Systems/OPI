@@ -1,4 +1,4 @@
-BIND_CLASS( ObjectData
+BIND_CLASS( Population
   CONSTRUCTOR NAME "createData" ARGS Host& host int size
   DESTRUCTOR NAME "destroyData"
   FUNCTION getOrbit RETURN Orbit*

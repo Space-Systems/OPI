@@ -17,14 +17,14 @@
 #ifndef OPI_PROPAGATOR_H
 #define OPI_PROPAGATOR_H
 #include "opi_common.h"
-#include "opi_data.h"
+#include "opi_population.h"
 #include "opi_error.h"
 #include "opi_module.h"
 #include "opi_pimpl_helper.h"
 #include <string>
 namespace OPI
 {
-	class ObjectData;
+	class Population;
 	class IndexList;
 	class PerturbationModule;
 
@@ -52,9 +52,9 @@ namespace OPI
 			virtual ~Propagator();
 
 			//! Starts the propagation for the given time frame
-			ErrorCode propagate(ObjectData& data, double julian_day, float dt );
+			ErrorCode propagate(Population& data, double julian_day, float dt );
 			//! Starts the index-based propagation for the given time frame
-			ErrorCode propagate(ObjectData& data, IndexList& indices, double julian_day, float dt);
+			ErrorCode propagate(Population& data, IndexList& indices, double julian_day, float dt);
 
 			//! Assigns a module to this propagator
 			/**
@@ -81,10 +81,10 @@ namespace OPI
 			void useModules();
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
-			virtual ErrorCode runPropagation(ObjectData& data, double julian_day, float dt ) = 0;
+			virtual ErrorCode runPropagation(Population& data, double julian_day, float dt ) = 0;
 			//! Override this to implement an index-based propagation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagateIndexed
-			virtual ErrorCode runIndexedPropagation(ObjectData& data, IndexList& indices, double julian_day, float dt );
+			virtual ErrorCode runIndexedPropagation(Population& data, IndexList& indices, double julian_day, float dt );
 
 		private:
 			Pimpl<PropagatorImpl> data;

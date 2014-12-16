@@ -39,7 +39,7 @@ class TestPropagator:
 
 		}
 
-		virtual OPI::ErrorCode runPropagation(OPI::ObjectData& data, double julian_day, float dt )
+		virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
 		{
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;

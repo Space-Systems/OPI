@@ -4,7 +4,7 @@ include(GenerateType)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set( OPI_SOURCE_FILES
-  opi_data.cpp
+  opi_population.cpp
   opi_error.cpp
   opi_host.cpp
   opi_plugininfo.cpp
@@ -32,7 +32,7 @@ set( OPI_LIBRARY_HEADER
   opi_common.h
   opi_error.h
   opi_datatypes.h
-  opi_data.h
+  opi_population.h
   opi_host.h
   opi_plugininfo.h
   opi_custom_propagator.h

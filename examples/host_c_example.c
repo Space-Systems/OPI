@@ -5,7 +5,7 @@
 int main(int argc, char* argv[])
 {
 	OPI_Host host;
-	OPI_ObjectData data;
+	OPI_Population data;
 	OPI_Propagator propagator;
 	OPI_Orbit* orbitals;
 	int i;
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 		OPI_Propagator_propagateAll(propagator, data, 0, 0);
 
 		// retrieve orbital data
-		orbitals = OPI_ObjectData_getOrbit(data);
+		orbitals = OPI_Population_getOrbit(data);
 
 		// just print it out here
 		for(i = 0; i < 200; ++i)

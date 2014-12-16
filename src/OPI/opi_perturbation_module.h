@@ -21,7 +21,7 @@
 #include "opi_module.h"
 namespace OPI
 {
-	class ObjectData;
+	class Population;
 	/*!
 	 * \brief This class represents a pertubation module which can be used by a Propagator
 	 *
@@ -36,9 +36,9 @@ namespace OPI
 			/**
 			 * The calculated pertubation forces will be added to the values present in data_out
 			 */
-			ErrorCode calculate(ObjectData& data_in, ObjectData& data_out, double julian_day, float dt );
+			ErrorCode calculate(Population& data_in, Population& data_out, double julian_day, float dt );
 		protected:
-			virtual ErrorCode runCalculation(ObjectData& data_in, ObjectData& data_out, double julian_day, float dt );
+			virtual ErrorCode runCalculation(Population& data_in, Population& data_out, double julian_day, float dt );
 	};
 }
 

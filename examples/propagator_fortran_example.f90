@@ -41,15 +41,15 @@ function OPI_Plugin_propagate( propagator, data, julian_day, dt) result(error_co
   write(*,*) "string:", OPI_Module_getPropertyString(propagator,"string")
   write(*,*) 'Running Fortran Propagator'
 
-  orbit => OPI_ObjectData_getOrbit(data)
+  orbit => OPI_Population_getOrbit(data)
 
-  size = OPI_ObjectData_getSize(data)
+  size = OPI_Population_getSize(data)
 
   do i = 1, size, 1
     orbit(i)%inclination = i
   end do
 
-  error_code = OPI_ObjectData_update(data, OPI_DATA_ORBIT);
+  error_code = OPI_Population_update(data, OPI_DATA_ORBIT);
 
   write(*,*) 'done'
 

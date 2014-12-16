@@ -33,13 +33,13 @@ namespace OPI
 
 	//! \brief This class contains all parameters required for processing orbital objects
 	//! \ingroup CPP_API_GROUP
-	class OPI_API_EXPORT ObjectData
+	class OPI_API_EXPORT Population
 	{
 		public:
 			//! Constructor
-			ObjectData(Host& host, int size = 0);
+			Population(Host& host, int size = 0);
 			//! Destructor
-			~ObjectData();
+			~Population();
 
 			//! Resizes the internal memory buffers
 			void resize(int size);

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-#include "opi_data.h"
+#include "opi_population.h"
 #include "opi_host.h"
 #include "opi_indexlist.h"
 #include "internal/opi_cudasupport.h"
@@ -29,7 +29,7 @@ namespace OPI
 	 * \cond INTERNAL_DOCUMENTATION
 	 */
 
-	// this holds all internal ObjectData variables (pimpl)
+	// this holds all internal Population variables (pimpl)
 	struct ObjectRawData
 	{
 			ObjectRawData(Host& _host):
@@ -60,14 +60,14 @@ namespace OPI
 	 * \endcond
 	 */
 
-	ObjectData::ObjectData(Host& host, int size):
+	Population::Population(Host& host, int size):
 		data(host)
 	{
 		data->size = 0;
 		resize(size);
 	}
 
-	ObjectData::~ObjectData()
+	Population::~Population()
 	{
 	}
 
@@ -80,7 +80,7 @@ namespace OPI
 	 *
 	 * This will not work between machines with different endianness!
 	 */
-	void ObjectData::write(const std::string& filename)
+	void Population::write(const std::string& filename)
 	{
 		int temp;
 		std::ofstream out(filename.c_str(), std::ofstream::binary);
@@ -116,9 +116,9 @@ namespace OPI
 
 	/**
 	 * \detail
-	 * See ObjectData::write for more information
+	 * See Population::write for more information
 	 */
-	ErrorCode ObjectData::read(const std::string& filename)
+	ErrorCode Population::read(const std::string& filename)
 	{
 		int number_of_objects;
 
@@ -172,7 +172,7 @@ namespace OPI
 		return NO_ERROR;
 	}
 
-	void ObjectData::resize(int size)
+	void Population::resize(int size)
 	{
 		if(data->size != size)
 		{
@@ -191,7 +191,7 @@ namespace OPI
 	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
 	 * requested device.
 	 */
-	Orbit* ObjectData::getOrbit(Device device, bool no_sync) const
+	Orbit* Population::getOrbit(Device device, bool no_sync) const
 	{
 		return data->data_orbit.getData(device, no_sync);
 	}
@@ -201,7 +201,7 @@ namespace OPI
 	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
 	 * requested device.
 	 */
-	ObjectProperties* ObjectData::getObjectProperties(Device device, bool no_sync) const
+	ObjectProperties* Population::getObjectProperties(Device device, bool no_sync) const
 	{
 		return data->data_properties.getData(device, no_sync);
 	}
@@ -211,7 +211,7 @@ namespace OPI
 	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
 	 * requested device.
 	 */
-	ObjectStatus* ObjectData::getObjectStatus(Device device, bool no_sync) const
+	ObjectStatus* Population::getObjectStatus(Device device, bool no_sync) const
 	{
 		return data->data_status.getData(device, no_sync);
 	}
@@ -221,7 +221,7 @@ namespace OPI
 	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
 	 * requested device.
 	 */
-	Vector3* ObjectData::getCartesianPosition(Device device, bool no_sync) const
+	Vector3* Population::getCartesianPosition(Device device, bool no_sync) const
 	{
 		return data->data_position.getData(device, no_sync);
 	}
@@ -231,7 +231,7 @@ namespace OPI
 	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
 	 * requested device.
 	 */
-	Vector3* ObjectData::getVelocity(Device device, bool no_sync) const
+	Vector3* Population::getVelocity(Device device, bool no_sync) const
 	{
 		return data->data_velocity.getData(device, no_sync);
 	}
@@ -241,12 +241,12 @@ namespace OPI
 	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
 	 * requested device.
 	 */
-	Vector3* ObjectData::getAcceleration(Device device, bool no_sync) const
+	Vector3* Population::getAcceleration(Device device, bool no_sync) const
 	{
 		return data->data_acceleration.getData(device, no_sync);
 	}
 
-	void ObjectData::remove(IndexList &list)
+	void Population::remove(IndexList &list)
 	{
 		list.sort();
 		int* listdata = list.getData(DEVICE_HOST);
@@ -258,7 +258,7 @@ namespace OPI
 		}
 	}
 
-	void ObjectData::remove(int index)
+	void Population::remove(int index)
 	{
 		data->data_acceleration.remove(index);
 		data->data_orbit.remove(index);
@@ -269,7 +269,7 @@ namespace OPI
 		data->size--;
 	}
 
-	ErrorCode ObjectData::update(int type, Device device)
+	ErrorCode Population::update(int type, Device device)
 	{
 		ErrorCode status = NO_ERROR;
 		switch(type)
@@ -299,7 +299,7 @@ namespace OPI
 		return status;
 	}
 
-	int ObjectData::getSize() const
+	int Population::getSize() const
 	{
 		return data->size;
 	}

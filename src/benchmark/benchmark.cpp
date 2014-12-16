@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 		OPI::Host host;
 		host.loadPlugins(argv[1]);
 
-		OPI::ObjectData data(host);
+		OPI::Population data(host);
 
 		data.read(argv[2]);
 

@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 	host.loadPlugins("plugins");
 
 	// create Data object AFTER! loading all plugins
-	OPI::ObjectData data(host, 200);
+	OPI::Population data(host, 200);
 
 	// list each loaded propagator
 	for(int i = 0; i < host.getPropagatorCount();++i)

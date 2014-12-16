@@ -17,10 +17,10 @@ OPI_loadPlugins(host, "plugins")
 data = OPI_createData(host, 200)
 
 # Fetch a pointer to the orbit data of the population we just created
-orbits = OPI_ObjectData_getOrbit(data)
+orbits = OPI_Population_getOrbit(data)
 
 # Fetch a pointer to the object properties array of the population
-props = OPI_ObjectData_getObjectProperties(data)
+props = OPI_Population_getObjectProperties(data)
 
 # Set initial values for objects
 # Don't forget setting BOL and EOL to zero if you don't use them!
@@ -29,7 +29,7 @@ props = OPI_ObjectData_getObjectProperties(data)
 # results. This is especially true for area to mass ratio, drag
 # coefficient and reflectivity in combination with atmospheric
 # perturbation models.
-for i in range(0, OPI_ObjectData_getSize(data)):
+for i in range(0, OPI_Population_getSize(data)):
 	orbits[i].semi_major_axis = 6800
 	orbits[i].eccentricity = 0.001
 	orbits[i].inclination = 23.5
@@ -46,7 +46,7 @@ for i in range(0, OPI_ObjectData_getSize(data)):
 	props[i].reflectivity = 1.3
 
 # Notify OPI of the updated values
-OPI_ObjectData_update(data, OPI_DEVICE_HOST)
+OPI_Population_update(data, OPI_DEVICE_HOST)
 
 # Print information about available propagators
 print "Propagators:"
@@ -63,7 +63,7 @@ if propagator:
 	# Propagate all objects with the chosen propagator and the given time stamp and step size
 	OPI_Propagator_propagateAll(propagator, data, 2450980.0, 86400.0)
 	# Update orbit pointer 
-	orbits = OPI_ObjectData_getOrbit(data)
+	orbits = OPI_Population_getOrbit(data)
 	# Print (partial) propagation results for one object
 	print(str(orbits[1].semi_major_axis) + " " + str(orbits[1].eccentricity) + " " + str(orbits[1].mean_anomaly))
 else:
