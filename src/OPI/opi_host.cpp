@@ -265,6 +265,17 @@ namespace OPI
 			return 0;
 		return impl->cudaSupport->getDeviceCount();
 	}
+	
+	int Host::selectCudaDevice(int deviceNumber) const
+	{
+		if(!impl->cudaSupport) {
+			return -1;
+		}
+		else {
+			impl->cudaSupport->selectDevice(deviceNumber);
+			return 0;
+		}
+	}
 
 	std::string Host::getCurrentCudaDeviceName() const
 	{

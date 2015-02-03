@@ -121,8 +121,9 @@ void CudaSupportImpl::selectDevice(int device)
 {
 	int deviceCount = 0;
 	cudaGetDeviceCount(&deviceCount);
-	if( device < deviceCount);
+	if( device < deviceCount) {
 		cudaSetDevice(device);
+	}
 }
 
 int CudaSupportImpl::getCurrentDevice()

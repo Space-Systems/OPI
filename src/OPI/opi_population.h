@@ -31,8 +31,13 @@ namespace OPI
 	class IndexPair;
 	class IndexList;
 
-	//! \brief This class contains all parameters required for processing orbital objects
-	//! \ingroup CPP_API_GROUP
+	/*! \brief This class contains all parameters required for processing orbital objects.
+	 * \ingroup CPP_API_GROUP
+	 *
+	 * When a Population object is created with a specific size, arrays of the types Orbit,
+	 * ObjectProperties and ObjectStatus are initialized with that size. These arrays are empty
+	 * and must be filled with actual data by the host or the plugin.
+	 */
 	class OPI_API_EXPORT Population
 	{
 		public:

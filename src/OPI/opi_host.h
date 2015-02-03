@@ -74,6 +74,12 @@ namespace OPI
 			//! Returns the number of available CUDA devices
 			int getCudaDeviceCount() const;
 
+			//! Selects the CUDA device to be used by the plugin.
+			/** The default device is zero.
+			 * \returns -1 if no CUDA devices are present, zero otherwise.
+			 */	
+			int selectCudaDevice(int deviceNumber) const;
+
 			//! Returns the name of the currently selected CUDA device.
 			std::string getCurrentCudaDeviceName() const;
 
