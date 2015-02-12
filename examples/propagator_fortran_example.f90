@@ -53,5 +53,5 @@ function OPI_Plugin_propagate( propagator, data, julian_day, dt) result(error_co
 
   write(*,*) 'done'
 
-  error_code = OPI_NO_ERROR
+  error_code = OPI_SUCCESS
 end function

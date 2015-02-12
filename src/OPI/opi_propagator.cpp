@@ -67,11 +67,11 @@ namespace OPI
 
 	ErrorCode Propagator::propagate(Population& objectdata, double julian_day, float dt)
 	{
-		ErrorCode status = NO_ERROR;
+		ErrorCode status = SUCCESS;
 		// ensure this propagator is enabled
 		status = enable();
 		// an error occured?
-		if(status == NO_ERROR)
+		if(status == SUCCESS)
 			status = runPropagation(objectdata, julian_day, dt);
 		getHost()->sendError(status);
 		return status;
@@ -83,7 +83,7 @@ namespace OPI
 	 */
 	ErrorCode Propagator::propagate(Population& objectdata, IndexList& indices, double julian_day, float dt)
 	{
-		ErrorCode status = NO_ERROR;
+		ErrorCode status = SUCCESS;
 		status = runIndexedPropagation(objectdata, indices, julian_day, dt);
 		if(status == NOT_IMPLEMENTED)
 			status = propagate(objectdata, julian_day, dt);

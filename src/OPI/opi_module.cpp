@@ -208,7 +208,7 @@ namespace OPI
 			template<class T>
 			ErrorCode setValue(const T& value)
 			{
-				ErrorCode status = NO_ERROR;
+				ErrorCode status = SUCCESS;
 				switch(type)
 				{
 					case TYPE_INTEGER:
@@ -235,7 +235,7 @@ namespace OPI
 			template<class T>
 			ErrorCode setValue(T* values, int n)
 			{
-				ErrorCode status = NO_ERROR;
+				ErrorCode status = SUCCESS;
 				if( n <= 0 )
 					status = INDEX_RANGE;
 				else if( n == 1)
@@ -306,7 +306,7 @@ namespace OPI
 					case TYPE_UNKNOWN:
 						return INCOMPATIBLE_TYPES;
 				}
-				return NO_ERROR;
+				return SUCCESS;
 			}
 		};
 	}
@@ -342,10 +342,10 @@ namespace OPI
 	ErrorCode Module::enable()
 	{
 		// already enabled, do nothing
-		ErrorCode status = NO_ERROR;
+		ErrorCode status = SUCCESS;
 		if(!isEnabled())
 			status = runEnable();
-		if(status == NO_ERROR)
+		if(status == SUCCESS)
 			data->enabled = true;
 		data->host->sendError(status);
 		return status;
@@ -353,11 +353,11 @@ namespace OPI
 
 	ErrorCode Module::disable()
 	{
-		ErrorCode status = NO_ERROR;
+		ErrorCode status = SUCCESS;
 		if(isEnabled())
 		{
 			status = runDisable();
-			if(status == NO_ERROR)
+			if(status == SUCCESS)
 				data->enabled = false;
 		}
 		data->host->sendError(status);
@@ -366,12 +366,12 @@ namespace OPI
 
 	ErrorCode Module::runEnable()
 	{
-		return NO_ERROR;
+		return SUCCESS;
 	}
 
 	ErrorCode Module::runDisable()
 	{
-		return NO_ERROR;
+		return SUCCESS;
 	}
 
 	bool Module::isEnabled() const
@@ -480,7 +480,7 @@ namespace OPI
 			result = properties[name].setValue(value);
 		}
 		host->sendError(result);
-		return NO_ERROR;
+		return SUCCESS;
 	}
 
 	ErrorCode Module::setProperty(const std::string &name, int value)
@@ -502,7 +502,7 @@ namespace OPI
 		// find property
 		if(data->properties.count(name) > 0)
 		{
-			result = NO_ERROR;
+			result = SUCCESS;
 			Property& property = data->properties[name];
 			// check the type
 			switch(property.type)

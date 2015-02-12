@@ -22,7 +22,7 @@ namespace OPI
 	{
 		switch(code)
 		{
-			case NO_ERROR:
+			case SUCCESS:
 				return "No error";
 			case INVALID_ARGUMENT:
 				return "Invalid argument";

@@ -62,7 +62,7 @@ class TestPropagator:
 			}
 			else
 				return OPI::CUDA_REQUIRED;
-			return OPI::NO_ERROR;
+			return OPI::SUCCESS;
 		}
 
 };

@@ -36,12 +36,12 @@ namespace OPI
 	ErrorCode DistanceQuery::rebuild(Population &data)
 	{
 		if(data.getSize() == 0)
-			return NO_ERROR;
+			return SUCCESS;
 		ErrorCode status;
 		// ensure this DistanceQuery is enabled
 		status = enable();
 		// an error occured?
-		if(status == NO_ERROR)
+		if(status == SUCCESS)
 			status = runRebuild(data);
 		// forward propagation call
 		getHost()->sendError(status);
@@ -51,12 +51,12 @@ namespace OPI
 	ErrorCode DistanceQuery::queryCubicPairs(Population &data, IndexPairList& pairs, float cube_size)
 	{
 		if(data.getSize() == 0)
-			return NO_ERROR;
+			return SUCCESS;
 		ErrorCode status;
 		// ensure this DistanceQuery is enabled
 		status = enable();
 		// an error occured?
-		if(status == NO_ERROR)
+		if(status == SUCCESS)
 			status = runCubicPairQuery(data, pairs, cube_size);
 		getHost()->sendError(status);
 		// forward propagation call

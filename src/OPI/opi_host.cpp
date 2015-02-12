@@ -56,7 +56,7 @@ namespace OPI
 	Host::Host()
 	{
 		impl->errorCallback = 0;
-		impl->lastError = NO_ERROR;
+		impl->lastError = SUCCESS;
 		impl->errorCallbackParameter = 0;
 
 		impl->cudaSupport = 0;
@@ -108,7 +108,7 @@ namespace OPI
 
 	ErrorCode Host::loadPlugins(const std::string &plugindir)
 	{
-		ErrorCode status = NO_ERROR;
+		ErrorCode status = SUCCESS;
 		std::cout << "Loading plugins from " << plugindir << std::endl;
 
 		// check if the cuda support plugin is loaded
@@ -378,7 +378,7 @@ namespace OPI
 
 	void Host::sendError(ErrorCode code) const
 	{
-		if(code != NO_ERROR)
+		if(code != SUCCESS)
 		{
 			if(impl->errorCallback)
 				impl->errorCallback((void*)(this), code, impl->errorCallbackParameter);

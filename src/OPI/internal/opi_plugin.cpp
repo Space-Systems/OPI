@@ -63,14 +63,14 @@ namespace OPI
 	{
 		if(proc_enable)
 			return proc_enable(this);
-		return NO_ERROR;
+		return SUCCESS;
 	}
 
 	ErrorCode Plugin::disable()
 	{
 		if(proc_disable)
 			return proc_disable(this);
-		return NO_ERROR;
+		return SUCCESS;
 	}
 
 	std::string Plugin::getName() const

@@ -47,7 +47,7 @@ namespace OPI
 
 	ErrorCode CustomPropagator::runPropagation(Population& data, double julian_day, float dt )
 	{
-		return NO_ERROR;
+		return SUCCESS;
 	}
 
 	bool CustomPropagator::requiresCUDA()

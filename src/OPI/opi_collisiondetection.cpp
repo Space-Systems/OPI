@@ -41,11 +41,11 @@ namespace OPI
 
 	ErrorCode CollisionDetection::detectPairs(Population &data, DistanceQuery *query, IndexPairList &pairs_out, float time_passed)
 	{
-		ErrorCode status = NO_ERROR;
+		ErrorCode status = SUCCESS;
 		// ensure this propagator is enabled
 		status = enable();
 		// an error occured?
-		if(status == NO_ERROR)
+		if(status == SUCCESS)
 			status = runDetectPairs(data, query, pairs_out, time_passed);
 		getHost()->sendError(status);
 		return status;

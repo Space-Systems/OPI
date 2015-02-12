@@ -169,7 +169,7 @@ namespace OPI
 				}
 			}
 		}
-		return NO_ERROR;
+		return SUCCESS;
 	}
 
 	void Population::resize(int size)
@@ -271,7 +271,7 @@ namespace OPI
 
 	ErrorCode Population::update(int type, Device device)
 	{
-		ErrorCode status = NO_ERROR;
+		ErrorCode status = SUCCESS;
 		switch(type)
 		{
 			case DATA_ORBIT:

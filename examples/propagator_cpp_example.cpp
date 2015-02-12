@@ -50,7 +50,7 @@ class TestPropagator:
 				orbit[i].inclination = i;
 			}
 			data.update(OPI::DATA_ORBIT);
-			return OPI::NO_ERROR;
+			return OPI::SUCCESS;
 		}
 	private:
 		int testproperty_int;
