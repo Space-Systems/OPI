@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			std::cout << "Propator and/or Query Plugin not found!" << std::endl;
+			std::cout << "Propagator and/or Query Plugin not found!" << std::endl;
 		}
 	}
 	return EXIT_SUCCESS;
