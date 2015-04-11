@@ -83,6 +83,9 @@ namespace OPI
 			//! Returns the name of the currently selected CUDA device.
 			std::string getCurrentCudaDeviceName() const;
 
+			//! Returns the major capability number of the currently selected CUDA device.
+			int getCurrentCudaDeviceCapability() const;
+
 			//! Get a Propagator by index.
 			/** After loading the available plugins this function can
 			 * be used to get the Propagator with the given index. Indices are assigned in the order

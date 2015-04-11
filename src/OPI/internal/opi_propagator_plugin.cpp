@@ -68,9 +68,9 @@ namespace OPI
 		return NOT_IMPLEMENTED;
 	}
 
-	bool PropagatorPlugin::requiresCUDA()
+	int PropagatorPlugin::requiresCUDA()
 	{
-		return false;
+		return 0;
 	}
 
 	/**
