@@ -76,6 +76,8 @@ namespace OPI
 			Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the acceleration in cartesian coordinates on the specified device
 			Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
+			//! Perform a sanity check on the current population data and generate debug information
+			std::string sanityCheck();
 
 		private:
 			//! Private implementation data

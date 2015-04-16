@@ -23,6 +23,7 @@
 #include <vector>
 #include <cassert>
 #include <fstream>
+#include <sstream>
 namespace OPI
 {
 	/**
@@ -304,4 +305,75 @@ namespace OPI
 		return data->size;
 	}
 
+	/**
+	 * @details
+	 * Call on a population to perform some validity checks of all orbits and properties. This is a host
+	 * function so the data will be synched to the host when calling this function. It is comparatively
+	 * slow and should be used for debugging or once after population data is read from input files.
+	 * The return value is a string that can be printed to the screen or a log file. If no problems were
+	 * found, an empty string is returned.
+	 */
+	std::string Population::sanityCheck()
+	{
+		if (getSize()==0) return std::string("Population is empty.");
+
+		// This function auto-syncs to host so it might be slow
+		Orbit* orbit = getOrbit(DEVICE_HOST);
+		ObjectProperties* props = getObjectProperties(DEVICE_HOST);
+
+		std::stringstream result;
+		result.str("");
+		const float twopi = 6.2831853f;
+		for (int i=0; i<getSize(); i++) {
+
+			// SMA is smaller than Earth's radius but object has not been marked as decayed
+			if (orbit[i].semi_major_axis < 6378.0f && orbit[i].eol <= 0.0f) {
+				result << "Object " << i << " (ID " << props[i].id << "): Unmarked deorbit: ";
+				result << "SMA: " << orbit[i].semi_major_axis << ", EOL: " << orbit[i].eol << "\n";
+			}
+			// Eccentricity is zero or smaller than zero
+			if (orbit[i].eccentricity <= 0.0f) {
+				result << "Object " << i << "(" << props[i].id << "): Eccentricity below zero: ";
+				result << orbit[i].eccentricity << "\n";
+			}
+			// Eccentricity is larger than one. This might occur when decayed objects are propagated
+			// further so only issue a warning if the object has not been marked as decayed.
+			// For some use cases hyperbolic orbits might actually be valid so this value might have
+			// to be adjusted. One possibility would be to calculate the delta-V required to achieve
+			// the given eccentricity and issue a warning when unrealistic speeds occur.
+			if (orbit[i].eccentricity > 1.0f && orbit[i].eol <= 0.0f) {
+				result << "Object " << i << "(" << props[i].id << "): Eccentricity larger than one: ";
+				result << orbit[i].eccentricity << "\n";
+			}
+			// Angles are outside of radian range (possibly given in degrees)
+			if (orbit[i].inclination < -twopi || orbit[i].inclination > twopi) {
+				result << "Object " << i << "(" << props[i].id << "): Inclination not in radian range: ";
+				result << orbit[i].inclination << "\n";
+			}
+			if (orbit[i].raan < -twopi || orbit[i].raan > twopi) {
+				result << "Object " << i << "(" << props[i].id << "): RAAN not in radian range: ";
+				result << orbit[i].raan << "\n";
+			}
+			if (orbit[i].arg_of_perigee < -twopi || orbit[i].arg_of_perigee > twopi) {
+				result << "Object " << i << "(" << props[i].id << "): Arg. of perigee not in radian range: ";
+				result << orbit[i].arg_of_perigee << "\n";
+			}
+			if (orbit[i].mean_anomaly < -twopi || orbit[i].mean_anomaly > twopi) {
+				result << "Object " << i << "(" << props[i].id << "): Mean anomaly not in radian range: ";
+				result << orbit[i].mean_anomaly << "\n";
+			}
+			// Drag and reflectivity coefficients are not set (which may lead to early decays or division by zero)
+			if (props[i].drag_coefficient <= 0.0f) {
+				result << "Object " << i << "(" << props[i].id << "): Invalid drag coefficient: ";
+				result << props[i].drag_coefficient << "\n";
+			}
+			if (props[i].reflectivity <= 0.0f) {
+				result << "Object " << i << "(" << props[i].id << "): Invalid reflectivity coefficient: ";
+				result << props[i].reflectivity << "\n";
+			}
+			//any number is NaN
+			//unrealistic A2m ratio (possible mixup with m2a)
+		}
+		return result.str();
+	}
 }
