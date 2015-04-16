@@ -50,8 +50,8 @@ namespace OPI
 		return SUCCESS;
 	}
 
-	bool CustomPropagator::requiresCUDA()
+	int CustomPropagator::requiresCUDA()
 	{
-		return false;
+		return 0;
 	}
 }

@@ -73,8 +73,11 @@ namespace OPI
 			//! Check if this propagator is able to propagate backwards
 			virtual bool backwardPropagation();
 
-			//! Check whether this propagator requires CUDA to function
-			virtual bool requiresCUDA();
+			//! Check whether this propagator requires CUDA to function.
+			/** Set to zero if CUDA is not required, otherwise set this to the major number of
+			 *  the required compute capability.
+			 */
+			virtual int requiresCUDA();
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules

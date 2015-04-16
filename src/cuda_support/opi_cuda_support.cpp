@@ -19,6 +19,7 @@
 #include <cuda_runtime.h>
 #include <iostream>
 #include <sstream>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -38,6 +39,7 @@ class CudaSupportImpl:
 		virtual void selectDevice(int device);
 		virtual int getCurrentDevice();
 		virtual std::string getCurrentDeviceName();
+		virtual int getCurrentDeviceCapability();
 		virtual int getDeviceCount();
 		virtual cudaDeviceProp* getDeviceProperties(int device);
 	private:
@@ -163,7 +165,20 @@ std::string CudaSupportImpl::getCurrentDeviceName()
 		return result.str();
 	}
 	else {
-		return std::string("No CUDA device selected.");
+		return std::string("No CUDA Device selected.");
+	}
+}
+
+int CudaSupportImpl::getCurrentDeviceCapability()
+{
+	int device = getCurrentDevice();
+	if((device >= 0) && (device < getDeviceCount())) {
+		int major = CUDAProperties[device].major;
+		return major;
+	}
+	else {
+		// No device selected.
+		return -1;
 	}
 }
 

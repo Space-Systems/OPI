@@ -43,7 +43,7 @@ namespace OPI
 		protected:
 			/// Override the propagation method
 			virtual ErrorCode runPropagation(Population& data, double julian_day, float dt );
-			virtual bool requiresCUDA();
+			virtual int requiresCUDA();
 
 		private:
 			Pimpl<CustomPropagatorImpl> impl;

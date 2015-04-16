@@ -188,12 +188,30 @@ namespace OPI
 				// if the propagator was created, add it to the list
 
 				if(propagator) {
-					if (hasCUDASupport() || !propagator->requiresCUDA()) {
+					if (propagator->requiresCUDA() <= 0) {
+						addPropagator(propagator);
+					}
+					else if (!hasCUDASupport()) {
+						std::cout << "[OPI] Skipping propagator " << propagator->getName()
+							<< " because it requires CUDA." << std::endl;
+					}
+					else if (getCurrentCudaDeviceCapability() <= 0) {
+						std::cout << "[OPI] Warning: Cannot determine CUDA compute capability of selected device "
+							<< "(perhaps no CUDA device was selected?). " << std::endl;
+						std::cout << "[OPI] Propagator " << propagator->getName() << " requires at least " 
+							<< propagator->requiresCUDA() << ".x - "
+							<< "otherwise propagation might fail." << std::endl;
+						addPropagator(propagator);
+					}
+					else if (propagator->requiresCUDA() <= getCurrentCudaDeviceCapability()) {
 						addPropagator(propagator);
 					}
 					else {
 						std::cout << "[OPI] Skipping propagator " << propagator->getName()
-							<< " because it requires CUDA." << std::endl;
+							<< " because selected device is not capable of running it." << std::endl;
+						std::cout << "[OPI] Device has compute capability " << getCurrentCudaDeviceCapability() << ", "
+							<< propagator->getName() << " requires at least " << propagator->requiresCUDA() << "."
+							<< std::endl;
 					}
 				}
 				break;
@@ -283,6 +301,14 @@ namespace OPI
 			return std::string("No CUDA device available.");
 		}
 		return impl->cudaSupport->getCurrentDeviceName();
+	}
+
+	int Host::getCurrentCudaDeviceCapability() const
+	{
+		if(!impl->cudaSupport) {
+			return 0;
+		}
+		return impl->cudaSupport->getCurrentDeviceCapability();
 	}
 
 	void Host::addPropagator(Propagator *propagator)
