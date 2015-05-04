@@ -22,6 +22,7 @@
 #include "opi_indexlist.h"
 #include "opi_host.h"
 #include "opi_propagator.h"
+#include "opi_perturbation_module.h"
 #include "opi_query.h"
 #include "opi_collisiondetection.h"
 #endif

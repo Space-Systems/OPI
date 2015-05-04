@@ -19,26 +19,39 @@
 
 #include "opi_common.h"
 #include "opi_module.h"
+#include "opi_error.h"
+#include "opi_pimpl_helper.h"
 namespace OPI
 {
 	class Population;
+
+	//! Contains the module implementation data
+	class PerturbationModuleImpl;
+
 	/*!
 	 * \brief This class represents a pertubation module which can be used by a Propagator
 	 *
 	 * \ingroup CPP_API_GROUP
 	 * \see Module, Host
 	 */
-	class PerturbationModule:
+	class OPI_API_EXPORT PerturbationModule:
 			public Module
 	{
 		public:
+			PerturbationModule();
+			virtual ~PerturbationModule();
 			//! Calculates the Pertubation for the passed dataset
 			/**
 			 * The calculated pertubation forces will be added to the values present in data_out
 			 */
-			ErrorCode calculate(Population& data_in, Population& data_out, double julian_day, float dt );
+			ErrorCode calculate(Population& data, Orbit* delta, float dt );
+			ErrorCode setTimeStep(double julian_day);
+
 		protected:
-			virtual ErrorCode runCalculation(Population& data_in, Population& data_out, double julian_day, float dt );
+			virtual ErrorCode runCalculation(Population& data, Orbit* delta, float dt );
+
+		private:
+			Pimpl<PerturbationModuleImpl> impl;
 	};
 }
 
