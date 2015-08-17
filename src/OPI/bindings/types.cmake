@@ -22,8 +22,6 @@ END_STRUCTURE( Orbit )
 
 COMMENT("This type contains the objects additional properties")
 BEGIN_STRUCTURE( ObjectProperties )
-  COMMENT("factor stating how many real objects this one represents (usually 1)")
-  STRUCTURE_VARIABLE(float factor)
   COMMENT("The objects mass in [kg]")
   STRUCTURE_VARIABLE(float mass)
   COMMENT("The objects diameter in [m]")
