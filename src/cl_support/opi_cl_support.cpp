@@ -180,7 +180,7 @@ std::string ClSupportImpl::getCurrentDeviceName()
 	*/
 	}
 	else {
-		return std::string("No CUDA Device selected.");
+		return std::string("No OpenCL Device selected.");
 	}
 }
 
