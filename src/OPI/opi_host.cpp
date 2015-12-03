@@ -17,7 +17,7 @@
 #include "opi_host.h"
 #include "internal/opi_plugin.h"
 #include "opi_propagator.h"
-#include "internal/opi_cudasupport.h"
+#include "internal/opi_gpusupport.h"
 #include "internal/opi_propagator_plugin.h"
 #include "internal/opi_query_plugin.h"
 #include "opi_custom_propagator.h"
@@ -37,8 +37,8 @@ namespace OPI
 	class HostImpl
 	{
 		public:
-			CudaSupport* cudaSupport;
-			DynLib* cudaSupportPluginHandle;
+			GpuSupport* gpuSupport;
+			DynLib* gpuSupportPluginHandle;
 
 			std::vector<Plugin*> pluginlist;
 			std::vector<Propagator*> propagagorlist;
@@ -59,8 +59,8 @@ namespace OPI
 		impl->lastError = SUCCESS;
 		impl->errorCallbackParameter = 0;
 
-		impl->cudaSupport = 0;
-		impl->cudaSupportPluginHandle = 0;
+		impl->gpuSupport = 0;
+		impl->gpuSupportPluginHandle = 0;
 	}
 	Host::~Host()
 	{
@@ -84,10 +84,10 @@ namespace OPI
 		}
 
 		// now free the support plugin memory
-		if(impl->cudaSupport)
-			impl->cudaSupport->shutdown();
-		delete impl->cudaSupport;
-		delete impl->cudaSupportPluginHandle;
+		if(impl->gpuSupport)
+			impl->gpuSupport->shutdown();
+		delete impl->gpuSupport;
+		delete impl->gpuSupportPluginHandle;
 
 		// free all plugin handles
 		for(size_t i = 0; i < impl->pluginlist.size(); ++i)
@@ -112,18 +112,18 @@ namespace OPI
 		std::cout << "Loading plugins from " << plugindir << std::endl;
 
 		// check if the cuda support plugin is loaded
-		if(impl->cudaSupport == 0)
+		if(impl->gpuSupport == 0)
 		{
 			// try to load cuda plugin
-			impl->cudaSupportPluginHandle = new DynLib(std::string(plugindir + "/support/OPI-cuda") + DynLib::getSuffix(), true);
-			if(impl->cudaSupportPluginHandle)
+			impl->gpuSupportPluginHandle = new DynLib(std::string(plugindir + "/support/OPI-cuda") + DynLib::getSuffix(), true);
+			if(impl->gpuSupportPluginHandle)
 			{
-				procCreateCudaSupport proc_create_support = (procCreateCudaSupport)impl->cudaSupportPluginHandle->loadFunction("createCudaSupport");
+				procCreateGpuSupport proc_create_support = (procCreateGpuSupport)impl->gpuSupportPluginHandle->loadFunction("createGpuSupport");
 				if(proc_create_support)
 				{
 					// plugin successfully loaded
-					impl->cudaSupport = proc_create_support();
-					impl->cudaSupport->init();
+					impl->gpuSupport = proc_create_support();
+					impl->gpuSupport->init();
 				}
 			}
 		}
@@ -279,36 +279,36 @@ namespace OPI
 
 	int Host::getCudaDeviceCount() const
 	{
-		if(!impl->cudaSupport)
+		if(!impl->gpuSupport)
 			return 0;
-		return impl->cudaSupport->getDeviceCount();
+		return impl->gpuSupport->getDeviceCount();
 	}
 	
 	int Host::selectCudaDevice(int deviceNumber) const
 	{
-		if(!impl->cudaSupport) {
+		if(!impl->gpuSupport) {
 			return -1;
 		}
 		else {
-			impl->cudaSupport->selectDevice(deviceNumber);
+			impl->gpuSupport->selectDevice(deviceNumber);
 			return 0;
 		}
 	}
 
 	std::string Host::getCurrentCudaDeviceName() const
 	{
-		if(!impl->cudaSupport) {
+		if(!impl->gpuSupport) {
 			return std::string("No CUDA device available.");
 		}
-		return impl->cudaSupport->getCurrentDeviceName();
+		return impl->gpuSupport->getCurrentDeviceName();
 	}
 
 	int Host::getCurrentCudaDeviceCapability() const
 	{
-		if(!impl->cudaSupport) {
+		if(!impl->gpuSupport) {
 			return 0;
 		}
-		return impl->cudaSupport->getCurrentDeviceCapability();
+		return impl->gpuSupport->getCurrentDeviceCapability();
 	}
 
 	void Host::addPropagator(Propagator *propagator)
@@ -361,7 +361,7 @@ namespace OPI
 
 	bool Host::hasCUDASupport() const
 	{
-		if(impl->cudaSupport)
+		if(impl->gpuSupport)
 			return getCudaDeviceCount() > 0;
 		return false;
 	}
@@ -396,9 +396,9 @@ namespace OPI
 	/**
 	 * \cond INTERNAL_DOCUMENTATION
 	 */
-	CudaSupport* Host::getCUDASupport() const
+	GpuSupport* Host::getGPUSupport() const
 	{
-		return impl->cudaSupport;
+		return impl->gpuSupport;
 	}
 
 
@@ -414,8 +414,8 @@ namespace OPI
 
 	cudaDeviceProp* Host::getCUDAProperties(int device) const
 	{
-		if(impl->cudaSupport)
-			return impl->cudaSupport->getDeviceProperties(device);
+		if(impl->gpuSupport)
+			return impl->gpuSupport->getDeviceProperties(device);
 		return 0;
 	}
 

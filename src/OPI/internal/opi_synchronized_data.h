@@ -17,7 +17,7 @@
 #ifndef OPI_SYNCHRONIZED_DATA_H
 #define OPI_SYNCHRONIZED_DATA_H
 #include "../opi_host.h"
-#include "opi_cudasupport.h"
+#include "opi_gpusupport.h"
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -113,7 +113,7 @@ namespace OPI
 	SynchronizedData<DataType>::~SynchronizedData()
 	{
 		// retrieve cuda support object
-		CudaSupport* cuda = host.getCUDASupport();
+		GpuSupport* cuda = host.getGPUSupport();
 		// check if the object is valid
 		if(cuda) {
 			// store currently selected device
@@ -210,7 +210,7 @@ namespace OPI
 	void SynchronizedData<DataType>::clearDevices()
 	{
 		// retrieve cuda support object
-		CudaSupport* cuda = host.getCUDASupport();
+		GpuSupport* cuda = host.getGPUSupport();
 		// check if the object is valid
 		if(cuda) {
 			// store current device
@@ -322,7 +322,7 @@ namespace OPI
 		}
 		else if ((device >= DEVICE_CUDA)&&(device <= DEVICE_CUDA_LAST)) {
 			// retrieve cuda support object from host
-			CudaSupport* cuda = host.getCUDASupport();
+			GpuSupport* cuda = host.getGPUSupport();
 			// check if object is valid
 			if(cuda) {
 				// check if the requested device is not out of range
@@ -365,7 +365,7 @@ namespace OPI
 					// check if the device with the latest information is a cuda device
 					if((latestDevice >= DEVICE_CUDA)&&(latestDevice <= DEVICE_CUDA_LAST)) {
 						// retrieve cuda support object
-						CudaSupport* cuda = host.getCUDASupport();
+						GpuSupport* cuda = host.getGPUSupport();
 						// check if the cuda support is valid
 						if(cuda) {
 							// store current selected device
@@ -412,7 +412,7 @@ namespace OPI
 	void SynchronizedData<DataType>::sync_host_to_device(Device device)
 	{
 		// retrieve cuda support
-		CudaSupport* cuda = host.getCUDASupport();
+		GpuSupport* cuda = host.getGPUSupport();
 		// check if support is valid
 		if(cuda) {
 			// store currently selected device

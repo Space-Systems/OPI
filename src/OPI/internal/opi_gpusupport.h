@@ -14,27 +14,27 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-#ifndef OPI_CUDA_SUPPORT_H
-#define OPI_CUDA_SUPPORT_H
+#ifndef OPI_GPU_SUPPORT_H
+#define OPI_GPU_SUPPORT_H
 #include <iostream>
 struct cudaDeviceProp;
 namespace OPI
 {
-	class CudaSupport;
+	class GpuSupport;
 
-	typedef CudaSupport* (*procCreateCudaSupport)();
+	typedef GpuSupport* (*procCreateGpuSupport)();
 	/**
 	 * \cond INTERNAL_DOCUMENTATION
 	 */
 
 	/**
 	 * @ingroup CPP_API_GROUP
-	 * @brief CUDA Support Interface
+	 * @brief CUDA/OpenCL Support Interface
 	 */
-	class CudaSupport
+	class GpuSupport
 	{
 		public:
-			virtual ~CudaSupport() {}
+			virtual ~GpuSupport() {}
 			virtual void init() = 0;
 
 			virtual void allocate(void** a, size_t size) = 0;

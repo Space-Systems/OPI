@@ -32,7 +32,7 @@ namespace OPI
 	class PropagatorIntegrator;
 	class DistanceQuery;
 	class Plugin;
-	class CudaSupport;
+	class GpuSupport;
 	class DynLib;
 	class CollisionDetection;
 
@@ -169,7 +169,7 @@ namespace OPI
 			//! \cond INTERNAL_DOCUMENTATION
 
 			//! Returns the CUDA Support object
-			CudaSupport* getCUDASupport() const;
+			GpuSupport* getGPUSupport() const;
 			//! Returns cuda device properties
 			cudaDeviceProp* getCUDAProperties(int device = 0) const;
 
