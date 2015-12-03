@@ -28,9 +28,9 @@ functions are subject to change. Your feedback is appreciated.
 BUILD INSTRUCTIONS
 ------------------
 
-Building OPI has currently only been tested on Linux systems (recent versions
-of Debian, Ubuntu and OpenSuSE) but Windows and OSX should be compatible.
-OPI uses CMake as a build system, so simply follow the usual instructions
+Building OPI has been tested on Linux (recent versions of Debian, Ubuntu and
+OpenSuSE), Windows (Visual Studio 2013) and OSX. OPI uses CMake as a build
+system, so simply follow the usual instructions below or use the GUI tool
 (in-place builds are not allowed):
 
 mkdir build
