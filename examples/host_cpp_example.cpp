@@ -76,7 +76,6 @@ int main(int argc, char* argv[])
 		std::cout << std::endl;
 	}
 
-	return 0;
 	if(propagator)
 	{
 		std::cout << "Using propagator: " << propagator->getName() << std::endl;
@@ -86,6 +85,7 @@ int main(int argc, char* argv[])
 		for(int i = 0; i < data.getSize(); ++i)
 		{
 			orbit[i].arg_of_perigee = i;
+			orbit[i].semi_major_axis = 6400.0f;
 		}
 		// inform the data about changes inside our orbit structure
 		data.update(OPI::DATA_ORBIT);
