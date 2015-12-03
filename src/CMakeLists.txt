@@ -13,6 +13,10 @@ if(ENABLE_CUDA_SUPPORT)
   add_subdirectory(cuda_support)
 endif()
 
+if(ENABLE_CL_SUPPORT)
+  add_subdirectory(cl_support)
+endif()
+
 export(
   TARGETS
     OPI
