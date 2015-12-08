@@ -61,7 +61,7 @@ set( OPI_INTERNAL_HEADER
   internal/opi_query_plugin.h
   internal/opi_pluginprocs.h
   internal/opi_plugin.h
-  internal/opi_cudasupport.h
+  internal/opi_gpusupport.h
   internal/opi_synchronized_data.h
   internal/dynlib.h
 )

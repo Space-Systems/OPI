@@ -115,7 +115,7 @@ namespace OPI
 		if(impl->gpuSupport == 0)
 		{
 			// try to load cuda plugin
-			impl->gpuSupportPluginHandle = new DynLib(std::string(plugindir + "/support/OPI-cuda") + DynLib::getSuffix(), true);
+			impl->gpuSupportPluginHandle = new DynLib(std::string(plugindir + "/support/OPI-cl") + DynLib::getSuffix(), true);
 			if(impl->gpuSupportPluginHandle)
 			{
 				procCreateGpuSupport proc_create_support = (procCreateGpuSupport)impl->gpuSupportPluginHandle->loadFunction("createGpuSupport");

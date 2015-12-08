@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	}
 
 	// fetch a specific propagator
-	OPI::Propagator* propagator = host.getPropagator("CPP Example Propagator");
+	OPI::Propagator* propagator = host.getPropagator("OpenCL Example Propagator");
 
 	std::cout << "Propagator properties:" << std::endl;
 	for(int i = 0; i < propagator->getPropertyCount(); ++i)
@@ -103,14 +103,9 @@ int main(int argc, char* argv[])
 		// this will automatically sync the data between different devices
 		orbit = data.getOrbit();
 
-		for(int i = 0; i < data.getSize(); ++i)
+		for(int i = 0; i < 10; ++i)
 		{
-			std::cout << orbit[i].inclination
-								<< " "
-								<< orbit[i].arg_of_perigee
-								<< " "
-								<< orbit[i].semi_major_axis
-								<< std::endl;
+			std::cout << orbit[i].inclination << " " << orbit[i].arg_of_perigee << " " << orbit[i].semi_major_axis << std::endl;
 		}
 	}
 	else

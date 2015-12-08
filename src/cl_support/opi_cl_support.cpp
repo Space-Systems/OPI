@@ -14,37 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-#include "../OPI/internal/opi_gpusupport.h"
-
-#include <CL/cl.hpp>
-#include <iostream>
-#include <sstream>
-#include <stdlib.h>
-
-using namespace std;
-
-class ClSupportImpl:
-		public OPI::GpuSupport
-{
-	public:
-		ClSupportImpl();
-		~ClSupportImpl();
-
-		virtual void init();
-
-		virtual void copy(void* a, void* b, size_t size, bool host_to_device);
-		virtual void allocate(void** a, size_t size);
-		virtual void free(void* mem);
-		virtual void shutdown();
-		virtual void selectDevice(int device);
-		virtual int getCurrentDevice();
-		virtual std::string getCurrentDeviceName();
-		virtual int getCurrentDeviceCapability();
-		virtual int getDeviceCount();
-		virtual cudaDeviceProp* getDeviceProperties(int device);
-	private:
-		cudaDeviceProp* CUDAProperties;
-};
+#include "opi_cl_support.h"
 
 ClSupportImpl::ClSupportImpl()
 {
@@ -58,14 +28,36 @@ ClSupportImpl::~ClSupportImpl()
 
 void ClSupportImpl::init()
 {
-	/*
-	std::vector< cl::Platform > platformList;
+	std::cout << "Calling CL init function" << std::endl;
+	std::vector<cl::Platform> platformList;
 	cl::Platform::get(&platformList);
-
+	std::string vendor;
+	std::string name;
+	std::string ext;
+	std::string dev;
+	cl_int error;
 	for (int i = 0; i < platformList.size(); i++) {
-		
+		platformList[i].getInfo((cl_platform_info)CL_PLATFORM_VENDOR, &vendor);
+		platformList[i].getInfo((cl_platform_info)CL_PLATFORM_NAME, &name);
+		platformList[i].getInfo((cl_platform_info)CL_PLATFORM_VERSION, &ext);
+		std::cout << "Platform " << i << ": " << vendor << " " << name << ": " << ext << std::endl;
+		platformList[i].getDevices(CL_DEVICE_TYPE_ALL, &deviceList);
+		for (int j = 0; j < deviceList.size(); j++) {
+			deviceList[j].getInfo((cl_device_info)CL_DEVICE_NAME, &dev);
+			std::cout << "Device " << j << ": " << dev << std::endl;
+		}
 	}
 
+	//Just select the first platform and device for now
+	cl_context_properties cprops[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties)(platformList[0])(), 0 };
+	context = cl::Context(CL_DEVICE_TYPE_ALL, cprops, NULL, NULL, &error);
+	if (error != CL_SUCCESS) std::cerr << "Error: " << error << std::endl;
+
+	currentDevice = 0;
+	deviceList = context.getInfo<CL_CONTEXT_DEVICES>();
+	defaultQueue = cl::CommandQueue(context, deviceList[currentDevice], 0, &error);
+
+	/*
 	int deviceCount = 0;
 	int deviceNumber = 0;
 
@@ -110,17 +102,22 @@ void ClSupportImpl::init()
 
 void ClSupportImpl::allocate(void** a, size_t size)
 {
-	//cudaMalloc(a, size);
+	*a = new cl::Buffer(context, CL_MEM_READ_WRITE, size);
 }
 
 void ClSupportImpl::free(void *mem)
 {
-	//cudaFree(mem);
+	delete(mem);
 }
 
 void ClSupportImpl::copy(void *destination, void *source, size_t size, bool host_to_device)
 {
-	//cudaMemcpy(destination, source, size, host_to_device ? cudaMemcpyHostToDevice : cudaMemcpyDeviceToHost);
+	if (host_to_device) {
+		defaultQueue.enqueueWriteBuffer(*static_cast<cl::Buffer*>(destination), CL_TRUE, 0, size, source);
+	}
+	else {
+		defaultQueue.enqueueReadBuffer(*static_cast<cl::Buffer*>(source), CL_TRUE, 0, size, destination);
+	}
 }
 
 void ClSupportImpl::shutdown()
@@ -130,27 +127,22 @@ void ClSupportImpl::shutdown()
 
 void ClSupportImpl::selectDevice(int device)
 {
-	/*
-	int deviceCount = 0;
-	cudaGetDeviceCount(&deviceCount);
-	if( device < deviceCount) {
-		cudaSetDevice(device);
+	if (device < deviceList.size()) {
+		currentDevice = device;
+		defaultQueue = cl::CommandQueue(context, deviceList[currentDevice], 0);
 	}
-	*/
+	else std::cout << "Invalid OpenCL device number - please select a number between 0 and "
+		<< deviceList.size() - 1 << "." << std::endl;	
 }
 
 int ClSupportImpl::getCurrentDevice()
 {
-	int device = -1;
-	//cudaGetDevice(&device);
-	return device;
+	return currentDevice;
 }
 
 int ClSupportImpl::getDeviceCount()
 {
-	int deviceCount = 0;
-	//cudaGetDeviceCount(&deviceCount);
-	return deviceCount;
+	return deviceList.size();
 }
 
 cudaDeviceProp* ClSupportImpl::getDeviceProperties(int device)
@@ -164,38 +156,44 @@ cudaDeviceProp* ClSupportImpl::getDeviceProperties(int device)
 
 std::string ClSupportImpl::getCurrentDeviceName()
 {
-	int device = getCurrentDevice();
-	if((device >= 0) && (device < getDeviceCount())) {
-		// Build the return string. Currently, all CUDA devices
-		// are made by Nvidia, there seems to be no data field
-		// for a manufacturer's name in the properties struct.
-	/*
-		std::stringstream result;
-		result << "NVIDIA ";
-		result << (const char*)&CUDAProperties[device].name;
-		result << " @ " << (CUDAProperties[device].clockRate)/1000 << "MHz";
-		if (&CUDAProperties[device].ECCEnabled)
-			result << " (ECC enabled)";
-		return result.str();
-	*/
-	}
-	else {
-		return std::string("No OpenCL Device selected.");
-	}
+	std::string vendor, name;
+	cl_device_type type;
+	deviceList[currentDevice].getInfo(CL_DEVICE_VENDOR, &vendor);
+	deviceList[currentDevice].getInfo(CL_DEVICE_NAME, &name);
+	deviceList[currentDevice].getInfo(CL_DEVICE_TYPE, &type);
+	std::stringstream result;
+	result << vendor << " " << name << " ";
+	if (type == CL_DEVICE_TYPE_GPU) { result << "(GPU)"; }
+	else if (type == CL_DEVICE_TYPE_CPU) { result << "(CPU)"; }
+	else result << "(other)";
+	return result.str();
 }
 
 int ClSupportImpl::getCurrentDeviceCapability()
 {
+	//char* version;
+	//deviceList[currentDevice].getInfo(CL_DRIVER_VERSION, &version);
+	//std::cout << version << std::endl;
+	return 1;
+}
 
-	int device = getCurrentDevice();
-	if((device >= 0) && (device < getDeviceCount())) {
-		//int major = CUDAProperties[device].major;
-		//return major;
-	}
-	else {
-		// No device selected.
-		return -1;
-	}
+cl::Context ClSupportImpl::getOpenCLContext()
+{
+	return context;
+}
+cl::CommandQueue ClSupportImpl::getOpenCLQueue()
+{
+	return defaultQueue;
+}
+
+cl::Device ClSupportImpl::getOpenCLDevice()
+{
+	return deviceList[currentDevice];
+}
+
+std::vector<cl::Device> ClSupportImpl::getOpenCLDeviceList()
+{
+	return deviceList;
 }
 
 

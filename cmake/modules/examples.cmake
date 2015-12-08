@@ -43,7 +43,7 @@ endmacro()
 macro(add_example_plugin PLUGIN)
   PARSE_ARGUMENTS( ARG
     "SOURCES;LIBRARIES"
-    "CUDA;FORTRAN"
+    "CUDA;OPENCL;FORTRAN"
     ${ARGN} )
   set(TARGET_DISABLED FALSE)
   if(ARG_FORTRAN)
@@ -62,14 +62,21 @@ macro(add_example_plugin PLUGIN)
       )
       set(ARG_LIBRARIES ${ARG_LIBRARIES} ${CUDA_LIBRARY} ${CUDA_CUDART_LIBRARY})
     endif()
-  else()
+  endif()
+  if (ARG_OPENCL)
+	if (ENABLE_CL_SUPPORT)
+		include_directories(${OpenCL_INCLUDE_DIRS})
+		set(ARG_LIBRARIES ${ARG_LIBRARIES} ${OpenCL_LIBRARY})
+	endif()
+  endif()
+  if( NOT ARG_CUDA)
     if( NOT TARGET_DISABLED)
     add_library(
       ${PLUGIN}
       MODULE
       ${ARG_SOURCES}
     )
-  endif()
+    endif()
   endif()
   if(NOT TARGET_DISABLED)
     if(TARGET ${PLUGIN})
