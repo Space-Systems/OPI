@@ -29,34 +29,35 @@ ClSupportImpl::~ClSupportImpl()
 void ClSupportImpl::init()
 {
 	std::cout << "Calling CL init function" << std::endl;
-	std::vector<cl::Platform> platformList;
-	cl::Platform::get(&platformList);
-	std::string vendor;
-	std::string name;
-	std::string ext;
-	std::string dev;
+	cl_platform_id platforms[8];
+	cl_uint nPlatforms;
 	cl_int error;
-	for (int i = 0; i < platformList.size(); i++) {
-		platformList[i].getInfo((cl_platform_info)CL_PLATFORM_VENDOR, &vendor);
-		platformList[i].getInfo((cl_platform_info)CL_PLATFORM_NAME, &name);
-		platformList[i].getInfo((cl_platform_info)CL_PLATFORM_VERSION, &ext);
-		std::cout << "Platform " << i << ": " << vendor << " " << name << ": " << ext << std::endl;
-		platformList[i].getDevices(CL_DEVICE_TYPE_ALL, &deviceList);
-		for (int j = 0; j < deviceList.size(); j++) {
-			deviceList[j].getInfo((cl_device_info)CL_DEVICE_NAME, &dev);
-			std::cout << "Device " << j << ": " << dev << std::endl;
+	error = clGetPlatformIDs(8, platforms, &nPlatforms);
+	for (int i = 0; i < 1; i++) {
+		size_t actualLength;
+		char vendor[32], name[64];
+		clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 32, &vendor, &actualLength);
+		clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME,   64, &name,   &actualLength);
+		std::cout << "Platform " << i << ": " << string(vendor) << " " << string(name) << std::endl;
+
+		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &nDevices);
+		devices = new cl_device_id[nDevices];
+		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, nDevices, devices, &nDevices);
+		for (int j = 0; j < nDevices; j++) {
+			char devName[64];
+			clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 64, devName, &actualLength);
+			std::cout << "Device " << j << ": " << string(devName) << std::endl;
 		}
 	}
 
 	//Just select the first platform and device for now
-	cl_context_properties cprops[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties)(platformList[0])(), 0 };
-	context = cl::Context(CL_DEVICE_TYPE_ALL, cprops, NULL, NULL, &error);
-	if (error != CL_SUCCESS) std::cerr << "Error: " << error << std::endl;
-
 	currentDevice = 0;
-	deviceList = context.getInfo<CL_CONTEXT_DEVICES>();
-	defaultQueue = cl::CommandQueue(context, deviceList[currentDevice], 0, &error);
-
+	cl_context_properties props[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[0]), 0 };
+	context = clCreateContext(props, 1, devices, NULL, NULL, &error);
+	if (error != CL_SUCCESS) std::cerr << "Error creating context: " << error << std::endl;
+	defaultQueue = clCreateCommandQueue(context, devices[currentDevice], 0, &error);
+	if (error != CL_SUCCESS) std::cerr << "Error creating queue: " << error << std::endl;
+	
 	/*
 	int deviceCount = 0;
 	int deviceNumber = 0;
@@ -102,37 +103,49 @@ void ClSupportImpl::init()
 
 void ClSupportImpl::allocate(void** a, size_t size)
 {
-	*a = new cl::Buffer(context, CL_MEM_READ_WRITE, size);
+	cl_int error;
+	*a = clCreateBuffer(context, CL_MEM_READ_WRITE, size, NULL, &error);
+	if (error != CL_SUCCESS) std::cout << "Error allocating OpenCL buffer memory: " << error << std::endl;
+	//else cout << "Allocated " << size << " bytes at " << *a << endl;
 }
 
 void ClSupportImpl::free(void *mem)
 {
-	delete(mem);
+	clReleaseMemObject((cl_mem)mem);
 }
 
 void ClSupportImpl::copy(void *destination, void *source, size_t size, bool host_to_device)
 {
+	cl_int error = CL_SUCCESS;
 	if (host_to_device) {
-		defaultQueue.enqueueWriteBuffer(*static_cast<cl::Buffer*>(destination), CL_TRUE, 0, size, source);
+		cl_mem destinationBuffer = static_cast<cl_mem>(destination);
+		error = clEnqueueWriteBuffer(defaultQueue, destinationBuffer, CL_TRUE, 0, size, source, 0, NULL, NULL);
+		if (error != CL_SUCCESS) std::cout << "Error copying Population data to OpenCL device: " << error << std::endl;
+		//else cout << "Copied " << size << " bytes to device at " << buf << endl;
 	}
 	else {
-		defaultQueue.enqueueReadBuffer(*static_cast<cl::Buffer*>(source), CL_TRUE, 0, size, destination);
+		cl_mem sourceBuffer = static_cast<cl_mem>(source);
+		error = clEnqueueReadBuffer(defaultQueue, sourceBuffer, CL_TRUE, 0, size, destination, 0, NULL, NULL);
+		if (error != CL_SUCCESS) std::cout << "Error downloading Population data from OpenCL device: " << error << std::endl;
+		//else cout << "Downloaded " << size << " bytes from device (" << source << " to " << destination << ")" << endl;
 	}
 }
 
 void ClSupportImpl::shutdown()
 {
-	//cudaThreadExit();
+	clReleaseCommandQueue(defaultQueue);
+	clReleaseContext(context);
 }
 
 void ClSupportImpl::selectDevice(int device)
 {
-	if (device < deviceList.size()) {
+	if (device < nDevices) {
 		currentDevice = device;
-		defaultQueue = cl::CommandQueue(context, deviceList[currentDevice], 0);
+		cl_int error;
+		defaultQueue = clCreateCommandQueue(context, devices[currentDevice], 0, &error);
 	}
 	else std::cout << "Invalid OpenCL device number - please select a number between 0 and "
-		<< deviceList.size() - 1 << "." << std::endl;	
+		<< nDevices - 1 << "." << std::endl;	
 }
 
 int ClSupportImpl::getCurrentDevice()
@@ -142,7 +155,7 @@ int ClSupportImpl::getCurrentDevice()
 
 int ClSupportImpl::getDeviceCount()
 {
-	return deviceList.size();
+	return nDevices;
 }
 
 cudaDeviceProp* ClSupportImpl::getDeviceProperties(int device)
@@ -156,6 +169,7 @@ cudaDeviceProp* ClSupportImpl::getDeviceProperties(int device)
 
 std::string ClSupportImpl::getCurrentDeviceName()
 {
+	/*
 	std::string vendor, name;
 	cl_device_type type;
 	deviceList[currentDevice].getInfo(CL_DEVICE_VENDOR, &vendor);
@@ -166,7 +180,8 @@ std::string ClSupportImpl::getCurrentDeviceName()
 	if (type == CL_DEVICE_TYPE_GPU) { result << "(GPU)"; }
 	else if (type == CL_DEVICE_TYPE_CPU) { result << "(CPU)"; }
 	else result << "(other)";
-	return result.str();
+	return result.str();*/
+	return "NOT YET IMPLEMENTED";
 }
 
 int ClSupportImpl::getCurrentDeviceCapability()
@@ -175,25 +190,6 @@ int ClSupportImpl::getCurrentDeviceCapability()
 	//deviceList[currentDevice].getInfo(CL_DRIVER_VERSION, &version);
 	//std::cout << version << std::endl;
 	return 1;
-}
-
-cl::Context ClSupportImpl::getOpenCLContext()
-{
-	return context;
-}
-cl::CommandQueue ClSupportImpl::getOpenCLQueue()
-{
-	return defaultQueue;
-}
-
-cl::Device ClSupportImpl::getOpenCLDevice()
-{
-	return deviceList[currentDevice];
-}
-
-std::vector<cl::Device> ClSupportImpl::getOpenCLDeviceList()
-{
-	return deviceList;
 }
 
 

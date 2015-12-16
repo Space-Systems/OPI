@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
 		for(int i = 0; i < data.getSize(); ++i)
 		{
 			orbit[i].arg_of_perigee = i;
-			orbit[i].semi_major_axis = 6400.0f;
+			orbit[i].semi_major_axis = 6800.0f;
 		}
 		// inform the data about changes inside our orbit structure
 		data.update(OPI::DATA_ORBIT);
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
 		// refresh data pointer for orbital data again
 		// this will automatically sync the data between different devices
-		orbit = data.getOrbit();
+		orbit = data.getOrbit(OPI::DEVICE_HOST);
 
 		for(int i = 0; i < 10; ++i)
 		{
