@@ -101,6 +101,11 @@ namespace OPI
 		return 0;
 	}
 
+	int Propagator::requiresOpenCL()
+	{
+		return 0;
+	}
+
 	ErrorCode Propagator::runIndexedPropagation(Population& data, IndexList& indices, double julian_day, float dt)
 	{
 		return NOT_IMPLEMENTED;

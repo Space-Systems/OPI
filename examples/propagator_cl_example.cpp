@@ -36,11 +36,54 @@ class TestPropagator:
 			registerProperty("int_array", testproperty_int_array, 5);
 			registerProperty("float_array", testproperty_float_array, 2);
 			registerProperty("double_array", testproperty_double_array, 4);
+
+			// Get GPU support module from host and cast it to the OpenCL implementation.
+			// This will provide important additional information such as the OpenCL context
+			// and default command queue.
+			clSupport = dynamic_cast<ClSupportImpl*>(host.getGPUSupport());
+			
+			// Create propagator kernel from embedded source code
+			propagator = createPropagator();
 		}
 
 		virtual ~TestPropagator()
 		{
 
+		}
+
+		cl_kernel createPropagator()
+		{
+			// cl_int for OpenCL error reporting
+			cl_int err;
+
+			// define kernel source code
+			const char* kernelCode = "\n" \
+				"struct Orbit {float semi_major_axis;float eccentricity;float inclination;float raan;float arg_of_perigee;float mean_anomaly;float bol;float eol;}; \n" \
+				"__kernel void propagate(__global struct Orbit* orbit, double julian_day, float dt) { \n" \
+				"int i = get_global_id(0); \n" \
+				"orbit[i].semi_major_axis += i + julian_day + dt; \n" \
+				"} \n";
+
+			// create kernel program
+			cl_program program = clCreateProgramWithSource(clSupport->getOpenCLContext(), 1, (const char**)&kernelCode, NULL, &err);
+			if (err != CL_SUCCESS) std::cout << "Error creating program: " << err << std::endl;
+
+			// build kernel for default device
+			const cl_device_id device = clSupport->getOpenCLDevice();
+			err = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
+
+			// print build log for debugging purposes
+			char buildLog[2048];
+			clGetProgramBuildInfo(program, clSupport->getOpenCLDevice(), CL_PROGRAM_BUILD_LOG, sizeof(buildLog), buildLog, NULL);
+			cout << "--- Build log ---\n " << buildLog << endl;
+
+			// create the kernel object
+			cl_kernel kernel = clCreateKernel(program, "propagate", &err);
+			if (err != CL_SUCCESS) {
+				std::cout << "Error creating kernel: " << err << std::endl;
+			}
+			cout << "Kernel created." << endl;
+			return kernel;
 		}
 
 		virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
@@ -52,63 +95,43 @@ class TestPropagator:
 			// cl_int for OpenCL error reporting
 			cl_int err;
 
-			// Get GPU support module from host and cast it to the OpenCL implementation.
-			// This will provide important additional information such as the OpenCL context
-			// and default command queue.
-			OPI::GpuSupport* gpu = getHost()->getGPUSupport();
-			ClSupportImpl* cl = dynamic_cast<ClSupportImpl*>(gpu);
+			// Check whether kernel was successfully built
+			if (propagator) {
 
-			// define kernel source code
-			const char* kernelCode = "\n" \
-				"struct Orbit {float semi_major_axis;float eccentricity;float inclination;float raan;float arg_of_perigee;float mean_anomaly;float bol;float eol;}; \n" \
-				"__kernel void propagate(__global struct Orbit* orbit, double julian_day, float dt) { \n" \
-				"int i = get_global_id(0); \n" \
-				"orbit[i].semi_major_axis = 6500.0 + i; \n" \
-				"} \n";
+				// Calling getOrbit and getObjectProperties with the DEVICE_CUDA flag will return
+				// cl_mem objects in the OpenCL implementation. They must be explicitly cast to
+				// cl_mem before they can be used as kernel arguments. This step will also trigger
+				// the memory transfer from host to OpenCL device.
+				cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
+				err = clSetKernelArg(propagator, 0, data.getSize(), &orbit);
+				if (err != CL_SUCCESS) cout << "Error setting population data: " << err << endl;
 
-			// create kernel program
-			cl_program program = clCreateProgramWithSource(cl->getOpenCLContext(), 1, (const char**)&kernelCode, NULL, &err);
-			if (err != CL_SUCCESS) std::cout << "Error creating program: " << err << std::endl;
+				// set remaining arguments (julian_day and dt)
+				err = clSetKernelArg(propagator, 1, sizeof(double), &julian_day);
+				if (err != CL_SUCCESS) cout << "Error setting jd data: " << err << endl;
+				err = clSetKernelArg(propagator, 2, sizeof(float), &dt);
+				if (err != CL_SUCCESS) cout << "Error setting dt data: " << err << endl;
 
-			// build kernel for default device
-			err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+				// run the kernel
+				const size_t s = data.getSize();
+				err = clEnqueueNDRangeKernel(clSupport->getOpenCLQueue(), propagator, 1, NULL, &s, NULL, 0, NULL, NULL);
+				if (err != CL_SUCCESS) cout << "Error running kernel: " << err << endl;
 
-			// print build log for debugging purposes
-			char buildLog[2048];
-			clGetProgramBuildInfo(program, cl->getOpenCLDevice(), CL_PROGRAM_BUILD_LOG, sizeof(buildLog), buildLog, NULL);
-			cout << "--- Build log ---\n " << buildLog << endl;
+				// wait for the kernel to finish
+				clFinish(clSupport->getOpenCLQueue());
 
-			// create the kernel object
-			cl_kernel kernel = clCreateKernel(program, "propagate", &err);
-			if (err != CL_SUCCESS) std::cout << "Error creating kernel: " << err << std::endl;
+				// Don't forget to notify OPI of the updated data on the device!
+				data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
 
-			// Calling getOrbit and getObjectProperties with the DEVICE_CUDA flag will return
-			// cl_mem objects in the OpenCL implementation. They must be explicitly cast to
-			// cl_mem before they can be used as kernel arguments. This step will also trigger
-			// the memory transfer from host to OpenCL device.
-			cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
-			err = clSetKernelArg(kernel, 0, data.getSize(), &orbit);
-			if (err != CL_SUCCESS) cout << "Error setting population data: " << err << endl;
-
-			// set remaining arguments (julian_day and dt)
-			err = clSetKernelArg(kernel, 1, sizeof(double), &julian_day);
-			if (err != CL_SUCCESS) cout << "Error setting jd data: " << err << endl;
-			err = clSetKernelArg(kernel, 2, sizeof(float), &dt);
-			if (err != CL_SUCCESS) cout << "Error setting dt data: " << err << endl;
-
-			// run the kernel
-			const size_t s = data.getSize();
-			err = clEnqueueNDRangeKernel(cl->getOpenCLQueue(), kernel, 1, NULL, &s, NULL, 0, NULL, NULL);
-			if (err != CL_SUCCESS) cout << "Error running kernel: " << err << endl;
-
-			// wait for the kernel to finish
-			clFinish(cl->getOpenCLQueue());
-
-			// Don't forget to notify OPI of the updated data on the device!
-			data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
-			
-			return OPI::SUCCESS;
+				return OPI::SUCCESS;
+			}
 		}
+
+		int requiresOpenCL()
+		{
+			return 1;
+		}
+
 	private:
 		int testproperty_int;
 		float testproperty_float;
@@ -117,6 +140,8 @@ class TestPropagator:
 		float testproperty_float_array[2];
 		double testproperty_double_array[4];
 		std::string testproperty_string;
+		cl_kernel propagator;
+		ClSupportImpl* clSupport;
 };
 
 #define OPI_IMPLEMENT_CPP_PROPAGATOR TestPropagator

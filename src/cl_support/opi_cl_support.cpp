@@ -18,12 +18,12 @@
 
 ClSupportImpl::ClSupportImpl()
 {
-	CUDAProperties = 0;
+	
 }
 
 ClSupportImpl::~ClSupportImpl()
 {
-	delete[] CUDAProperties;
+	
 }
 
 void ClSupportImpl::init()
@@ -33,7 +33,7 @@ void ClSupportImpl::init()
 	cl_uint nPlatforms;
 	cl_int error;
 	error = clGetPlatformIDs(8, platforms, &nPlatforms);
-	for (int i = 0; i < 1; i++) {
+	for (int i = 0; i < nPlatforms; i++) {
 		size_t actualLength;
 		char vendor[32], name[64];
 		clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 32, &vendor, &actualLength);
@@ -51,8 +51,10 @@ void ClSupportImpl::init()
 	}
 
 	//Just select the first platform and device for now
+	int currentPlatform = 0;
 	currentDevice = 0;
-	cl_context_properties props[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[0]), 0 };
+	clGetDeviceIDs(platforms[currentPlatform], CL_DEVICE_TYPE_ALL, nDevices, devices, &nDevices);
+	cl_context_properties props[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[currentPlatform]), 0 };
 	context = clCreateContext(props, 1, devices, NULL, NULL, &error);
 	if (error != CL_SUCCESS) std::cerr << "Error creating context: " << error << std::endl;
 	defaultQueue = clCreateCommandQueue(context, devices[currentDevice], 0, &error);
@@ -160,11 +162,7 @@ int ClSupportImpl::getDeviceCount()
 
 cudaDeviceProp* ClSupportImpl::getDeviceProperties(int device)
 {
-	/*
-	if((device >= 0) && (device < getDeviceCount()))
-		 return &CUDAProperties[device];
-	*/
-	return 0;
+	return NULL;
 }
 
 std::string ClSupportImpl::getCurrentDeviceName()

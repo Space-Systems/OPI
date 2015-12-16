@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-#include "../OPI/internal/opi_cudasupport.h"
+#include "../OPI/internal/opi_gpusupport.h"
 
 #include <cuda_runtime.h>
 #include <iostream>
@@ -24,7 +24,7 @@
 using namespace std;
 
 class CudaSupportImpl:
-		public OPI::CudaSupport
+		public OPI::GpuSupport
 {
 	public:
 		CudaSupportImpl();

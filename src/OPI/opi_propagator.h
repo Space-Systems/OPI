@@ -79,6 +79,12 @@ namespace OPI
 			 */
 			virtual int requiresCUDA();
 
+			//! Check whether this propagator requires OpenCL to function.
+			/** Set to zero if OpenCL is not required, otherwise set this to the major number of
+			*  the required compute capability.
+			*/
+			virtual int requiresOpenCL();
+
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
 			void useModules();

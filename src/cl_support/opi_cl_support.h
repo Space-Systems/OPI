@@ -49,8 +49,6 @@ public:
 	inline cl_device_id* getOpenCLDeviceList() { return devices; }
 
 private:
-	cudaDeviceProp* CUDAProperties;
-
 	cl_context context;
 	cl_command_queue defaultQueue;
 	cl_device_id* devices;
