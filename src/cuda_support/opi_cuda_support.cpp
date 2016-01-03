@@ -188,7 +188,7 @@ extern "C"
 #if WIN32
 __declspec(dllexport)
 #endif
-OPI::CudaSupport* createCudaSupport()
+OPI::GpuSupport* createGpuSupport()
 {
 	return new CudaSupportImpl();
 }
