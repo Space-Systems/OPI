@@ -123,13 +123,13 @@ void ClSupportImpl::copy(void *destination, void *source, size_t size, bool host
 		cl_mem destinationBuffer = static_cast<cl_mem>(destination);
 		error = clEnqueueWriteBuffer(defaultQueue, destinationBuffer, CL_TRUE, 0, size, source, 0, NULL, NULL);
 		if (error != CL_SUCCESS) std::cout << "Error copying Population data to OpenCL device: " << error << std::endl;
-		//else cout << "Copied " << size << " bytes to device at " << buf << endl;
+		//else cout << "Copied " << size << " bytes to device at " << destinationBuffer << endl;
 	}
 	else {
 		cl_mem sourceBuffer = static_cast<cl_mem>(source);
 		error = clEnqueueReadBuffer(defaultQueue, sourceBuffer, CL_TRUE, 0, size, destination, 0, NULL, NULL);
 		if (error != CL_SUCCESS) std::cout << "Error downloading Population data from OpenCL device: " << error << std::endl;
-		//else cout << "Downloaded " << size << " bytes from device (" << source << " to " << destination << ")" << endl;
+		//else cout << "Downloaded " << size << " bytes from device (" << sourceBuffer << " to " << destination << ")" << endl;
 	}
 }
 

@@ -103,7 +103,7 @@ class TestPropagator:
 				// cl_mem before they can be used as kernel arguments. This step will also trigger
 				// the memory transfer from host to OpenCL device.
 				cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
-				err = clSetKernelArg(propagator, 0, data.getSize(), &orbit);
+				err = clSetKernelArg(propagator, 0, sizeof(cl_mem), &orbit);
 				if (err != CL_SUCCESS) cout << "Error setting population data: " << err << endl;
 
 				// set remaining arguments (julian_day and dt)
@@ -125,6 +125,7 @@ class TestPropagator:
 
 				return OPI::SUCCESS;
 			}
+			return OPI::INVALID_DEVICE;
 		}
 
 		int requiresOpenCL()
