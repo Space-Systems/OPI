@@ -65,6 +65,10 @@ class TestPropagator:
 			return OPI::SUCCESS;
 		}
 
+		int requiresCUDA() {
+			return 3;
+		}
+
 };
 
 #define OPI_IMPLEMENT_CPP_PROPAGATOR TestPropagator
