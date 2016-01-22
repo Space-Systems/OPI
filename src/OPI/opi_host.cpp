@@ -106,16 +106,18 @@ namespace OPI
 		return impl->lastError;
 	}
 
-	ErrorCode Host::loadPlugins(const std::string &plugindir)
+	ErrorCode Host::loadPlugins(const std::string& plugindir, gpuPlatform platformSupport)
 	{
 		ErrorCode status = SUCCESS;
 		std::cout << "Loading plugins from " << plugindir << std::endl;
 
 		// check if the cuda support plugin is loaded
-		if(impl->gpuSupport == 0)
+		if(impl->gpuSupport == 0 && platformSupport != PLATFORM_NONE)
 		{
 			// try to load cuda plugin
-			impl->gpuSupportPluginHandle = new DynLib(std::string(plugindir + "/support/OPI-cl") + DynLib::getSuffix(), true);
+			std::string pluginName = (platformSupport == PLATFORM_OPENCL ? "OPI-cl" : "OPI-cuda");
+			
+			impl->gpuSupportPluginHandle = new DynLib(std::string(plugindir + "/support/" + pluginName) + DynLib::getSuffix(), true);
 			if(impl->gpuSupportPluginHandle)
 			{
 				procCreateGpuSupport proc_create_support = (procCreateGpuSupport)impl->gpuSupportPluginHandle->loadFunction("createGpuSupport");
@@ -124,6 +126,9 @@ namespace OPI
 					// plugin successfully loaded
 					impl->gpuSupport = proc_create_support();
 					impl->gpuSupport->init();
+				}
+				else {
+					platformSupport = PLATFORM_NONE;
 				}
 			}
 		}
@@ -147,7 +152,7 @@ namespace OPI
 						// if it is valid load the plugin
 						Plugin* plugin = new Plugin(lib);
 						impl->pluginlist.push_back(plugin);
-						loadPlugin(plugin);
+						loadPlugin(plugin,platformSupport);
 					}
 					else
 						delete lib;
@@ -166,7 +171,7 @@ namespace OPI
 		return status;
 	}
 
-	void Host::loadPlugin(Plugin *plugin)
+	void Host::loadPlugin(Plugin *plugin, gpuPlatform platform)
 	{
 		// we have a functional plugin loaded
 		// now create the correct type for it
@@ -188,30 +193,41 @@ namespace OPI
 				// if the propagator was created, add it to the list
 
 				if(propagator) {
-					if (propagator->requiresCUDA() <= 0) {
+					if (propagator->requiresCUDA() <= 0 && propagator->requiresOpenCL() <= 0) {
+						// no GPU support required; load plugin
 						addPropagator(propagator);
 					}
-					else if (!hasCUDASupport()) {
-						std::cout << "[OPI] Skipping propagator " << propagator->getName()
-							<< " because it requires CUDA." << std::endl;
+					else if (propagator->requiresCUDA() > 0) {
+						if (platform != PLATFORM_CUDA) {
+							std::cout << propagator->getName()
+							<< ": Skipped - no CUDA support available." << std::endl;
+						}
+						else if (getCurrentCudaDeviceCapability() <= 0) {
+							std::cout << "[OPI] Warning: Cannot determine CUDA compute capability of selected device "
+								<< "(perhaps no CUDA device was selected?). " << std::endl;
+							std::cout << "[OPI] Propagator " << propagator->getName() << " requires at least " 
+								<< propagator->requiresCUDA() << ".x - "
+								<< "otherwise propagation might fail." << std::endl;
+							addPropagator(propagator);
+						}
+						else if (propagator->requiresCUDA() <= getCurrentCudaDeviceCapability()) {
+							addPropagator(propagator);
+						}
+						else {
+							std::cout << propagator->getName()
+							<< ": Skipped - Compute capability too low (" <<
+							getCurrentCudaDeviceCapability() << ", needs at least" <<
+							propagator->requiresCUDA() << ")" << std::endl;
+						}
 					}
-					else if (getCurrentCudaDeviceCapability() <= 0) {
-						std::cout << "[OPI] Warning: Cannot determine CUDA compute capability of selected device "
-							<< "(perhaps no CUDA device was selected?). " << std::endl;
-						std::cout << "[OPI] Propagator " << propagator->getName() << " requires at least " 
-							<< propagator->requiresCUDA() << ".x - "
-							<< "otherwise propagation might fail." << std::endl;
-						addPropagator(propagator);
-					}
-					else if (propagator->requiresCUDA() <= getCurrentCudaDeviceCapability()) {
-						addPropagator(propagator);
-					}
-					else {
-						std::cout << "[OPI] Skipping propagator " << propagator->getName()
-							<< " because selected device is not capable of running it." << std::endl;
-						std::cout << "[OPI] Device has compute capability " << getCurrentCudaDeviceCapability() << ", "
-							<< propagator->getName() << " requires at least " << propagator->requiresCUDA() << "."
-							<< std::endl;
+					else if (propagator->requiresOpenCL() > 0) {
+						if (platform == PLATFORM_OPENCL) {
+							addPropagator(propagator);
+						}
+						else {
+							std::cout << propagator->getName()
+							<< ": Skipped - no OpenCL support available." << std::endl;
+						}
 					}
 				}
 				break;

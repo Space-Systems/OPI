@@ -55,6 +55,12 @@ namespace OPI
 		public:
 			Host();
 			~Host();
+	
+			enum gpuPlatform {
+				PLATFORM_NONE,
+				PLATFORM_CUDA,
+				PLATFORM_OPENCL
+			};
 
 			//! Check whether CUDA is supported on the current hardware.
 			bool hasCUDASupport() const;
@@ -62,11 +68,11 @@ namespace OPI
 			//! Load all plugins found in the given directory.
 			/** A plugin can be a Propagator, CustomPropagator, PerturbationModule, PropagatorIntegrator,
 			 * DistanceQuery, CollisionDetection (including the C and Fortran equivalents thereof),
-			 * the CUDA support plugin supplied by OPI, or any other shared object that implements the
-			 * Module interface.
+			 * or any other shared object that implements the Module interface.
+			 * The parameter platformSupport states whether support for CUDA (default) or OpenCL should be loaded.
 			 * \returns an ErrorCode containing information on any errors that occurred during the operation.
 			 */
-			ErrorCode loadPlugins(const std::string& plugindir);
+			ErrorCode loadPlugins(const std::string& plugindir, gpuPlatform platformSupport = PLATFORM_CUDA);
 
 			//! Sets an error callback for this host.
 			void setErrorCallback(OPI_ErrorCallback callback, void* privatedata);
@@ -179,7 +185,7 @@ namespace OPI
 		private:
 			Host(const Host& other);
 			//! Load a specific plugin
-			void loadPlugin(Plugin* plugin);
+			void loadPlugin(Plugin* plugin, gpuPlatform platform);
 			Pimpl<HostImpl> impl;
 	};
 }
