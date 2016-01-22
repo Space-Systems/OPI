@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
 
 	host.setErrorCallback(&ErrorCallback, 0);
 	// load plugins
-	host.loadPlugins("plugins");
+	host.loadPlugins("plugins",OPI::Host::PLATFORM_OPENCL);
 
 	// create Data object AFTER! loading all plugins
 	OPI::Population data(host, 200);
@@ -36,48 +36,48 @@ int main(int argc, char* argv[])
 	// fetch a specific propagator
 	OPI::Propagator* propagator = host.getPropagator("OpenCL Example Propagator");
 
-	std::cout << "Propagator properties:" << std::endl;
-	for(int i = 0; i < propagator->getPropertyCount(); ++i)
-	{
-		std::string name = propagator->getPropertyName(i);
-		std::cout << name;
-		switch(propagator->getPropertyType(i))
-		{
-			case OPI::TYPE_UNKNOWN:
-				break;
-			case OPI::TYPE_INTEGER:
-				std::cout << "(TYPE_INTEGER) value: " << propagator->getPropertyInt(i);
-				break;
-			case OPI::TYPE_FLOAT:
-				std::cout << "(TYPE_FLOAT) value: " << propagator->getPropertyFloat(i);
-				break;
-			case OPI::TYPE_DOUBLE:
-				std::cout << "(TYPE_DOUBLE) value: " << propagator->getPropertyDouble(i);
-				break;
-			case OPI::TYPE_STRING:
-				std::cout << "(TYPE_STRING) value: " << propagator->getPropertyString(i);
-				break;
-			case OPI::TYPE_INTEGER_ARRAY:
-				std::cout << "(TYPE_INTEGER_ARRAY) values: " << propagator->getPropertyInt(i, 0);
-				for(int j = 1; j < propagator->getPropertySize(i); ++j)
-					std::cout << ", " << propagator->getPropertyInt(i, j);
-				break;
-			case OPI::TYPE_FLOAT_ARRAY:
-				std::cout << "(TYPE_FLOAT_ARRAY) values: " << propagator->getPropertyFloat(i, 0);
-				for(int j = 1; j < propagator->getPropertySize(i); ++j)
-					std::cout << ", " << propagator->getPropertyFloat(i, j);
-				break;
-			case OPI::TYPE_DOUBLE_ARRAY:
-				std::cout << "(TYPE_DOUBLE_ARRAY) values: " << propagator->getPropertyDouble(i, 0);
-				for(int j = 1; j < propagator->getPropertySize(i); ++j)
-					std::cout << ", " << propagator->getPropertyDouble(i, j);
-				break;
-		}
-		std::cout << std::endl;
-	}
+	if (propagator) {
 
-	if(propagator)
-	{
+		std::cout << "Propagator properties:" << std::endl;
+		for(int i = 0; i < propagator->getPropertyCount(); ++i)
+		{
+			std::string name = propagator->getPropertyName(i);
+			std::cout << name;
+			switch(propagator->getPropertyType(i))
+			{
+				case OPI::TYPE_UNKNOWN:
+					break;
+				case OPI::TYPE_INTEGER:
+					std::cout << "(TYPE_INTEGER) value: " << propagator->getPropertyInt(i);
+					break;
+				case OPI::TYPE_FLOAT:
+					std::cout << "(TYPE_FLOAT) value: " << propagator->getPropertyFloat(i);
+					break;
+				case OPI::TYPE_DOUBLE:
+					std::cout << "(TYPE_DOUBLE) value: " << propagator->getPropertyDouble(i);
+					break;
+				case OPI::TYPE_STRING:
+					std::cout << "(TYPE_STRING) value: " << propagator->getPropertyString(i);
+					break;
+				case OPI::TYPE_INTEGER_ARRAY:
+					std::cout << "(TYPE_INTEGER_ARRAY) values: " << propagator->getPropertyInt(i, 0);
+					for(int j = 1; j < propagator->getPropertySize(i); ++j)
+						std::cout << ", " << propagator->getPropertyInt(i, j);
+					break;
+				case OPI::TYPE_FLOAT_ARRAY:
+					std::cout << "(TYPE_FLOAT_ARRAY) values: " << propagator->getPropertyFloat(i, 0);
+					for(int j = 1; j < propagator->getPropertySize(i); ++j)
+						std::cout << ", " << propagator->getPropertyFloat(i, j);
+					break;
+				case OPI::TYPE_DOUBLE_ARRAY:
+					std::cout << "(TYPE_DOUBLE_ARRAY) values: " << propagator->getPropertyDouble(i, 0);
+					for(int j = 1; j < propagator->getPropertySize(i); ++j)
+						std::cout << ", " << propagator->getPropertyDouble(i, j);
+					break;
+			}
+			std::cout << std::endl;
+		}
+
 		std::cout << "Using propagator: " << propagator->getName() << std::endl;
 		// request data pointer for orbital data
 		OPI::Orbit* orbit = data.getOrbit();
