@@ -37,13 +37,12 @@ class TestPropagator:
 			registerProperty("float_array", testproperty_float_array, 2);
 			registerProperty("double_array", testproperty_double_array, 4);
 
+			initialized = false;
+
 			// Get GPU support module from host and cast it to the OpenCL implementation.
 			// This will provide important additional information such as the OpenCL context
 			// and default command queue.
-			clSupport = dynamic_cast<ClSupportImpl*>(host.getGPUSupport());
-			
-			// Create propagator kernel from embedded source code
-			propagator = createPropagator();
+			clSupport = dynamic_cast<ClSupportImpl*>(host.getGPUSupport());			
 		}
 
 		virtual ~TestPropagator()
@@ -92,6 +91,12 @@ class TestPropagator:
 			std::cout << "Test float: " <<  testproperty_float << std::endl;
 			std::cout << "Test string: " << testproperty_string << std::endl;
 
+			if (!initialized) {
+				// Create propagator kernel from embedded source code
+				propagator = createPropagator();
+				initialized = true;
+			}
+
 			// cl_int for OpenCL error reporting
 			cl_int err;
 
@@ -102,6 +107,7 @@ class TestPropagator:
 				// cl_mem objects in the OpenCL implementation. They must be explicitly cast to
 				// cl_mem before they can be used as kernel arguments. This step will also trigger
 				// the memory transfer from host to OpenCL device.
+				cout << data.getSize() << endl;
 				cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
 				err = clSetKernelArg(propagator, 0, sizeof(cl_mem), &orbit);
 				if (err != CL_SUCCESS) cout << "Error setting population data: " << err << endl;
@@ -133,6 +139,11 @@ class TestPropagator:
 			return 1;
 		}
 
+		int requiresCUDA()
+		{
+			return 0;
+		}
+
 	private:
 		int testproperty_int;
 		float testproperty_float;
@@ -143,6 +154,7 @@ class TestPropagator:
 		std::string testproperty_string;
 		cl_kernel propagator;
 		ClSupportImpl* clSupport;
+		bool initialized;
 };
 
 #define OPI_IMPLEMENT_CPP_PROPAGATOR TestPropagator
