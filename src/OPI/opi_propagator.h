@@ -72,6 +72,9 @@ namespace OPI
 
 			//! Check if this propagator is able to propagate backwards
 			virtual bool backwardPropagation();
+	
+			//! Check if this propagator supports generation of cartesian state vectors
+			virtual bool cartesianCoordinates();
 
 			//! Check whether this propagator requires CUDA to function.
 			/** Set to zero if CUDA is not required, otherwise set this to the major number of

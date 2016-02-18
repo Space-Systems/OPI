@@ -95,6 +95,11 @@ namespace OPI
 	{
 		return true;
 	}
+
+	bool Propagator::cartesianCoordinates()
+	{
+		return false;
+	}
 	
 	int Propagator::requiresCUDA()
 	{
