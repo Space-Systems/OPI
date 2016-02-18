@@ -116,8 +116,9 @@ namespace OPI
 		{
 			// try to load cuda plugin
 			std::string pluginName = (platformSupport == PLATFORM_OPENCL ? "OPI-cl" : "OPI-cuda");
-			
-			impl->gpuSupportPluginHandle = new DynLib(std::string(plugindir + "/support/" + pluginName) + DynLib::getSuffix(), true);
+			std::string libraryFileName = std::string(plugindir + "/support/" + pluginName + DynLib::getSuffix());
+
+			impl->gpuSupportPluginHandle = new DynLib(libraryFileName, true);
 			if(impl->gpuSupportPluginHandle)
 			{
 				procCreateGpuSupport proc_create_support = (procCreateGpuSupport)impl->gpuSupportPluginHandle->loadFunction("createGpuSupport");
@@ -129,7 +130,12 @@ namespace OPI
 				}
 				else {
 					platformSupport = PLATFORM_NONE;
+					std::cout << "[OPI] Unable to load GPU support library." << std::endl;
 				}
+			}
+			else {
+				platformSupport = PLATFORM_NONE;
+				std::cout << "[OPI] Cannot find GPU support library (" << libraryFileName << ")"<< std::endl;
 			}
 		}
 
