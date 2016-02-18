@@ -115,7 +115,8 @@ namespace OPI
 		if(impl->cudaSupport == 0)
 		{
 			// try to load cuda plugin
-			impl->cudaSupportPluginHandle = new DynLib(std::string(plugindir + "/support/OPI-cuda") + DynLib::getSuffix(), true);
+			std::string libraryFileName = std::string(plugindir + "/support/OPI-cuda" + DynLib::getSuffix());
+			impl->cudaSupportPluginHandle = new DynLib(libraryFileName);
 			if(impl->cudaSupportPluginHandle)
 			{
 				procCreateCudaSupport proc_create_support = (procCreateCudaSupport)impl->cudaSupportPluginHandle->loadFunction("createCudaSupport");
@@ -125,6 +126,12 @@ namespace OPI
 					impl->cudaSupport = proc_create_support();
 					impl->cudaSupport->init();
 				}
+				else {
+					std::cout << "[OPI] Unable to load CUDA support library." << std::endl;
+				}
+			}
+			else {
+				std::cout << "[OPI] Cannot find CUDA support library (" << libraryFileName << ")"<< std::endl;
 			}
 		}
 
