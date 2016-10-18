@@ -47,10 +47,18 @@ add_example_plugin(
     propagator_cuda_example.cu
 )
 
-# a simple OpenCL example plugins
+# a simple OpenCL example plugin (C API)
 add_example_plugin(
 	PropagatorCLExample
 	OPENCL
 	SOURCES
 		propagator_cl_example.cpp
+)
+
+# a simple OpenCL example plugin (C++ API)
+add_example_plugin(
+  PropagatorCL2Example
+  OPENCL
+  SOURCES
+    propagator_cl2_example.cpp
 )

@@ -5,7 +5,7 @@
 #include <typeinfo> //testing
 
 // some plugin information
-#define OPI_PLUGIN_NAME "OpenCL Example Propagator"
+#define OPI_PLUGIN_NAME "OpenCL C Example Propagator"
 #define OPI_PLUGIN_AUTHOR "ILR TU BS"
 #define OPI_PLUGIN_DESC "A simple test"
 // the plugin version

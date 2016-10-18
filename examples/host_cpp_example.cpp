@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	}
 
 	// fetch a specific propagator
-	OPI::Propagator* propagator = host.getPropagator("OpenCL Example Propagator");
+    OPI::Propagator* propagator = host.getPropagator("OpenCL CPP Example Propagator");
 
 	if (propagator) {
 
