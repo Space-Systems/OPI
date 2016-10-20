@@ -1,5 +1,4 @@
 #include "OPI/opi_cpp.h"
-#include "../src/cl_support/opi_cl_support.h"
 
 // For this example, we'll use the new C++ wrapper, cl2.hpp.
 // This requires some additional casting, see comments below.
@@ -48,7 +47,7 @@ class TestPropagator:
 			// Get GPU support module from host and cast it to the OpenCL implementation.
 			// This will provide important additional information such as the OpenCL context
 			// and default command queue.
-			clSupport = dynamic_cast<ClSupportImpl*>(host.getGPUSupport());			
+            clSupport = host.getGPUSupport();
 		}
 
 		virtual ~TestPropagator()
@@ -72,13 +71,13 @@ class TestPropagator:
             // Create the kernel program. OPI's OpenCL support module returns the context
             // and device pointers as C types - to write a propagator using the OpenCL C++
             // API, these need to be wrapped into their respective C++ objects.
-            cl::Context context = cl::Context(clSupport->getOpenCLContext());
+            cl::Context context = cl::Context(*clSupport->getOpenCLContext());
             cl::Program program = cl::Program(context, kernelCode, false, &err);
             if (err != CL_SUCCESS) std::cout << "Error creating program: " << err << std::endl;
 
             // Build the kernel for the default device. Again, the C type from OPI's OpenCL
             // module needs to be wrapped into the cl::Device class.
-            cl::Device device = cl::Device(clSupport->getOpenCLDevice());
+            cl::Device device = cl::Device(*clSupport->getOpenCLDevice());
             err = program.build({device});
             if (err != CL_SUCCESS) std::cout << "Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
 
@@ -87,7 +86,7 @@ class TestPropagator:
 			if (err != CL_SUCCESS) {
                 std::cout << "Error creating kernel: " << err << std::endl;
 			}
-            else cout << "Kernel created." << endl;
+            else std::cout << "Kernel created." << std::endl;
 			return kernel;
 		}
 
@@ -106,7 +105,7 @@ class TestPropagator:
 			// cl_int for OpenCL error reporting
             cl_int err;
 
-            cout << data.getSize() << endl;
+            std::cout << data.getSize() << std::endl;
 
             // Calling getOrbit and getObjectProperties with the DEVICE_CUDA flag will return
             // cl_mem instances in the OpenCL implementation. They must be explicitly cast to
@@ -122,7 +121,7 @@ class TestPropagator:
 
             // The cl::Buffer object can then be used as a kernel argument.
             err = propagator.setArg(0, orbitBuffer);
-            if (err != CL_SUCCESS) cout << "Error setting population data: " << err << endl;
+            if (err != CL_SUCCESS) std::cout << "Error setting population data: " << err << std::endl;
 
             // set remaining arguments (julian_day and dt)
             propagator.setArg(1, julian_day);
@@ -130,9 +129,9 @@ class TestPropagator:
 
             // Enqueue the kernel.
             const size_t problemSize = data.getSize();
-            cl::CommandQueue queue = cl::CommandQueue(clSupport->getOpenCLQueue());
+            cl::CommandQueue queue = cl::CommandQueue(*clSupport->getOpenCLQueue());
             err = queue.enqueueNDRangeKernel(propagator, cl::NullRange, cl::NDRange(problemSize), cl::NullRange);
-            if (err != CL_SUCCESS) cout << "Error running kernel: " << err << endl;
+            if (err != CL_SUCCESS) std::cout << "Error running kernel: " << err << std::endl;
 
             // wait for the kernel to finish
             queue.finish();
@@ -162,7 +161,7 @@ class TestPropagator:
 		double testproperty_double_array[4];
 		std::string testproperty_string;
         cl::Kernel propagator;
-		ClSupportImpl* clSupport;
+        OPI::GpuSupport* clSupport;
 		bool initialized;
 };
 

@@ -1,5 +1,4 @@
 #include "OPI/opi_cpp.h"
-#include "../src/cl_support/opi_cl_support.h"
 #include "CL/cl.h"
 
 #include <typeinfo> //testing
@@ -39,10 +38,8 @@ class TestPropagator:
 
 			initialized = false;
 
-			// Get GPU support module from host and cast it to the OpenCL implementation.
-			// This will provide important additional information such as the OpenCL context
-			// and default command queue.
-			clSupport = dynamic_cast<ClSupportImpl*>(host.getGPUSupport());			
+            // Get GPU support module from host.
+            clSupport = host.getGPUSupport();
 		}
 
 		virtual ~TestPropagator()
@@ -64,24 +61,24 @@ class TestPropagator:
 				"} \n";
 
 			// create kernel program
-			cl_program program = clCreateProgramWithSource(clSupport->getOpenCLContext(), 1, (const char**)&kernelCode, NULL, &err);
+            cl_program program = clCreateProgramWithSource(*clSupport->getOpenCLContext(), 1, (const char**)&kernelCode, NULL, &err);
 			if (err != CL_SUCCESS) std::cout << "Error creating program: " << err << std::endl;
 
 			// build kernel for default device
-			const cl_device_id device = clSupport->getOpenCLDevice();
+            const cl_device_id device = *clSupport->getOpenCLDevice();
 			err = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
 
 			// print build log for debugging purposes
 			char buildLog[2048];
-			clGetProgramBuildInfo(program, clSupport->getOpenCLDevice(), CL_PROGRAM_BUILD_LOG, sizeof(buildLog), buildLog, NULL);
-			cout << "--- Build log ---\n " << buildLog << endl;
+            clGetProgramBuildInfo(program, *clSupport->getOpenCLDevice(), CL_PROGRAM_BUILD_LOG, sizeof(buildLog), buildLog, NULL);
+            std::cout << "--- Build log ---\n " << buildLog << std::endl;
 
 			// create the kernel object
 			cl_kernel kernel = clCreateKernel(program, "propagate", &err);
 			if (err != CL_SUCCESS) {
 				std::cout << "Error creating kernel: " << err << std::endl;
 			}
-			cout << "Kernel created." << endl;
+            std::cout << "Kernel created." << std::endl;
 			return kernel;
 		}
 
@@ -107,24 +104,24 @@ class TestPropagator:
 				// cl_mem objects in the OpenCL implementation. They must be explicitly cast to
 				// cl_mem before they can be used as kernel arguments. This step will also trigger
 				// the memory transfer from host to OpenCL device.
-				cout << data.getSize() << endl;
+                std::cout << data.getSize() << std::endl;
 				cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
 				err = clSetKernelArg(propagator, 0, sizeof(cl_mem), &orbit);
-				if (err != CL_SUCCESS) cout << "Error setting population data: " << err << endl;
+                if (err != CL_SUCCESS) std::cout << "Error setting population data: " << err << std::endl;
 
 				// set remaining arguments (julian_day and dt)
 				err = clSetKernelArg(propagator, 1, sizeof(double), &julian_day);
-				if (err != CL_SUCCESS) cout << "Error setting jd data: " << err << endl;
+                if (err != CL_SUCCESS) std::cout << "Error setting jd data: " << err << std::endl;
 				err = clSetKernelArg(propagator, 2, sizeof(float), &dt);
-				if (err != CL_SUCCESS) cout << "Error setting dt data: " << err << endl;
+                if (err != CL_SUCCESS) std::cout << "Error setting dt data: " << err << std::endl;
 
 				// run the kernel
 				const size_t s = data.getSize();
-				err = clEnqueueNDRangeKernel(clSupport->getOpenCLQueue(), propagator, 1, NULL, &s, NULL, 0, NULL, NULL);
-				if (err != CL_SUCCESS) cout << "Error running kernel: " << err << endl;
+                err = clEnqueueNDRangeKernel(*clSupport->getOpenCLQueue(), propagator, 1, NULL, &s, NULL, 0, NULL, NULL);
+                if (err != CL_SUCCESS) std::cout << "Error running kernel: " << err << std::endl;
 
 				// wait for the kernel to finish
-				clFinish(clSupport->getOpenCLQueue());
+                clFinish(*clSupport->getOpenCLQueue());
 
 				// Don't forget to notify OPI of the updated data on the device!
 				data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
@@ -153,7 +150,7 @@ class TestPropagator:
 		double testproperty_double_array[4];
 		std::string testproperty_string;
 		cl_kernel propagator;
-		ClSupportImpl* clSupport;
+        OPI::GpuSupport* clSupport;
 		bool initialized;
 };
 

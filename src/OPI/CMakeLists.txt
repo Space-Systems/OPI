@@ -41,6 +41,7 @@ set( OPI_LIBRARY_HEADER
   opi_indexlist.h
   opi_collisiondetection.h
   opi_module.h
+  opi_gpusupport.h
 
   # plugin types
   opi_propagator.h
@@ -61,7 +62,6 @@ set( OPI_INTERNAL_HEADER
   internal/opi_query_plugin.h
   internal/opi_pluginprocs.h
   internal/opi_plugin.h
-  internal/opi_gpusupport.h
   internal/opi_synchronized_data.h
   internal/dynlib.h
 )

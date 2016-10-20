@@ -33,7 +33,7 @@ void ClSupportImpl::init()
 	cl_uint nPlatforms;
 	cl_int error;
 	error = clGetPlatformIDs(8, platforms, &nPlatforms);
-	for (int i = 0; i < nPlatforms; i++) {
+    for (unsigned int i = 0; i < nPlatforms; i++) {
 		size_t actualLength;
 		char vendor[32], name[64];
 		clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 32, &vendor, &actualLength);
@@ -43,7 +43,7 @@ void ClSupportImpl::init()
 		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &nDevices);
 		devices = new cl_device_id[nDevices];
 		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, nDevices, devices, &nDevices);
-		for (int j = 0; j < nDevices; j++) {
+        for (unsigned int j = 0; j < nDevices; j++) {
 			char devName[64];
 			clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 64, devName, &actualLength);
 			std::cout << "Device " << j << ": " << string(devName) << std::endl;
@@ -160,11 +160,6 @@ int ClSupportImpl::getDeviceCount()
 	return nDevices;
 }
 
-cudaDeviceProp* ClSupportImpl::getDeviceProperties(int device)
-{
-	return NULL;
-}
-
 std::string ClSupportImpl::getCurrentDeviceName()
 {
 	/*
@@ -188,6 +183,26 @@ int ClSupportImpl::getCurrentDeviceCapability()
 	//deviceList[currentDevice].getInfo(CL_DRIVER_VERSION, &version);
 	//std::cout << version << std::endl;
 	return 1;
+}
+
+cl_context* ClSupportImpl::getOpenCLContext()
+{
+    return &context;
+}
+
+cl_command_queue* ClSupportImpl::getOpenCLQueue()
+{
+    return &defaultQueue;
+}
+
+cl_device_id* ClSupportImpl::getOpenCLDevice()
+{
+    return &devices[currentDevice];
+}
+
+cl_device_id** ClSupportImpl::getOpenCLDeviceList()
+{
+    return &devices;
 }
 
 

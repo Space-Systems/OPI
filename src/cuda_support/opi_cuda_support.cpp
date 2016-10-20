@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-#include "../OPI/internal/opi_gpusupport.h"
+#include "../OPI/opi_gpusupport.h"
 
 #include <cuda_runtime.h>
 #include <iostream>
@@ -41,7 +41,13 @@ class CudaSupportImpl:
 		virtual std::string getCurrentDeviceName();
 		virtual int getCurrentDeviceCapability();
 		virtual int getDeviceCount();
-		virtual cudaDeviceProp* getDeviceProperties(int device);
+        virtual cudaDeviceProp* getDeviceProperties(int device);
+#ifndef OPI_DISABLE_OPENCL
+        virtual cl_context* getOpenCLContext() { return NULL; }
+        virtual cl_command_queue* getOpenCLQueue() { return NULL; }
+        virtual cl_device_id* getOpenCLDevice() { return NULL; }
+        virtual cl_device_id** getOpenCLDeviceList() { return NULL; }
+#endif
 	private:
 		cudaDeviceProp* CUDAProperties;
 };
@@ -181,7 +187,6 @@ int CudaSupportImpl::getCurrentDeviceCapability()
 		return -1;
 	}
 }
-
 
 extern "C"
 {

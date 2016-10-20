@@ -25,4 +25,5 @@
 #include "opi_perturbation_module.h"
 #include "opi_query.h"
 #include "opi_collisiondetection.h"
+#include "opi_gpusupport.h"
 #endif

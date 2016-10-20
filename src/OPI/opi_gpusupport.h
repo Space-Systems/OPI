@@ -17,7 +17,13 @@
 #ifndef OPI_GPU_SUPPORT_H
 #define OPI_GPU_SUPPORT_H
 #include <iostream>
+
+#ifndef OPI_DISABLE_OPENCL
+#include <CL/cl.h>
+#endif
+
 struct cudaDeviceProp;
+
 namespace OPI
 {
 	class GpuSupport;
@@ -44,12 +50,21 @@ namespace OPI
 			virtual void shutdown() = 0;
 
 			virtual void selectDevice(int device) = 0;
-			virtual cudaDeviceProp* getDeviceProperties(int device) = 0;
 			virtual int getCurrentDevice() = 0;
 			virtual int getCurrentDeviceCapability() = 0;
 			virtual std::string getCurrentDeviceName() = 0;
 
 			virtual int getDeviceCount() = 0;
+
+            virtual cudaDeviceProp* getDeviceProperties(int device) = 0;
+
+#ifndef OPI_DISABLE_OPENCL
+            virtual cl_context* getOpenCLContext() = 0;
+            virtual cl_command_queue* getOpenCLQueue() = 0;
+            virtual cl_device_id* getOpenCLDevice() = 0;
+            virtual cl_device_id** getOpenCLDeviceList() = 0;
+#endif
+
 		protected:
 
 	};

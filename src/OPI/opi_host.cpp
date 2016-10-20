@@ -17,7 +17,7 @@
 #include "opi_host.h"
 #include "internal/opi_plugin.h"
 #include "opi_propagator.h"
-#include "internal/opi_gpusupport.h"
+#include "opi_gpusupport.h"
 #include "internal/opi_propagator_plugin.h"
 #include "internal/opi_query_plugin.h"
 #include "opi_custom_propagator.h"
