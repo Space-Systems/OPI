@@ -26,7 +26,6 @@ namespace OPI
 	class ObjectRawData;
 	class Host;
 	class ObjectProperties;
-	class ObjectStatus;
 	class Vector3;
 	class IndexPair;
 	class IndexList;
@@ -68,8 +67,6 @@ namespace OPI
 			Orbit* getOrbit(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the object properties on the specified device
 			ObjectProperties* getObjectProperties(Device device = DEVICE_HOST, bool no_sync = false) const;
-			//! Retrieve the object status on the specified device
-			ObjectStatus* getObjectStatus(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the position in cartesian coordinates on the specified device
 			Vector3* getCartesianPosition(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the velocity in cartesian coordinates on the specified device

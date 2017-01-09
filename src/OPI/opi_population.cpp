@@ -37,10 +37,9 @@ namespace OPI
 				host(_host),
 				data_orbit(host),
 				data_properties(host),
-				data_status(host),
 				data_position(host),
 				data_velocity(host),
-				data_acceleration(host)
+                data_acceleration(host)
 			{
 
 			}
@@ -49,10 +48,9 @@ namespace OPI
 
 			SynchronizedData<Orbit> data_orbit;
 			SynchronizedData<ObjectProperties> data_properties;
-			SynchronizedData<ObjectStatus> data_status;
 			SynchronizedData<Vector3> data_position;
 			SynchronizedData<Vector3> data_velocity;
-			SynchronizedData<Vector3> data_acceleration;
+            SynchronizedData<Vector3> data_acceleration;
 			// data size
 			int size;
 
@@ -104,14 +102,6 @@ namespace OPI
 				out.write(reinterpret_cast<char*>(&temp), sizeof(int));
 				out.write(reinterpret_cast<char*>(getObjectProperties()), sizeof(ObjectProperties) * data->size);
 			}
-			if(data->data_status.hasData())
-			{
-				temp = DATA_STATUS;
-				out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-				temp = sizeof(ObjectStatus);
-				out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-				out.write(reinterpret_cast<char*>(getObjectStatus()), sizeof(ObjectStatus) * data->size);
-			}
 		}
 	}
 
@@ -155,14 +145,6 @@ namespace OPI
 								data->data_properties.update(DEVICE_HOST);
 								break;
 							}
-						case DATA_STATUS:
-							if(size == sizeof(ObjectStatus))
-							{
-								ObjectStatus* status = getObjectStatus(DEVICE_HOST, true);
-								in.read(reinterpret_cast<char*>(status), sizeof(ObjectStatus) * number_of_objects);
-								data->data_status.update(DEVICE_HOST);
-								break;
-							}
 						default:
 							std::cout << "Found unknown block id " << type << std::endl;
 							in.seekg(number_of_objects * size);
@@ -178,7 +160,6 @@ namespace OPI
 		if(data->size != size)
 		{
 			data->data_orbit.resize(size);
-			data->data_status.resize(size);
 			data->data_properties.resize(size);
 			data->data_position.resize(size);
 			data->data_velocity.resize(size);
@@ -205,16 +186,6 @@ namespace OPI
 	ObjectProperties* Population::getObjectProperties(Device device, bool no_sync) const
 	{
 		return data->data_properties.getData(device, no_sync);
-	}
-
-	/**
-	 * @details
-	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
-	 * requested device.
-	 */
-	ObjectStatus* Population::getObjectStatus(Device device, bool no_sync) const
-	{
-		return data->data_status.getData(device, no_sync);
 	}
 
 	/**
@@ -265,7 +236,6 @@ namespace OPI
 		data->data_orbit.remove(index);
 		data->data_position.remove(index);
 		data->data_properties.remove(index);
-		data->data_status.remove(index);
 		data->data_velocity.remove(index);
 		data->size--;
 	}
@@ -280,9 +250,6 @@ namespace OPI
 				break;
 			case DATA_PROPERTIES:
 				data->data_properties.update(device);
-				break;
-			case DATA_STATUS:
-				data->data_status.update(device);
 				break;
 			case DATA_VELOCITY:
 				data->data_velocity.update(device);
