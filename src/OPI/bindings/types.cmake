@@ -54,7 +54,6 @@ BEGIN_STRUCTURE( IndexPair )
   STRUCTURE_VARIABLE(int object2)
 END_STRUCTURE( IndexPair )
 
-
 COMMENT("This type contains all available object data values")
 BEGIN_ENUM(DataType)
   ENUM_VALUE(DATA_ORBIT 0)
@@ -62,6 +61,7 @@ BEGIN_ENUM(DataType)
   ENUM_VALUE(DATA_CARTESIAN 2)
   ENUM_VALUE(DATA_VELOCITY 3)
   ENUM_VALUE(DATA_ACCELERATION 4)
+  ENUM_VALUE(DATA_BYTES 5)
 END_ENUM(DataType)
 
 COMMENT("This type contains all available device types")

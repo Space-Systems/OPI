@@ -39,7 +39,8 @@ namespace OPI
 				data_properties(host),
 				data_position(host),
 				data_velocity(host),
-                data_acceleration(host)
+                data_acceleration(host),
+                data_bytes(host)
 			{
 
 			}
@@ -51,8 +52,10 @@ namespace OPI
 			SynchronizedData<Vector3> data_position;
 			SynchronizedData<Vector3> data_velocity;
             SynchronizedData<Vector3> data_acceleration;
+            SynchronizedData<char> data_bytes;
 			// data size
 			int size;
+            int byteArraySize;
 
 	};
 	/**
@@ -63,6 +66,7 @@ namespace OPI
 		data(host)
 	{
 		data->size = 0;
+        data->byteArraySize = 1;
 		resize(size);
 	}
 
@@ -155,7 +159,7 @@ namespace OPI
 		return SUCCESS;
 	}
 
-	void Population::resize(int size)
+    void Population::resize(int size, int byteArraySize)
 	{
 		if(data->size != size)
 		{
@@ -163,10 +167,18 @@ namespace OPI
 			data->data_properties.resize(size);
 			data->data_position.resize(size);
 			data->data_velocity.resize(size);
-			data->data_acceleration.resize(size);
+            data->data_acceleration.resize(size);
+            data->data_bytes.resize(size*byteArraySize);
 			data->size = size;
+            data->byteArraySize = byteArraySize;
 		}
 	}
+
+    void Population::resizeByteArray(int size)
+    {
+        data->data_bytes.resize(data->size * size);
+        data->byteArraySize = size;
+    }
 
 	/**
 	 * @details
@@ -216,7 +228,12 @@ namespace OPI
 	Vector3* Population::getAcceleration(Device device, bool no_sync) const
 	{
 		return data->data_acceleration.getData(device, no_sync);
-	}
+    }
+
+    char* Population::getBytes(Device device, bool no_sync) const
+    {
+        return data->data_bytes.getData(device, no_sync);
+    }
 
 	void Population::remove(IndexList &list)
 	{
@@ -236,7 +253,8 @@ namespace OPI
 		data->data_orbit.remove(index);
 		data->data_position.remove(index);
 		data->data_properties.remove(index);
-		data->data_velocity.remove(index);
+        data->data_velocity.remove(index);
+        data->data_bytes.remove(index*data->byteArraySize, data->byteArraySize);
 		data->size--;
 	}
 
@@ -259,7 +277,10 @@ namespace OPI
 				break;
 			case DATA_ACCELERATION:
 				data->data_acceleration.update(device);
-				break;
+                break;
+            case DATA_BYTES:
+                data->data_bytes.update(device);
+                break;
 			default:
 				status = INVALID_TYPE;
 		}

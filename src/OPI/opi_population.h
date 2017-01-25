@@ -46,7 +46,9 @@ namespace OPI
 			~Population();
 
 			//! Resizes the internal memory buffers
-			void resize(int size);
+            void resize(int size, int byteArraySize = 1);
+            //! Set the per-object size of the bytes buffer
+            void resizeByteArray(int size);
 			//! Returns the number of objects the internal buffers can hold
 			int getSize() const;
 
@@ -72,14 +74,16 @@ namespace OPI
 			//! Retrieve the velocity in cartesian coordinates on the specified device
 			Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the acceleration in cartesian coordinates on the specified device
-			Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
-			//! Perform a sanity check on the current population data and generate debug information
+            Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
+
+            char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Perform a sanity check on the current population data and generate debug information
 			std::string sanityCheck();
 
 		private:
 			//! Private implementation data
-			Pimpl<ObjectRawData> data;
-	};
+            Pimpl<ObjectRawData> data;
+    };
 }
 
 #endif

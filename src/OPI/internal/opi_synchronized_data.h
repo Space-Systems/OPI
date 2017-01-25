@@ -28,17 +28,17 @@ namespace OPI
 	class SynchronizedData
 	{
 		public:
-			//! Initialize with a reference to the host object
-			SynchronizedData(Host& owning_host);
+            //! Initialize with a reference to the host object
+            SynchronizedData(Host& owning_host);
 			~SynchronizedData();
 
 			//! Reserves space to hold a specific amount of objects
 			void reserve(int num_Objects);
 			//! Resize all memory objects
-			void resize(int num_Objects);
+            void resize(int num_Objects);
 
 			//! Remove the object at index index;
-			void remove(int index);
+            void remove(int index, int arraySize = 1);
 			//! Retrieve the device-specific data pointer for the requested device
 			DataType* getData(Device device, bool no_sync);
 			//! Notify about updates in data structure of requested device
@@ -94,11 +94,11 @@ namespace OPI
 			Device latestDevice;
 			//! The number of objects this data object can currently hold
 			int numObjects;
-			int reservedSize;
+            int reservedSize;
 	};
 
 	template<class DataType>
-	SynchronizedData<DataType>::SynchronizedData(Host& owning_host):
+    SynchronizedData<DataType>::SynchronizedData(Host& owning_host):
 		host(owning_host)
 	{
 		// set latest device to -1
@@ -106,7 +106,7 @@ namespace OPI
 		// the host does not need an update by default
 		hostNeedsUpdate = false;
 		numObjects = 0;
-		reservedSize = 0;
+        reservedSize = 0;
 	}
 
 	template<class DataType>
@@ -235,7 +235,7 @@ namespace OPI
 
 
 	template<class DataType>
-	void SynchronizedData<DataType>::remove(int index)
+    void SynchronizedData<DataType>::remove(int index, int arraySize)
 	{
 		// check if data is available and the index range is valid
 		if((hasData()) && (index >= 0) && (index < numObjects))
@@ -243,7 +243,7 @@ namespace OPI
 			// synchronize data to host
 			ensure_synchronization(DEVICE_HOST);
 			// erase element from host vector
-			hostData.erase(hostData.begin() + index);
+            hostData.erase(hostData.begin() + index, hostData.begin() + index + arraySize);
 			// update where the latest information is located
 			update(DEVICE_HOST);
 			numObjects -= 1;
@@ -288,7 +288,7 @@ namespace OPI
 			hostData.resize(num_Objects);
 		}
 		numObjects = num_Objects;
-	}
+    }
 
 	template<class DataType>
 	DataType* SynchronizedData<DataType>::getData(Device device, bool no_sync)
@@ -334,7 +334,7 @@ namespace OPI
 						int oldDevice = cuda->getCurrentDevice();
 						cuda->selectDevice(device - DEVICE_CUDA);
 						// allocate
-						cuda->allocate((void**)&(deviceData[device].ptr), sizeof(DataType) * reservedSize);
+                        cuda->allocate((void**)&(deviceData[device].ptr), sizeof(DataType) * reservedSize);
 						// set needUpdate flag to true
 						deviceData[device].needsUpdate = true;
 						// select the old device
@@ -374,7 +374,7 @@ namespace OPI
 							cuda->selectDevice(latestDevice - DEVICE_CUDA);
 							// copy data from device to host
 							hostData.resize(numObjects);
-							cuda->copy(hostData.data(), deviceData[latestDevice].ptr, sizeof(DataType) * numObjects, false);
+                            cuda->copy(hostData.data(), deviceData[latestDevice].ptr, sizeof(DataType) * numObjects, false);
 							// set update flag to false, since we just updated the values
 							hostNeedsUpdate = false;
 							// select the old device
@@ -420,7 +420,7 @@ namespace OPI
 			// select the right device
 			cuda->selectDevice(device - DEVICE_CUDA);
 			// copy data from host to device
-			cuda->copy(deviceData[device].ptr, hostData.data(), sizeof(DataType) * numObjects, true);
+            cuda->copy(deviceData[device].ptr, hostData.data(), sizeof(DataType) * numObjects, true);
 			// select the old device again
 			cuda->selectDevice(oldDevice);
 		}

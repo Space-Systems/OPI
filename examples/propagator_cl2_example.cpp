@@ -63,9 +63,12 @@ class TestPropagator:
             // Define kernel source code as a string literal (requires C++11).
             std::string kernelCode = R"(
                 struct Orbit {float semi_major_axis;float eccentricity;float inclination;float raan;float arg_of_perigee;float mean_anomaly;float bol;float eol;};
-                __kernel void propagate(__global struct Orbit* orbit, double julian_day, float dt) {
-                int i = get_global_id(0);
-                orbit[i].semi_major_axis += i + julian_day + dt;
+                typedef struct Aux {double a; int i; double b;};
+                __kernel void propagate(__global struct Orbit* orbit, __global char* bytes, double julian_day, float dt) {
+                int i = get_global_id(0);                
+                __global struct Aux* b = (__global struct Aux*)&bytes[i*sizeof(__global struct Aux)];
+                b->i = b->i*2;
+                orbit[i].semi_major_axis += b->i + i;
                 })";
 
             // Create the kernel program. OPI's OpenCL support module returns the context
@@ -112,20 +115,23 @@ class TestPropagator:
             // cl_mem before they can be used as kernel arguments. This step will also trigger
             // the memory transfer from host to OpenCL device.
             cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
+            cl_mem bytes = reinterpret_cast<cl_mem>(data.getBytes(OPI::DEVICE_CUDA));
 
             // To use the OpenCL C++ API, we also need to create a cl::Buffer object from
             // the cl_mem instance. IMPORTANT: The retainObject flag of the cl::Buffer constructor
             // must be set to true, otherwise OPI will lose ownership of the memory pointer
             // which will cause subsequent copy operations to fail.
             cl::Buffer orbitBuffer = cl::Buffer(orbit, true);
+            cl::Buffer bytesBuffer = cl::Buffer(bytes, true);
 
             // The cl::Buffer object can then be used as a kernel argument.
             err = propagator.setArg(0, orbitBuffer);
+            err = propagator.setArg(1, bytesBuffer);
             if (err != CL_SUCCESS) std::cout << "Error setting population data: " << err << std::endl;
 
             // set remaining arguments (julian_day and dt)
-            propagator.setArg(1, julian_day);
-            propagator.setArg(2, dt);
+            propagator.setArg(2, julian_day);
+            propagator.setArg(3, dt);
 
             // Enqueue the kernel.
             const size_t problemSize = data.getSize();
@@ -138,6 +144,7 @@ class TestPropagator:
 
             // Don't forget to notify OPI of the updated data on the device!
             data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
+            data.update(OPI::DATA_BYTES, OPI::DEVICE_CUDA);
 
             return OPI::SUCCESS;
 		}
