@@ -77,6 +77,9 @@ namespace OPI
             Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
 
             char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
+
+            Population createSubPopulation(IndexList &list);
+
             //! Perform a sanity check on the current population data and generate debug information
 			std::string sanityCheck();
 
