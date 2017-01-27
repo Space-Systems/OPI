@@ -268,6 +268,38 @@ namespace OPI
         return p;
     }
 
+    Population Population::copy()
+    {
+        int b = data->byteArraySize;
+        Population p(data->host, data->size);
+        p.resizeByteArray(b);
+        Orbit* orbits = data->data_orbit.getData(DEVICE_HOST, false);
+        ObjectProperties* props = data->data_properties.getData(DEVICE_HOST, false);
+        Vector3* pos = data->data_position.getData(DEVICE_HOST, false);
+        Vector3* vel = data->data_velocity.getData(DEVICE_HOST, false);
+        Vector3* acc = data->data_acceleration.getData(DEVICE_HOST, false);
+        char* bytes = data->data_bytes.getData(DEVICE_HOST, false);
+        for(int i = 0; i < data->size; ++i)
+        {
+            p.getOrbit()[i] = orbits[i];
+            p.getObjectProperties()[i] = props[i];
+            p.getCartesianPosition()[i] = pos[i];
+            p.getVelocity()[i] = vel[i];
+            p.getAcceleration()[i] = acc[i];
+            for (int j=0; j<b; j++)
+            {
+                p.getBytes()[i*b+j] = bytes[i*b+j];
+            }
+        }
+        p.update(DATA_ORBIT);
+        p.update(DATA_PROPERTIES);
+        p.update(DATA_CARTESIAN);
+        p.update(DATA_VELOCITY);
+        p.update(DATA_ACCELERATION);
+        p.update(DATA_BYTES);
+        return p;
+    }
+
 	void Population::remove(IndexList &list)
 	{
 		list.sort();

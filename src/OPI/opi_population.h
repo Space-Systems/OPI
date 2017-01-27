@@ -79,6 +79,8 @@ namespace OPI
             char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
             Population createSubPopulation(IndexList &list);
+            //! Retrieve a deep copy of the population on the host
+            Population copy();
 
             //! Perform a sanity check on the current population data and generate debug information
 			std::string sanityCheck();
