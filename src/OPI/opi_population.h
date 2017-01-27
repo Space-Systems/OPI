@@ -35,7 +35,9 @@ namespace OPI
 	 *
 	 * When a Population object is created with a specific size, arrays of the types Orbit,
 	 * ObjectProperties and ObjectStatus are initialized with that size. These arrays are empty
-	 * and must be filled with actual data by the host or the plugin.
+     * and must be filled with actual data by the host or the plugin. The "bytes" array can be
+     * used to store arbitrary, per-object information. Its per-object size (default: 1 byte)
+     * can be adjusted using the resizeByteArray function.
 	 */
 	class OPI_API_EXPORT Population
 	{
@@ -75,9 +77,10 @@ namespace OPI
 			Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the acceleration in cartesian coordinates on the specified device
             Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
-
+            //! Retrieve the arbitrary binary information on the specified device
             char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
+            //! Retrieve a subset of the population based on a given list of indices on the host
             Population createSubPopulation(IndexList &list);
             //! Retrieve a deep copy of the population on the host
             Population copy();
