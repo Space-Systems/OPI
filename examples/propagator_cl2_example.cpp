@@ -44,9 +44,9 @@ class TestPropagator:
 
 			initialized = false;
 
-			// Get GPU support module from host and cast it to the OpenCL implementation.
-			// This will provide important additional information such as the OpenCL context
-			// and default command queue.
+            // Get GPU support module from host.
+            // The OpenCL version will provide important additional information such as the
+            // OpenCL context and default command queue.
             clSupport = host.getGPUSupport();
 		}
 
@@ -81,7 +81,8 @@ class TestPropagator:
             if (err != CL_SUCCESS) std::cout << "Error creating program: " << err << std::endl;
 
             // Build the kernel for the default device. Again, the C type from OPI's OpenCL
-            // module needs to be wrapped into the cl::Device class.
+            // module needs to be wrapped into the cl::Device class. Again, make sure
+            // retainOwnership is true to let OPI manage the device.
             cl::Device device = cl::Device(*clSupport->getOpenCLDevice(), true);
             err = program.build({device});
             if (err != CL_SUCCESS) std::cout << "Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
@@ -120,10 +121,9 @@ class TestPropagator:
             cl_mem bytes = reinterpret_cast<cl_mem>(data.getBytes(OPI::DEVICE_CUDA));
 
             // To use the OpenCL C++ API, we also need to create a cl::Buffer object from
-            // the cl_mem instance. IMPORTANT: The retainObject flag of the cl::Buffer constructor
+            // the cl_mem instance. The retainObject flag of the cl::Buffer constructor
             // must be set to true, otherwise OPI will lose ownership of the memory pointer
             // which will cause subsequent copy operations to fail.
-
             cl::Buffer orbitBuffer = cl::Buffer(orbit, true);
             cl::Buffer bytesBuffer = cl::Buffer(bytes, true);
 
