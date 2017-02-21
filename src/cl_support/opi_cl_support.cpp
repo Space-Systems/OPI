@@ -108,12 +108,14 @@ void ClSupportImpl::allocate(void** a, size_t size)
 	cl_int error;
 	*a = clCreateBuffer(context, CL_MEM_READ_WRITE, size, NULL, &error);
 	if (error != CL_SUCCESS) std::cout << "Error allocating OpenCL buffer memory: " << error << std::endl;
-	//else cout << "Allocated " << size << " bytes at " << *a << endl;
+    //else cout << "Allocated " << size << " bytes at " << *a << endl;
 }
 
 void ClSupportImpl::free(void *mem)
 {
-	clReleaseMemObject((cl_mem)mem);
+    cl_int error = clReleaseMemObject(static_cast<cl_mem>(mem));
+    if (error != CL_SUCCESS) std::cout << "Error freeing OpenCL buffer memory: " << error << std::endl;
+    //else cout << "Freed memory object at " << static_cast<cl_mem>(mem) << endl;
 }
 
 void ClSupportImpl::copy(void *destination, void *source, size_t size, bool host_to_device)
@@ -121,16 +123,16 @@ void ClSupportImpl::copy(void *destination, void *source, size_t size, bool host
 	cl_int error = CL_SUCCESS;
 	if (host_to_device) {
 		cl_mem destinationBuffer = static_cast<cl_mem>(destination);
-		error = clEnqueueWriteBuffer(defaultQueue, destinationBuffer, CL_TRUE, 0, size, source, 0, NULL, NULL);
+        error = clEnqueueWriteBuffer(defaultQueue, destinationBuffer, CL_TRUE, 0, size, source, 0, NULL, NULL);
 		if (error != CL_SUCCESS) std::cout << "Error copying Population data to OpenCL device: " << error << std::endl;
-		//else cout << "Copied " << size << " bytes to device at " << destinationBuffer << endl;
+        //else cout << "Copied " << size << " bytes to device at " << destinationBuffer << endl;
 	}
 	else {
 		cl_mem sourceBuffer = static_cast<cl_mem>(source);
-		error = clEnqueueReadBuffer(defaultQueue, sourceBuffer, CL_TRUE, 0, size, destination, 0, NULL, NULL);
+        error = clEnqueueReadBuffer(defaultQueue, sourceBuffer, CL_TRUE, 0, size, destination, 0, NULL, NULL);
 		if (error != CL_SUCCESS) std::cout << "Error downloading Population data from OpenCL device: " << error << std::endl;
-		//else cout << "Downloaded " << size << " bytes from device (" << sourceBuffer << " to " << destination << ")" << endl;
-	}
+        //else cout << "Downloaded " << size << " bytes from device (" << sourceBuffer << " to " << destination << ")" << endl;
+    }
 }
 
 void ClSupportImpl::shutdown()
@@ -141,13 +143,14 @@ void ClSupportImpl::shutdown()
 
 void ClSupportImpl::selectDevice(int device)
 {
-	if (device < nDevices) {
-		currentDevice = device;
-		cl_int error;
-		defaultQueue = clCreateCommandQueue(context, devices[currentDevice], 0, &error);
-	}
-	else std::cout << "Invalid OpenCL device number - please select a number between 0 and "
-		<< nDevices - 1 << "." << std::endl;	
+    if (device != currentDevice)
+    {
+        if (device < nDevices) {
+            //FIXME: Device switching not yet supported
+        }
+        else std::cout << "Invalid OpenCL device number - please select a number between 0 and "
+            << nDevices - 1 << "." << std::endl;
+    }
 }
 
 int ClSupportImpl::getCurrentDevice()

@@ -63,24 +63,26 @@ class TestPropagator:
             // Define kernel source code as a string literal (requires C++11).
             std::string kernelCode = R"(
                 struct Orbit {float semi_major_axis;float eccentricity;float inclination;float raan;float arg_of_perigee;float mean_anomaly;float bol;float eol;};
-                typedef struct Aux {double a; int i; double b;};
+                typedef struct Aux {double a; char c; int i; double b;};
+                void test(global struct Aux* b) { b->i = b->i + 1; }
                 __kernel void propagate(__global struct Orbit* orbit, __global char* bytes, double julian_day, float dt) {
                 int i = get_global_id(0);                
                 __global struct Aux* b = (__global struct Aux*)&bytes[i*sizeof(__global struct Aux)];
-                b->i = b->i*2;
-                orbit[i].semi_major_axis += b->i + i;
+                test(b);
+                orbit[i].semi_major_axis = i;
                 })";
 
             // Create the kernel program. OPI's OpenCL support module returns the context
             // and device pointers as C types - to write a propagator using the OpenCL C++
             // API, these need to be wrapped into their respective C++ objects.
-            cl::Context context = cl::Context(*clSupport->getOpenCLContext());
+            // retainOwnership needs to be set to true to let OPI manage the context.
+            cl::Context context = cl::Context(*clSupport->getOpenCLContext(), true);
             cl::Program program = cl::Program(context, kernelCode, false, &err);
             if (err != CL_SUCCESS) std::cout << "Error creating program: " << err << std::endl;
 
             // Build the kernel for the default device. Again, the C type from OPI's OpenCL
             // module needs to be wrapped into the cl::Device class.
-            cl::Device device = cl::Device(*clSupport->getOpenCLDevice());
+            cl::Device device = cl::Device(*clSupport->getOpenCLDevice(), true);
             err = program.build({device});
             if (err != CL_SUCCESS) std::cout << "Error building: " << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
 
@@ -113,7 +115,7 @@ class TestPropagator:
             // Calling getOrbit and getObjectProperties with the DEVICE_CUDA flag will return
             // cl_mem instances in the OpenCL implementation. They must be explicitly cast to
             // cl_mem before they can be used as kernel arguments. This step will also trigger
-            // the memory transfer from host to OpenCL device.
+            // the memory transfer from host to OpenCL device.            
             cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
             cl_mem bytes = reinterpret_cast<cl_mem>(data.getBytes(OPI::DEVICE_CUDA));
 
@@ -121,6 +123,7 @@ class TestPropagator:
             // the cl_mem instance. IMPORTANT: The retainObject flag of the cl::Buffer constructor
             // must be set to true, otherwise OPI will lose ownership of the memory pointer
             // which will cause subsequent copy operations to fail.
+
             cl::Buffer orbitBuffer = cl::Buffer(orbit, true);
             cl::Buffer bytesBuffer = cl::Buffer(bytes, true);
 
@@ -135,7 +138,7 @@ class TestPropagator:
 
             // Enqueue the kernel.
             const size_t problemSize = data.getSize();
-            cl::CommandQueue queue = cl::CommandQueue(*clSupport->getOpenCLQueue());
+            cl::CommandQueue queue = cl::CommandQueue(*clSupport->getOpenCLQueue(), true);
             err = queue.enqueueNDRangeKernel(propagator, cl::NullRange, cl::NDRange(problemSize), cl::NullRange);
             if (err != CL_SUCCESS) std::cout << "Error running kernel: " << err << std::endl;
 
