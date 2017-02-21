@@ -24,6 +24,7 @@
 #include <cassert>
 #include <fstream>
 #include <sstream>
+#include <string.h> //memcpy
 namespace OPI
 {
 	/**
@@ -70,9 +71,34 @@ namespace OPI
 		resize(size);
 	}
 
+    Population::Population(const Population& source) : data(source.getHostPointer())
+    {
+        data->size = 0;
+        data->byteArraySize = 1;
+        int s = source.getSize();
+        int b = source.getByteArraySize();
+        resize(s);
+        resizeByteArray(b);
+
+        // TODO Use std::copy instead
+        memcpy(getOrbit(), source.getOrbit(), s*sizeof(Orbit));
+        memcpy(getObjectProperties(), source.getObjectProperties(), s*sizeof(ObjectProperties));
+        memcpy(getCartesianPosition(), source.getCartesianPosition(), s*sizeof(Vector3));
+        memcpy(getVelocity(), source.getVelocity(), s*sizeof(Vector3));
+        memcpy(getAcceleration(), source.getAcceleration(), s*sizeof(Vector3));
+        memcpy(getBytes(), source.getBytes(), b*s*sizeof(char));
+
+        update(DATA_ORBIT);
+        update(DATA_PROPERTIES);
+        update(DATA_CARTESIAN);
+        update(DATA_VELOCITY);
+        update(DATA_ACCELERATION);
+        update(DATA_BYTES);
+    }
+
 	Population::~Population()
 	{
-	}
+    }
 
 	/**
 	 * \detail
@@ -268,38 +294,6 @@ namespace OPI
         return p;
     }
 
-    Population Population::copy()
-    {
-        int b = data->byteArraySize;
-        Population p(data->host, data->size);
-        p.resizeByteArray(b);
-        Orbit* orbits = data->data_orbit.getData(DEVICE_HOST, false);
-        ObjectProperties* props = data->data_properties.getData(DEVICE_HOST, false);
-        Vector3* pos = data->data_position.getData(DEVICE_HOST, false);
-        Vector3* vel = data->data_velocity.getData(DEVICE_HOST, false);
-        Vector3* acc = data->data_acceleration.getData(DEVICE_HOST, false);
-        char* bytes = data->data_bytes.getData(DEVICE_HOST, false);
-        for(int i = 0; i < data->size; ++i)
-        {
-            p.getOrbit()[i] = orbits[i];
-            p.getObjectProperties()[i] = props[i];
-            p.getCartesianPosition()[i] = pos[i];
-            p.getVelocity()[i] = vel[i];
-            p.getAcceleration()[i] = acc[i];
-            for (int j=0; j<b; j++)
-            {
-                p.getBytes()[i*b+j] = bytes[i*b+j];
-            }
-        }
-        p.update(DATA_ORBIT);
-        p.update(DATA_PROPERTIES);
-        p.update(DATA_CARTESIAN);
-        p.update(DATA_VELOCITY);
-        p.update(DATA_ACCELERATION);
-        p.update(DATA_BYTES);
-        return p;
-    }
-
 	void Population::remove(IndexList &list)
 	{
 		list.sort();
@@ -357,6 +351,16 @@ namespace OPI
 	{
 		return data->size;
 	}
+
+    int Population::getByteArraySize() const
+    {
+        return data->byteArraySize;
+    }
+
+    Host& Population::getHostPointer() const
+    {
+        return data->host;
+    }
 
 	/**
 	 * @details

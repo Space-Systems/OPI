@@ -44,6 +44,19 @@ namespace OPI
 		public:
 			//! Constructor
 			Population(Host& host, int size = 0);
+
+            /*! Copy constructor
+            *
+            * This function performs a deep copy of the population on the host. Device data
+            * will be downloaded as part of this operation. The copy does not contain any
+            * device data so synchronization will happen again in the other direction as soon
+            * as the copy is requested on the device. This function may therefore severely
+            * slow down CUDA/OpenCL propagation when used in every propagation step.
+            * In such cases, if possible, use the respective CUDA/OpenCL functions
+            * to copy individual device buffers as required.
+            */
+            Population(const Population& source);
+
 			//! Destructor
 			~Population();
 
@@ -53,6 +66,8 @@ namespace OPI
             void resizeByteArray(int size);
 			//! Returns the number of objects the internal buffers can hold
 			int getSize() const;
+            //! Returns the per-object size of the byte buffer
+            int getByteArraySize() const;
 
 			//! Removes an object
 			void remove(int index);
@@ -82,11 +97,12 @@ namespace OPI
 
             //! Retrieve a subset of the population based on a given list of indices on the host
             Population createSubPopulation(IndexList &list);
-            //! Retrieve a deep copy of the population on the host
-            Population copy();
 
             //! Perform a sanity check on the current population data and generate debug information
 			std::string sanityCheck();
+
+        protected:
+            Host& getHostPointer() const;
 
 		private:
 			//! Private implementation data
