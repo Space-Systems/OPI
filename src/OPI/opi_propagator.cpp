@@ -91,6 +91,26 @@ namespace OPI
 		return status;
 	}
 
+    ErrorCode Propagator::propagate(Population& objectdata, double* julian_days, int length, float dt)
+    {
+        ErrorCode status = SUCCESS;
+        if (length < 1 || length < objectdata.getSize())
+        {
+            status = INDEX_RANGE;
+        }
+        else if (length == 1)
+        {
+            status = runPropagation(objectdata, julian_days[0], dt);
+        }
+        else if (length == objectdata.getSize())
+        {
+            status = runMultiTimePropagation(objectdata, julian_days, dt);
+        }
+        else status = INDEX_RANGE;
+        getHost()->sendError(status);
+        return status;
+    }
+
 	bool Propagator::backwardPropagation()
 	{
 		return true;
@@ -115,5 +135,10 @@ namespace OPI
 	{
 		return NOT_IMPLEMENTED;
 	}
+
+    ErrorCode Propagator::runMultiTimePropagation(Population& data, double* julian_days, float dt)
+    {
+        return NOT_IMPLEMENTED;
+    }
 
 }

@@ -55,6 +55,8 @@ namespace OPI
 			ErrorCode propagate(Population& data, double julian_day, float dt );
 			//! Starts the index-based propagation for the given time frame
 			ErrorCode propagate(Population& data, IndexList& indices, double julian_day, float dt);
+            //! Starts propagation with individual times for each object
+            ErrorCode propagate(Population& data, double* julian_days, int length, float dt);
 
 			//! Assigns a module to this propagator
 			/**
@@ -97,6 +99,9 @@ namespace OPI
 			//! Override this to implement an index-based propagation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagateIndexed
 			virtual ErrorCode runIndexedPropagation(Population& data, IndexList& indices, double julian_day, float dt );
+            //! Override this to implement propagation with individual times.
+            //! OPI will make sure that the julian_days vector length matches that of the Population.
+            virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, float dt);
 
 		private:
 			Pimpl<PropagatorImpl> data;
