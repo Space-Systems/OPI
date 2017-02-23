@@ -57,6 +57,12 @@ namespace OPI
             */
             Population(const Population& source);
 
+            /*! Indexed copy
+             *
+             * Slower than copy constructor
+             */
+            Population(const Population& source, IndexList &list);
+
 			//! Destructor
 			~Population();
 
@@ -94,9 +100,6 @@ namespace OPI
             Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the arbitrary binary information on the specified device
             char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
-
-            //! Retrieve a subset of the population based on a given list of indices on the host
-            Population createSubPopulation(IndexList &list);
 
             //! Perform a sanity check on the current population data and generate debug information
 			std::string sanityCheck();

@@ -96,6 +96,51 @@ namespace OPI
         update(DATA_BYTES);
     }
 
+    Population::Population(const Population& source, IndexList &list) : data(source.getHostPointer())
+    {
+        data->size = 0;
+        data->byteArraySize = 1;
+        int s = list.getSize();
+        int b = source.getByteArraySize();
+        resize(s);
+        resizeByteArray(b);
+        int* listdata = list.getData(DEVICE_HOST);
+
+        Orbit* orbits = source.getOrbit(DEVICE_HOST, false);
+        ObjectProperties* props = source.getObjectProperties(DEVICE_HOST, false);
+        Vector3* pos = source.getCartesianPosition(DEVICE_HOST, false);
+        Vector3* vel = source.getVelocity(DEVICE_HOST, false);
+        Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
+        char* bytes = source.getBytes(DEVICE_HOST, false);
+
+        Orbit* thisOrbit = getOrbit();
+        ObjectProperties* thisProps = getObjectProperties();
+        Vector3* thisPos = getCartesianPosition();
+        Vector3* thisVel = getVelocity();
+        Vector3* thisAcc = getAcceleration();
+        char* thisBytes = getBytes();
+
+        for(int i = 0; i < list.getSize(); ++i)
+        {
+            thisOrbit[i] = orbits[listdata[i]];
+            thisProps[i] = props[listdata[i]];
+            thisPos[i] = pos[listdata[i]];
+            thisVel[i] = vel[listdata[i]];
+            thisAcc[i] = acc[listdata[i]];
+            for (int j=0; j<b; j++)
+            {
+                thisBytes[i*b+j] = bytes[listdata[i]*b+j];
+            }
+        }
+
+        update(DATA_ORBIT);
+        update(DATA_PROPERTIES);
+        update(DATA_CARTESIAN);
+        update(DATA_VELOCITY);
+        update(DATA_ACCELERATION);
+        update(DATA_BYTES);
+    }
+
 	Population::~Population()
 	{
     }
@@ -259,39 +304,6 @@ namespace OPI
     char* Population::getBytes(Device device, bool no_sync) const
     {
         return data->data_bytes.getData(device, no_sync);
-    }
-
-    Population Population::createSubPopulation(IndexList &list)
-    {
-        int* listdata = list.getData(DEVICE_HOST);
-        int b = data->byteArraySize;
-        Population p(data->host, list.getSize());
-        p.resizeByteArray(b);
-        Orbit* orbits = data->data_orbit.getData(DEVICE_HOST, false);
-        ObjectProperties* props = data->data_properties.getData(DEVICE_HOST, false);
-        Vector3* pos = data->data_position.getData(DEVICE_HOST, false);
-        Vector3* vel = data->data_velocity.getData(DEVICE_HOST, false);
-        Vector3* acc = data->data_acceleration.getData(DEVICE_HOST, false);
-        char* bytes = data->data_bytes.getData(DEVICE_HOST, false);
-        for(int i = 0; i < list.getSize(); ++i)
-        {
-            p.getOrbit()[i] = orbits[listdata[i]];
-            p.getObjectProperties()[i] = props[listdata[i]];
-            p.getCartesianPosition()[i] = pos[listdata[i]];
-            p.getVelocity()[i] = vel[listdata[i]];
-            p.getAcceleration()[i] = acc[listdata[i]];
-            for (int j=0; j<b; j++)
-            {
-                p.getBytes()[i*b+j] = bytes[listdata[i]*b+j];
-            }
-        }
-        p.update(DATA_ORBIT);
-        p.update(DATA_PROPERTIES);
-        p.update(DATA_CARTESIAN);
-        p.update(DATA_VELOCITY);
-        p.update(DATA_ACCELERATION);
-        p.update(DATA_BYTES);
-        return p;
     }
 
 	void Population::remove(IndexList &list)

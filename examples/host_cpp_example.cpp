@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
         list.add(0);
         list.add(1);
         list.add(2);
-        OPI::Population data2 = data.createSubPopulation(list);
+        OPI::Population data2 = OPI::Population(data, list);
 
         for (int i=0; i<50000; i++)
         {
