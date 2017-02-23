@@ -51,7 +51,18 @@ namespace OPI
 			Propagator();
 			virtual ~Propagator();
 
-			//! Starts the propagation for the given time frame
+            /**
+             * @brief propagate Starts the propagation for the given time frame.
+             *
+             * This function calls the propagator and performs propagation. The resulting
+             * orbit and position/velocity vectors (if supported) are written back to the
+             * given Population. The propagation result shall reflect the state of the
+             * population at the point in time defined by julian_day + dt seconds.
+             * @param data The population to be propagated
+             * @param julian_day The base date in Julian date format
+             * @param dt The time step, in seconds, from last propagation.
+             * @return OPI::SUCCESS if propagation was successful, or other error code.
+             */
 			ErrorCode propagate(Population& data, double julian_day, float dt );
 			//! Starts the index-based propagation for the given time frame
 			ErrorCode propagate(Population& data, IndexList& indices, double julian_day, float dt);
@@ -78,10 +89,11 @@ namespace OPI
 			//! Check if this propagator supports generation of cartesian state vectors
 			virtual bool cartesianCoordinates();
 
-			//! Check whether this propagator requires CUDA to function.
-			/** Set to zero if CUDA is not required, otherwise set this to the major number of
-			 *  the required compute capability.
-			 */
+            /**
+             * @brief requiresCUDA Check whether this propagator requires CUDA to function.
+             * @return 0 if CUDA is not required, or the major number of
+             *  the minimum required compute capability.
+             */
 			virtual int requiresCUDA();
 
 			//! Check whether this propagator requires OpenCL to function.
