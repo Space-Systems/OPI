@@ -131,6 +131,11 @@ namespace OPI
 		return 0;
 	}
 
+    int Propagator::minimumOPIVersionRequired()
+    {
+        return 0;
+    }
+
 	ErrorCode Propagator::runIndexedPropagation(Population& data, IndexList& indices, double julian_day, float dt)
 	{
 		return NOT_IMPLEMENTED;

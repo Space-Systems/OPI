@@ -102,6 +102,14 @@ namespace OPI
 			*/
 			virtual int requiresOpenCL();
 
+            /**
+             * @brief minimumOPIVersionRequired Returns the minimum OPI API level that this propagator requires.
+             *
+             * API level is equal to OPI's major version number.
+             * @return An integer representing the minimum API level required.
+             */
+            virtual int minimumOPIVersionRequired();
+
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
 			void useModules();
