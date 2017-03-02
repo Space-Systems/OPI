@@ -24,6 +24,7 @@
 #include "opi_collisiondetection.h"
 #include "internal/dynlib.h"
 #include <iostream>
+#include <fstream>
 #ifdef _MSC_VER
 #include "internal/msdirent.h"
 #else
@@ -110,13 +111,14 @@ namespace OPI
 	{
 		ErrorCode status = SUCCESS;
 		std::cout << "Loading plugins from " << plugindir << std::endl;
+        std::string suffix = DynLib::getSuffix();
 
 		// check if the cuda support plugin is loaded
 		if(impl->gpuSupport == 0 && platformSupport != PLATFORM_NONE)
 		{
 			// try to load cuda plugin
 			std::string pluginName = (platformSupport == PLATFORM_OPENCL ? "OPI-cl" : "OPI-cuda");
-			std::string libraryFileName = std::string(plugindir + "/support/" + pluginName + DynLib::getSuffix());
+            std::string libraryFileName = std::string(plugindir + "/support/" + pluginName + suffix);
 
 			impl->gpuSupportPluginHandle = new DynLib(libraryFileName, true);
 			if(impl->gpuSupportPluginHandle)
@@ -149,8 +151,10 @@ namespace OPI
 			while((dir_entry = readdir(dir)))
 			{
 				std::string entry_name(dir_entry->d_name);
-				// skip a few names
-				if((entry_name != ".")&&(entry_name != "..") && (entry_name != "support"))
+                // only consider files ending in the platform-specific library suffix
+                if(entry_name.find_last_of(".") != std::string::npos &&
+                   entry_name.substr(entry_name.find_last_of("."), suffix.length()) == suffix
+                  )
 				{
 					// try to load the plugin
 					DynLib* lib = new DynLib(plugindir + "/" + entry_name);
@@ -158,7 +162,12 @@ namespace OPI
 						// if it is valid load the plugin
 						Plugin* plugin = new Plugin(lib);
 						impl->pluginlist.push_back(plugin);
-						loadPlugin(plugin,platformSupport);
+                        std::string configFileName = "";
+                        if (entry_name.find_last_of(".") != std::string::npos)
+                        {
+                            configFileName = plugindir + "/" + entry_name.substr(0,entry_name.find_last_of(".")) + ".cfg";
+                        }
+                        loadPlugin(plugin,platformSupport,configFileName);
 					}
 					else
 						delete lib;
@@ -177,7 +186,7 @@ namespace OPI
 		return status;
 	}
 
-	void Host::loadPlugin(Plugin *plugin, gpuPlatform platform)
+    void Host::loadPlugin(Plugin *plugin, gpuPlatform platform, const std::string& configfile)
 	{
 		// we have a functional plugin loaded
 		// now create the correct type for it
@@ -201,6 +210,7 @@ namespace OPI
 				if(propagator) {
 					if (propagator->requiresCUDA() <= 0 && propagator->requiresOpenCL() <= 0) {
 						// no GPU support required; load plugin
+                        loadPluginConfig(propagator, configfile);
 						addPropagator(propagator);
 					}
 					else if (propagator->requiresCUDA() > 0) {
@@ -214,9 +224,11 @@ namespace OPI
 							std::cout << "[OPI] Propagator " << propagator->getName() << " requires at least " 
 								<< propagator->requiresCUDA() << ".x - "
 								<< "otherwise propagation might fail." << std::endl;
+                            loadPluginConfig(propagator, configfile);
 							addPropagator(propagator);
 						}
 						else if (propagator->requiresCUDA() <= getCurrentCudaDeviceCapability()) {
+                            loadPluginConfig(propagator, configfile);
 							addPropagator(propagator);
 						}
 						else {
@@ -228,6 +240,7 @@ namespace OPI
 					}
 					else if (propagator->requiresOpenCL() > 0) {
 						if (platform == PLATFORM_OPENCL) {
+                            loadPluginConfig(propagator, configfile);
 							addPropagator(propagator);
 						}
 						else {
@@ -273,6 +286,68 @@ namespace OPI
 				std::cout << "[OPI] Unknown Plugin Type: " << plugin->getInfo().name << plugin->getInfo().type << std::endl;
 		}
 	}
+
+    void Host::loadPluginConfig(Propagator* propagator, const std::string& filename)
+    {
+        std::ifstream in(filename.c_str(), std::ifstream::in);
+        if (in.is_open())
+        {
+            std::cout << "Initialising " << propagator->getName() << " from config file" << std::endl;
+            while (in.good())
+            {
+                std::string line;
+                std::getline(in, line);
+                //trim
+                if (line[0] != '#')
+                {
+                    std::vector<std::string> setting = tokenize(line, "=");
+                    if (setting.size() >= 2)
+                    {
+                        std::string property = setting[0];
+                        std::string value = setting[1];
+                        if (propagator->hasProperty(property))
+                        {
+                            if (value.substr(0,1) == "\"" && value.substr(value.length()-1, value.length()) == "\"")
+                            {
+                                propagator->setProperty(property, value.substr(1,value.length()-2));
+                            }
+                            else if (value.find_first_of(".") != std::string::npos)
+                            {
+                                propagator->setProperty(property, atof(value.c_str()));
+                            }
+                            else {
+                                propagator->setProperty(property, atoi(value.c_str()));
+                            }
+                        }
+                        else {
+                            std::cout << "Not setting unknown property " << property << std::endl;
+                        }
+                    }
+                }
+            }
+            in.close();
+        }
+        else {
+            std::cout << "No config file found for propagator " << propagator->getName() << std::endl;
+        }
+    }
+
+    std::vector<std::string> Host::tokenize(std::string line, std::string delimiter)
+    {
+        std::vector<std::string> elements;
+
+        std::string::size_type lastPos = line.find_first_not_of(delimiter, 0);
+        std::string::size_type pos     = line.find_first_of(delimiter, lastPos);
+
+        while (std::string::npos != pos || std::string::npos != lastPos)
+        {
+            elements.push_back(line.substr(lastPos, pos - lastPos));
+            lastPos = line.find_first_not_of(delimiter, pos);
+            pos = line.find_first_of(delimiter, lastPos);
+        }
+        return elements;
+    }
+
 
 	Propagator* Host::getPropagator(const std::string& name) const
 	{
