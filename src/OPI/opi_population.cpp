@@ -157,9 +157,13 @@ namespace OPI
 	void Population::write(const std::string& filename)
 	{
 		int temp;
+        short versionNumber = 1;
+        short magic = 47627;
 		std::ofstream out(filename.c_str(), std::ofstream::binary);
 		if(out.is_open())
-		{
+		{                        
+            out.write(reinterpret_cast<char*>(&magic), sizeof(short));
+            out.write(reinterpret_cast<char*>(&versionNumber), sizeof(short));
 			out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
 			if(data->data_orbit.hasData())
 			{
@@ -177,6 +181,38 @@ namespace OPI
 				out.write(reinterpret_cast<char*>(&temp), sizeof(int));
 				out.write(reinterpret_cast<char*>(getObjectProperties()), sizeof(ObjectProperties) * data->size);
 			}
+            if(data->data_position.hasData())
+            {
+                temp = DATA_CARTESIAN;
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                temp = sizeof(Vector3);
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                out.write(reinterpret_cast<char*>(getCartesianPosition()), sizeof(Vector3) * data->size);
+            }
+            if(data->data_velocity.hasData())
+            {
+                temp = DATA_VELOCITY;
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                temp = sizeof(Vector3);
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                out.write(reinterpret_cast<char*>(getVelocity()), sizeof(Vector3) * data->size);
+            }
+            if(data->data_acceleration.hasData())
+            {
+                temp = DATA_VELOCITY;
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                temp = sizeof(Vector3);
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                out.write(reinterpret_cast<char*>(getAcceleration()), sizeof(Vector3) * data->size);
+            }
+            if(data->data_bytes.hasData())
+            {
+                temp = DATA_BYTES;
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                temp = data->byteArraySize;
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                out.write(reinterpret_cast<char*>(getBytes()), data->byteArraySize * data->size);
+            }
 		}
 	}
 
@@ -186,46 +222,90 @@ namespace OPI
 	 */
 	ErrorCode Population::read(const std::string& filename)
 	{
-		int number_of_objects;
+        int number_of_objects = 0;
+        short magicNumber = 0;
+        short versionNumber = 0;
 
-		std::ifstream in(filename.c_str(), std::ofstream::binary);
+        std::ifstream in(filename.c_str(), std::ifstream::binary);
 		if(in.is_open())
-		{
-			in.read(reinterpret_cast<char*>(&number_of_objects), sizeof(int));
-			resize(number_of_objects);
-			data->size = number_of_objects;
-			while(in.good())
-			{
-				int type;
-				int size;
-				in.read(reinterpret_cast<char*>(&type), sizeof(int));
-				if(!in.eof())
-				{
-					in.read(reinterpret_cast<char*>(&size), sizeof(int));
-					switch(type)
-					{
-						case DATA_ORBIT:
-							if(size == sizeof(Orbit))
-							{
-								Orbit* orbit = getOrbit(DEVICE_HOST, true);
-								in.read(reinterpret_cast<char*>(orbit), sizeof(Orbit) * number_of_objects);
-								data->data_orbit.update(DEVICE_HOST);
-								break;
-							}
-						case DATA_PROPERTIES:
-							if(size == sizeof(ObjectProperties))
-							{
-								ObjectProperties* prop = getObjectProperties(DEVICE_HOST, true);
-								in.read(reinterpret_cast<char*>(prop), sizeof(ObjectProperties) * number_of_objects);
-								data->data_properties.update(DEVICE_HOST);
-								break;
-							}
-						default:
-							std::cout << "Found unknown block id " << type << std::endl;
-							in.seekg(number_of_objects * size);
-					}
-				}
-			}
+        {
+            in.read(reinterpret_cast<char*>(&magicNumber), sizeof(short));
+            if (magicNumber == 47627)
+            {
+                in.read(reinterpret_cast<char*>(&versionNumber), sizeof(short));
+                if (versionNumber == 1)
+                {
+                    in.read(reinterpret_cast<char*>(&number_of_objects), sizeof(int));
+                    resize(number_of_objects);
+                    data->size = number_of_objects;
+                    while(in.good())
+                    {
+                        int type;
+                        int size;
+                        in.read(reinterpret_cast<char*>(&type), sizeof(int));
+                        if(!in.eof())
+                        {
+                            in.read(reinterpret_cast<char*>(&size), sizeof(int));
+                            switch(type)
+                            {
+                            case DATA_ORBIT:
+                                if(size == sizeof(Orbit))
+                                {
+                                    Orbit* orbit = getOrbit(DEVICE_HOST, true);
+                                    in.read(reinterpret_cast<char*>(orbit), sizeof(Orbit) * number_of_objects);
+                                    data->data_orbit.update(DEVICE_HOST);
+                                    break;
+                                }
+                            case DATA_PROPERTIES:
+                                if(size == sizeof(ObjectProperties))
+                                {
+                                    ObjectProperties* prop = getObjectProperties(DEVICE_HOST, true);
+                                    in.read(reinterpret_cast<char*>(prop), sizeof(ObjectProperties) * number_of_objects);
+                                    data->data_properties.update(DEVICE_HOST);
+                                    break;
+                                }
+                            case DATA_CARTESIAN:
+                                if(size == sizeof(Vector3))
+                                {
+                                    Vector3* pos = getCartesianPosition(DEVICE_HOST, true);
+                                    in.read(reinterpret_cast<char*>(pos), sizeof(Vector3) * number_of_objects);
+                                    data->data_position.update(DEVICE_HOST);
+                                    break;
+                                }
+                            case DATA_VELOCITY:
+                                if(size == sizeof(Vector3))
+                                {
+                                    Vector3* vel = getVelocity(DEVICE_HOST, true);
+                                    in.read(reinterpret_cast<char*>(vel), sizeof(Vector3) * number_of_objects);
+                                    data->data_velocity.update(DEVICE_HOST);
+                                    break;
+                                }
+                            case DATA_ACCELERATION:
+                                if(size == sizeof(Vector3))
+                                {
+                                    Vector3* acc = getAcceleration(DEVICE_HOST, true);
+                                    in.read(reinterpret_cast<char*>(acc), sizeof(Vector3) * number_of_objects);
+                                    data->data_acceleration.update(DEVICE_HOST);
+                                    break;
+                                }
+                            case DATA_BYTES:
+                                if(size == size) //TODO
+                                {
+                                    char* bytes = getBytes(DEVICE_HOST, true);
+                                    in.read(bytes, size * number_of_objects);
+                                    data->data_bytes.update(DEVICE_HOST);
+                                    break;
+                                }
+                            default:
+                                std::cout << "Found unknown block id " << type << std::endl;
+                                in.seekg(number_of_objects * size);
+                            }
+                        }
+                    }
+                }
+                else std::cout << "Unknown file version" << std::endl;
+            }
+            else std::cout << filename << " does not appear to be an OPI population file." << std::endl;
 		}
 		return SUCCESS;
 	}
