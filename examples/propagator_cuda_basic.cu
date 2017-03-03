@@ -131,8 +131,11 @@ class BasicCUDA: public OPI::Propagator
             else return OPI::CUDA_REQUIRED;
         }
 
-        //TODO Reset baseDay on runDisable and runEnable
-
+        // Saving a member variable like baseDay in the propagator can lead to problems because
+        // the host might change the propagation times or even the entire population without
+        // notice. Therefore, plugin authors need to make sure that at least when disabling
+        // and subsquently enabling the propagator, hosts can expect the propagator to
+        // reset to its initial state.
         virtual OPI::ErrorCode runEnable()
         {
             baseDay = 0;
@@ -143,6 +146,14 @@ class BasicCUDA: public OPI::Propagator
         {
             baseDay = 0;
             return OPI::SUCCESS;
+        }
+
+        // Theoretically, the algorithm inside the CUDA kernel can handle backward propagation,
+        // but the simplified handling of the input time cannot. Therefore, we'll return false
+        // in this function.
+        bool backwardPropagation()
+        {
+            return false;
         }
 
         int requiresCUDA()
