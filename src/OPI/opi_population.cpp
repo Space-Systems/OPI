@@ -291,8 +291,9 @@ namespace OPI
                             case DATA_BYTES:
                                 if(size == size) //TODO
                                 {
+                                    resizeByteArray(size);
                                     char* bytes = getBytes(DEVICE_HOST, true);
-                                    in.read(bytes, size * number_of_objects);
+                                    in.read(bytes, size * number_of_objects * sizeof(char));
                                     data->data_bytes.update(DEVICE_HOST);
                                     break;
                                 }
