@@ -41,10 +41,18 @@ add_example_plugin(
 
 # cuda example
 add_example_plugin(
-  PropagatorCUDAExample
+  PropagatorCUDABasic
   CUDA
   SOURCES
-    propagator_cuda_example.cu
+    propagator_cuda_basic.cu
+)
+
+# cuda example
+add_example_plugin(
+  PropagatorCUDAMultiDevice
+  CUDA
+  SOURCES
+    propagator_cuda_multidevice_example.cu
 )
 
 # a simple OpenCL example plugin (C API)
