@@ -157,13 +157,13 @@ namespace OPI
 	void Population::write(const std::string& filename)
 	{
 		int temp;
-        short versionNumber = 1;
-        short magic = 47627;
+        int versionNumber = 1;
+        int magic = 47627;
 		std::ofstream out(filename.c_str(), std::ofstream::binary);
 		if(out.is_open())
 		{                        
-            out.write(reinterpret_cast<char*>(&magic), sizeof(short));
-            out.write(reinterpret_cast<char*>(&versionNumber), sizeof(short));
+            out.write(reinterpret_cast<char*>(&magic), sizeof(int));
+            out.write(reinterpret_cast<char*>(&versionNumber), sizeof(int));
 			out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
 			if(data->data_orbit.hasData())
 			{
@@ -223,16 +223,16 @@ namespace OPI
 	ErrorCode Population::read(const std::string& filename)
 	{
         int number_of_objects = 0;
-        short magicNumber = 0;
-        short versionNumber = 0;
+        int magicNumber = 0;
+        int versionNumber = 0;
 
         std::ifstream in(filename.c_str(), std::ifstream::binary);
 		if(in.is_open())
         {
-            in.read(reinterpret_cast<char*>(&magicNumber), sizeof(short));
+            in.read(reinterpret_cast<char*>(&magicNumber), sizeof(int));
             if (magicNumber == 47627)
             {
-                in.read(reinterpret_cast<char*>(&versionNumber), sizeof(short));
+                in.read(reinterpret_cast<char*>(&versionNumber), sizeof(int));
                 if (versionNumber == 1)
                 {
                     in.read(reinterpret_cast<char*>(&number_of_objects), sizeof(int));
