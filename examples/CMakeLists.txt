@@ -39,12 +39,27 @@ add_example_plugin(
     propagator_fortran_example.f90
 )
 
-# cuda example
+# cpp basic example
+add_example_plugin(
+  PropagatorCPPBasic
+  SOURCES
+    propagator_basic_cpp.cpp
+)
+
+# cuda basic example
 add_example_plugin(
   PropagatorCUDABasic
   CUDA
   SOURCES
-    propagator_cuda_basic.cu
+    propagator_basic_cuda.cu
+)
+
+# opencl basic example (C++ API)
+add_example_plugin(
+  PropagatorCL2Basic
+  OPENCL
+  SOURCES
+    propagator_basic_cl2.cpp
 )
 
 # cuda example

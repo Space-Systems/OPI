@@ -4,14 +4,14 @@
 // some plugin information
 #define OPI_PLUGIN_NAME "BasicCUDA"
 #define OPI_PLUGIN_AUTHOR "ILR TU BS"
-#define OPI_PLUGIN_DESC "Basic Mean Motion Converter"
+#define OPI_PLUGIN_DESC "Basic Mean Motion Converter - CUDA version"
 
 // the plugin version
 #define OPI_PLUGIN_VERSION_MAJOR 0
 #define OPI_PLUGIN_VERSION_MINOR 1
 #define OPI_PLUGIN_VERSION_PATCH 0
 
-// iteratively converting mean anomaly to excentric anomaly
+// Auxiliary kernel function that iteratively converts mean anomaly to eccentric anomaly.
 __host__ __device__ float mean2eccentric(float meanAnomaly, float eccentricity)
 {
     float eccentricAnomaly = meanAnomaly;
@@ -26,12 +26,13 @@ __host__ __device__ float mean2eccentric(float meanAnomaly, float eccentricity)
     return eccentricAnomaly;
 }
 
-// CUDA kernel that does the actual transformations
+// CUDA kernel that does the actual transformations.
 // Adapted from https://doi.org/10.5281/zenodo.322256, Listing 6.3
 __global__ void kernel_propagate(OPI::Orbit* orbit, OPI::Vector3* position, float seconds, int size)
 {
-    // Get the kernel ID.
+    // Get the kernel ID...
     int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    // ...and make sure it does not exceed the Population size.
     if (idx < size)
     {
         // Store orbit data from the object this kernel is responsible for.
@@ -52,7 +53,8 @@ __global__ void kernel_propagate(OPI::Orbit* orbit, OPI::Vector3* position, floa
         float t = fmod(seconds, orbit_period);
 
         // Calculate the mean anomaly and eccentric anomaly.
-        // Note: This disregards the initial mean anomaly given in the Population.
+        // Note: This disregards the initial mean anomaly given in the Population -
+        // avoid this in production plugins.
         float mean_anomaly = fmodf(sqrtf((RMUE * t * t) / powf(sma,3.0f)), 2.0f*PI);
         float excentric_anomaly = mean2eccentric(mean_anomaly, ecc);
 
@@ -82,6 +84,8 @@ __global__ void kernel_propagate(OPI::Orbit* orbit, OPI::Vector3* position, floa
     }
 }
 
+// Basic propagator that calculates cartesian position and unperturbed mean motion.
+// This is the CUDA version. There are equivalent C++ and OpenCL plugins in the examples folder.
 class BasicCUDA: public OPI::Propagator
 {
     public:
@@ -156,11 +160,19 @@ class BasicCUDA: public OPI::Propagator
             return false;
         }
 
+        // CUDA compute capability 3 is required for this plugin.
         int requiresCUDA()
         {
             return 3;
         }
 
+        // This plugin does not require OpenCL.
+        int requiresOpenCL()
+        {
+            return 0;
+        }
+
+        // This plugin is written for OPI version 1.0.
         int minimumOPIVersionRequired()
         {
             return 1;
