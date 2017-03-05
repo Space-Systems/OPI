@@ -24,11 +24,11 @@ add_example(
     host_fortran_example.f90
 )
 
-# a simple cpp example plugins
+# a simple cpp plugin showing PropagatorProperties
 add_example_plugin(
-  PropagatorCPPExample
+  PropagatorPropertiesCPP
   SOURCES
-    propagator_cpp_example.cpp
+    propagator_properties_cpp.cpp
 )
 
 # a simple fortran example plugin
