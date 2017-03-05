@@ -1,4 +1,6 @@
 #include "OPI/opi_cpp.h"
+#include <string>
+#include <iostream>
 
 // For this example, we'll use the new C++ wrapper, cl2.hpp.
 // This requires some additional casting, see comments below.
@@ -6,18 +8,19 @@
 #define CL_HPP_MINIMUM_OPENCL_VERSION 110
 #include "CL/cl2.hpp"
 
-#include <string>
-#include <iostream>
-
-// some plugin information
+// Basic information about the plugin that can be queried by the host.
+// OPI_PLUGIN_NAME is the most important as it serves as an identifier
+// for the host to request a specific propagator. It should be descriptive
+// and closely match the plugin's file name.
 #define OPI_PLUGIN_NAME "BasicCL"
 #define OPI_PLUGIN_AUTHOR "ILR TU BS"
 #define OPI_PLUGIN_DESC "Basic Mean Motion Converter - OpenCL version"
 
-// the plugin version
+// Set the version number for the plugin here.
 #define OPI_PLUGIN_VERSION_MAJOR 0
 #define OPI_PLUGIN_VERSION_MINOR 1
 #define OPI_PLUGIN_VERSION_PATCH 0
+
 
 // Basic propagator that calculates cartesian position and unperturbed mean motion.
 // This is the OpenCL version. There are equivalent C++ and CUDA plugins in the examples folder.

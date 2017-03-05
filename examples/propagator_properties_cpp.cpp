@@ -1,11 +1,15 @@
 #include "OPI/opi_cpp.h"
 #include <iostream>
 
-// some plugin information
+// Basic information about the plugin that can be queried by the host.
+// OPI_PLUGIN_NAME is the most important as it serves as an identifier
+// for the host to request a specific propagator. It should be descriptive
+// and closely match the plugin's file name.
 #define OPI_PLUGIN_NAME "PropertiesExampleCPP"
 #define OPI_PLUGIN_AUTHOR "ILR TU BS"
-#define OPI_PLUGIN_DESC "Example Propagator Showing How To Use PropagatorProperties"
-// the plugin version
+#define OPI_PLUGIN_DESC "Example propagator showing how to use PropagatorProperties"
+
+// Set the version number for the plugin here.
 #define OPI_PLUGIN_VERSION_MAJOR 0
 #define OPI_PLUGIN_VERSION_MINOR 1
 #define OPI_PLUGIN_VERSION_PATCH 0
@@ -16,9 +20,9 @@
 // queried and set by the host or via a config file. Their purpose is to communicate
 // additional settings to the propagator that are not covered by the generic interface.
 // It is recommended that plugin authors supply a commented config file explaining the
-// PPs and their default values while host authors should query the plugin's PPs and
+// PPs and their default values. Host authors should always query the plugin's PPs and
 // display them in the user interface. An example config file is provided for this
-// example.
+// plugin.
 class PropertiesCPP: public OPI::Propagator
 {
     private:
@@ -59,15 +63,15 @@ class PropertiesCPP: public OPI::Propagator
         // set default values. When a plugin is loaded, the host will attempt to
         // load a config file AFTER the constructor was called. This means that the config
         // file takes priority over member variable defaults, and property settings by the
-        // host take priority over the config file. The name of the config file is the FILE
-        // name of the plugin, with the .dll/.so/.dynlib suffix replaced with .cfg.
+        // host take priority over the config file. The name of the config file is the file
+        // name of the plugin (not the plugin name defined above!), with the .dll/.so/.dynlib
+        // suffix replaced with .cfg. It should reside in the same directory as the plugin.
         PropertiesCPP(OPI::Host& host)
 		{
             // Call the above function to set internal variables for PPs
             setDefaultPropertyValues();
 
-            // Define available properties and link them to the internal
-            // variables.
+            // Define available properties and link them to the internal variables.
             registerProperty("ThisIsAnInteger", &testproperty_int);
             registerProperty("ThisIsAFloat", &testproperty_float);
             registerProperty("ThisIsADouble", &testproperty_double);
@@ -118,7 +122,7 @@ class PropertiesCPP: public OPI::Propagator
             return true;
         }
 
-        // This propagator does not return a position vector.
+        // This propagator does not generate a position vector.
         bool cartesianCoordinates()
         {
             return false;

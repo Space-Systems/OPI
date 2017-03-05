@@ -1,15 +1,19 @@
 #include <cuda.h>
 #include "OPI/opi_cpp.h"
 
-// some plugin information
+// Basic information about the plugin that can be queried by the host.
+// OPI_PLUGIN_NAME is the most important as it serves as an identifier
+// for the host to request a specific propagator. It should be descriptive
+// and closely match the plugin's file name.
 #define OPI_PLUGIN_NAME "BasicCUDA"
 #define OPI_PLUGIN_AUTHOR "ILR TU BS"
 #define OPI_PLUGIN_DESC "Basic Mean Motion Converter - CUDA version"
 
-// the plugin version
+// Set the version number for the plugin here.
 #define OPI_PLUGIN_VERSION_MAJOR 0
 #define OPI_PLUGIN_VERSION_MINOR 1
 #define OPI_PLUGIN_VERSION_PATCH 0
+
 
 // Auxiliary kernel function that iteratively converts mean anomaly to eccentric anomaly.
 __host__ __device__ float mean2eccentric(float meanAnomaly, float eccentricity)
