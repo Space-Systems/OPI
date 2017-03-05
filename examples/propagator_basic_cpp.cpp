@@ -74,6 +74,12 @@ class BasicCPP: public OPI::Propagator
             return false;
         }
 
+        // This propagator returns a position vector.
+        bool cartesianCoordinates()
+        {
+            return true;
+        }
+
         // This plugin does not require CUDA.
         int requiresCUDA()
         {

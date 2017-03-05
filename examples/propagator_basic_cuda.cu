@@ -160,6 +160,12 @@ class BasicCUDA: public OPI::Propagator
             return false;
         }
 
+        // This propagator returns a position vector.
+        bool cartesianCoordinates()
+        {
+            return true;
+        }
+
         // CUDA compute capability 3 is required for this plugin.
         int requiresCUDA()
         {
