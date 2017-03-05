@@ -183,7 +183,10 @@ namespace OPI
                                     }
                                     else if (value.find_first_of(".") != std::string::npos)
                                     {
-                                        setProperty(property, atof(value.c_str()));
+                                        if (value.substr(value.length()-1,1) == "f")
+                                            setProperty(property, (float)atof(value.substr(0,value.length()-2).c_str()));
+                                        else
+                                            setProperty(property, atof(value.c_str()));
                                     }
                                     else {
                                         setProperty(property, atoi(value.c_str()));
