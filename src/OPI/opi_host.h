@@ -186,8 +186,6 @@ namespace OPI
 			Host(const Host& other);
 			//! Load a specific plugin
             void loadPlugin(Plugin* plugin, gpuPlatform platform, const std::string& configfile);
-            void loadPluginConfig(Propagator* propagator, const std::string& filename);
-            std::vector<std::string> tokenize(std::string line, std::string delimiter);
 			Pimpl<HostImpl> impl;
 	};
 }

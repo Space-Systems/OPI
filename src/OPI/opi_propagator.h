@@ -22,6 +22,7 @@
 #include "opi_module.h"
 #include "opi_pimpl_helper.h"
 #include <string>
+#include <vector>
 namespace OPI
 {
 	class Population;
@@ -50,6 +51,9 @@ namespace OPI
 		public:
 			Propagator();
 			virtual ~Propagator();
+
+            void loadConfigFile();
+            void loadConfigFile(const std::string& filename);
 
             /**
              * @brief propagate Starts the propagation for the given time frame.
@@ -108,7 +112,7 @@ namespace OPI
              * API level is equal to OPI's major version number.
              * @return An integer representing the minimum API level required.
              */
-            virtual int minimumOPIVersionRequired();
+            virtual int minimumOPIVersionRequired();           
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
@@ -122,9 +126,14 @@ namespace OPI
             //! Override this to implement propagation with individual times.
             //! OPI will make sure that the julian_days vector length matches that of the Population.
             virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, float dt);
+            //! Variable to hold the appropriate name for the config file.
+            std::string configFileName;
 
 		private:
+            //! Auxiliary function for loadConfig
+            std::vector<std::string> tokenize(std::string line, std::string delimiter);
 			Pimpl<PropagatorImpl> data;
+
 	};
 }
 

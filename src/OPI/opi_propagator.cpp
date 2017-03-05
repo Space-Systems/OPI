@@ -17,7 +17,8 @@
 #include "opi_propagator.h"
 #include "opi_host.h"
 #include "opi_perturbation_module.h"
-#include <vector>
+#include <iostream>
+#include <fstream>
 namespace OPI
 {
 	/**
@@ -37,8 +38,9 @@ namespace OPI
 
 	//! \endcond
 
-	Propagator::Propagator()
+    Propagator::Propagator()
 	{
+        configFileName = "";
 	}
 
 	Propagator::~Propagator()
@@ -144,6 +146,82 @@ namespace OPI
     ErrorCode Propagator::runMultiTimePropagation(Population& data, double* julian_days, float dt)
     {
         return NOT_IMPLEMENTED;
+    }
+
+    void Propagator::loadConfigFile()
+    {
+        loadConfigFile(configFileName);
+    }
+
+    void Propagator::loadConfigFile(const std::string& filename)
+    {
+        if (filename != "" && filename.length() > 4)
+        {
+            if (filename.substr(filename.length()-4,4) == ".cfg")
+            {
+                std::ifstream in(filename.c_str(), std::ifstream::in);
+                if (in.is_open())
+                {
+                    std::cout << "Initialising " << getName() << " from config file" << std::endl;
+                    while (in.good())
+                    {
+                        std::string line;
+                        std::getline(in, line);
+                        //trim
+                        if (line[0] != '#')
+                        {
+                            std::vector<std::string> setting = tokenize(line, "=");
+                            if (setting.size() >= 2)
+                            {
+                                std::string property = setting[0];
+                                std::string value = setting[1];
+                                if (hasProperty(property))
+                                {
+                                    if (value.substr(0,1) == "\"" && value.substr(value.length()-1, value.length()) == "\"")
+                                    {
+                                        setProperty(property, value.substr(1,value.length()-2));
+                                    }
+                                    else if (value.find_first_of(".") != std::string::npos)
+                                    {
+                                        setProperty(property, atof(value.c_str()));
+                                    }
+                                    else {
+                                        setProperty(property, atoi(value.c_str()));
+                                    }
+                                }
+                                else {
+                                    std::cout << "Not setting unknown property " << property << std::endl;
+                                }
+                            }
+                        }
+                    }
+                    in.close();
+                }
+                else {
+                    std::cout << "No config file found for propagator " << getName() << std::endl;
+                }
+            }
+            else {
+                std::cout << filename << " is not a valid config file for propagator " << getName() << std::endl;
+            }
+        }
+        configFileName = filename;
+    }
+
+    std::vector<std::string> Propagator::tokenize(std::string line, std::string delimiter)
+    {
+        std::vector<std::string> elements;
+
+        std::string::size_type lastPos = line.find_first_not_of(delimiter, 0);
+        std::string::size_type pos     = line.find_first_of(delimiter, lastPos);
+
+        while (std::string::npos != pos || std::string::npos != lastPos)
+        {
+            elements.push_back(line.substr(lastPos, pos - lastPos));
+            lastPos = line.find_first_not_of(delimiter, pos);
+            pos = line.find_first_of(delimiter, lastPos);
+        }
+        return elements;
     }
 
 }
