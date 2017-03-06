@@ -57,6 +57,7 @@ namespace OPI
 			// data size
 			int size;
             int byteArraySize;
+            std::string lastPropagatorName;
 
 	};
 	/**
@@ -68,13 +69,15 @@ namespace OPI
 	{
 		data->size = 0;
         data->byteArraySize = 1;
-		resize(size);
+        data->lastPropagatorName = "None";
+		resize(size);        
 	}
 
     Population::Population(const Population& source) : data(source.getHostPointer())
     {
         data->size = 0;
         data->byteArraySize = 1;
+        data->lastPropagatorName = source.getLastPropagatorName();
         int s = source.getSize();
         int b = source.getByteArraySize();
         resize(s);
@@ -100,6 +103,7 @@ namespace OPI
     {
         data->size = 0;
         data->byteArraySize = 1;
+        data->lastPropagatorName = source.getLastPropagatorName();
         int s = list.getSize();
         int b = source.getByteArraySize();
         resize(s);
@@ -159,12 +163,15 @@ namespace OPI
 		int temp;
         int versionNumber = 1;
         int magic = 47627;
+        int nameLength = data->lastPropagatorName.length();
 		std::ofstream out(filename.c_str(), std::ofstream::binary);
 		if(out.is_open())
 		{                        
             out.write(reinterpret_cast<char*>(&magic), sizeof(int));
             out.write(reinterpret_cast<char*>(&versionNumber), sizeof(int));
 			out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
+            out.write(reinterpret_cast<char*>(&nameLength), sizeof(int));
+            out.write(reinterpret_cast<char*>(&data->lastPropagatorName), data->lastPropagatorName.length());
 			if(data->data_orbit.hasData())
 			{
 				temp = DATA_ORBIT;
@@ -225,6 +232,8 @@ namespace OPI
         int number_of_objects = 0;
         int magicNumber = 0;
         int versionNumber = 0;
+        int propagatorNameLength = 0;
+        char* propagatorName;
 
         std::ifstream in(filename.c_str(), std::ifstream::binary);
 		if(in.is_open())
@@ -238,6 +247,9 @@ namespace OPI
                     in.read(reinterpret_cast<char*>(&number_of_objects), sizeof(int));
                     resize(number_of_objects);
                     data->size = number_of_objects;
+                    in.read(reinterpret_cast<char*>(&propagatorNameLength), sizeof(int));
+                    in.read(reinterpret_cast<char*>(&propagatorName), propagatorNameLength*sizeof(char));
+                    data->lastPropagatorName = std::string(propagatorName);
                     while(in.good())
                     {
                         int type;
@@ -331,6 +343,17 @@ namespace OPI
         data->data_bytes.resize(data->size * size);
         data->byteArraySize = size;
     }
+
+    std::string Population::getLastPropagatorName() const
+    {
+        return data->lastPropagatorName;
+    }
+
+    void Population::setLastPropagatorName(std::string propagatorName)
+    {
+        data->lastPropagatorName = propagatorName;
+    }
+
 
 	/**
 	 * @details

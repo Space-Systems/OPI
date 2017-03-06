@@ -74,6 +74,14 @@ namespace OPI
 			int getSize() const;
             //! Returns the per-object size of the byte buffer
             int getByteArraySize() const;
+            //! Returns the name of the last plugin the population was propagated with.
+            std::string getLastPropagatorName() const;
+            /*! Set the name of the last propagator the population was propagated with.
+             *
+             * This is done automatically by OPI on successful propagation
+             * and should not require any extra effort from the plugin author.
+             */
+            void setLastPropagatorName(std::string propagatorName);
 
 			//! Removes an object
 			void remove(int index);

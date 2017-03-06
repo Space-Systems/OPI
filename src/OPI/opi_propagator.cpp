@@ -76,6 +76,10 @@ namespace OPI
 		if(status == SUCCESS)
 			status = runPropagation(objectdata, julian_day, dt);
 		getHost()->sendError(status);
+        if (status == OPI::SUCCESS && objectdata.getLastPropagatorName() != getName())
+        {
+            objectdata.setLastPropagatorName(getName());
+        }
 		return status;
 	}
 
@@ -90,6 +94,10 @@ namespace OPI
 		if(status == NOT_IMPLEMENTED)
 			status = propagate(objectdata, julian_day, dt);
 		getHost()->sendError(status);
+        if (status == OPI::SUCCESS && objectdata.getLastPropagatorName() != getName())
+        {
+            objectdata.setLastPropagatorName(getName());
+        }
 		return status;
 	}
 
@@ -110,6 +118,10 @@ namespace OPI
         }
         else status = INDEX_RANGE;
         getHost()->sendError(status);
+        if (status == OPI::SUCCESS && objectdata.getLastPropagatorName() != getName())
+        {
+            objectdata.setLastPropagatorName(getName());
+        }
         return status;
     }
 
