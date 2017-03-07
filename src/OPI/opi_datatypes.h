@@ -52,7 +52,7 @@ namespace OPI
 	}
 
 	//! Scalar Multiplication operator for Orbit
-	OPI_CUDA_PREFIX inline Orbit operator*(const Orbit& a, const float& b)
+    OPI_CUDA_PREFIX inline Orbit operator*(const Orbit& a, const double& b)
 	{
 		Orbit out;
 		out.semi_major_axis = a.semi_major_axis * b;
@@ -65,7 +65,7 @@ namespace OPI
 	}
 
 	//! Scalar Division operator for Orbit
-	OPI_CUDA_PREFIX inline Orbit operator/(const Orbit& a, const float& b)
+    OPI_CUDA_PREFIX inline Orbit operator/(const Orbit& a, const double& b)
 	{
 		Orbit out;
 		out.semi_major_axis = a.semi_major_axis / b;
@@ -97,7 +97,7 @@ namespace OPI
 		return out;
 	}
 
-	OPI_CUDA_PREFIX inline Vector3 operator+(const Vector3& a, float b)
+    OPI_CUDA_PREFIX inline Vector3 operator+(const Vector3& a, double b)
 	{
 		Vector3 out;
 		out.x = a.x + b;
@@ -106,7 +106,7 @@ namespace OPI
 		return out;
 	}
 
-	OPI_CUDA_PREFIX inline Vector3 operator-(const Vector3& a, float b)
+    OPI_CUDA_PREFIX inline Vector3 operator-(const Vector3& a, double b)
 	{
 		Vector3 out;
 		out.x = a.x - b;
@@ -115,8 +115,8 @@ namespace OPI
 		return out;
 	}
 
-	//! Divides a vector by a float
-	OPI_CUDA_PREFIX inline Vector3 operator/(const Vector3& a, float b)
+    //! Divides a vector by a double
+    OPI_CUDA_PREFIX inline Vector3 operator/(const Vector3& a, double b)
 	{
 		Vector3 out;
 		out.x = a.x / b;
@@ -125,8 +125,8 @@ namespace OPI
 		return out;
 	}
 
-	//! Multiplies a vector times a float
-	OPI_CUDA_PREFIX inline Vector3 operator*(const Vector3& a, float b)
+    //! Multiplies a vector times a double
+    OPI_CUDA_PREFIX inline Vector3 operator*(const Vector3& a, double b)
 	{
 		Vector3 out;
 		out.x = a.x * b;
@@ -136,9 +136,9 @@ namespace OPI
 	}
 
 	//! Dot product for vector3
-	OPI_CUDA_PREFIX inline float operator*(const Vector3& a, const Vector3& b)
+    OPI_CUDA_PREFIX inline double operator*(const Vector3& a, const Vector3& b)
 	{
-		float out;
+        double out;
 		out = a.x * b.x + a.y * b.y + a.z * b.z;
 		return out;
 	}
@@ -153,19 +153,19 @@ namespace OPI
 	}
 
 	//! Calculates the length²
-	OPI_CUDA_PREFIX inline float lengthSquare(const Vector3& v)
+    OPI_CUDA_PREFIX inline double lengthSquare(const Vector3& v)
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
 	}
 
 	//! Calculates the length
-	OPI_CUDA_PREFIX inline float length(const Vector3 v)
+    OPI_CUDA_PREFIX inline double length(const Vector3 v)
 	{
 		return sqrt(lengthSquare(v));
 	}
 
 	//! Returns the smallest element
-	OPI_CUDA_PREFIX inline float smallest(const Vector3& v)
+    OPI_CUDA_PREFIX inline double smallest(const Vector3& v)
 	{
 		if(v.x < v.y)
 			return v.x < v.z ? v.x : v.z;
@@ -174,7 +174,7 @@ namespace OPI
 	}
 
 	//! Returns the highest element
-	OPI_CUDA_PREFIX inline float highest(const Vector3& v)
+    OPI_CUDA_PREFIX inline double highest(const Vector3& v)
 	{
 		if(v.x > v.y)
 			return v.x > v.z ? v.x : v.z;

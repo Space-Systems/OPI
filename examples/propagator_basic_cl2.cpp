@@ -193,20 +193,20 @@ class BasicCL: public OPI::Propagator
             // The orbit and vector types need to be redefined in OpenCL.
             // Make sure they are identical to their counterparts on the host!
             struct Orbit {
-                float semi_major_axis;
-                float eccentricity;
-                float inclination;
-                float raan;
-                float arg_of_perigee;
-                float mean_anomaly;
-                float bol;
-                float eol;
+                double semi_major_axis;
+                double eccentricity;
+                double inclination;
+                double raan;
+                double arg_of_perigee;
+                double mean_anomaly;
+                double bol;
+                double eol;
             };
 
             struct Vector3 {
-                float x;
-                float y;
-                float z;
+                double x;
+                double y;
+                double z;
             };
 
             // Auxiliary OpenCL function to convert mean anomaly to eccentric anomaly.
@@ -236,12 +236,15 @@ class BasicCL: public OPI::Propagator
                 if (i < size)
                 {
                     // Store orbit data from the object this kernel is responsible for.
-                    float sma = orbit[i].semi_major_axis;
-                    float ecc = orbit[i].eccentricity;
-                    float inc = orbit[i].inclination;
-                    float raan = orbit[i].raan;
-                    float aop = orbit[i].arg_of_perigee;
-                    float phi = orbit[i].mean_anomaly;
+                    // We will use float internally since it is more efficient on the GPU.
+                    // This is recommended for use cases where speed is more important than
+                    // accuracy, such as visualization.
+                    float sma = (float)orbit[i].semi_major_axis;
+                    float ecc = (float)orbit[i].eccentricity;
+                    float inc = (float)orbit[i].inclination;
+                    float raan = (float)orbit[i].raan;
+                    float aop = (float)orbit[i].arg_of_perigee;
+                    float phi = (float)orbit[i].mean_anomaly;
 
                     // Define some auxiliary constants.
                     float PI = 3.1415926f;
@@ -278,12 +281,12 @@ class BasicCL: public OPI::Propagator
                     if (arg > EPSILON) r = p / arg;
 
                     // Write the position vector into the OPI::Population array.
-                    position[i].x = w.x*r;
-                    position[i].y = w.y*r;
-                    position[i].z = w.z*r;
+                    position[i].x = (double)(w.x*r);
+                    position[i].y = (double)(w.y*r);
+                    position[i].z = (double)(w.z*r);
 
                     // Finally, also write back the new mean anomaly into the orbit.
-                    orbit[i].mean_anomaly = mean_anomaly;
+                    orbit[i].mean_anomaly = (double)mean_anomaly;
                 }
             }
 

@@ -127,12 +127,16 @@ class BasicCPP: public OPI::Propagator
             for (int i=0; i<size; i++)
             {
                 // Store orbit data from the object this kernel is responsible for.
-                float sma = orbit[i].semi_major_axis;
-                float ecc = orbit[i].eccentricity;
-                float inc = orbit[i].inclination;
-                float raan = orbit[i].raan;
-                float aop = orbit[i].arg_of_perigee;
-                float phi = orbit[i].mean_anomaly;
+                // We will use float internally to line up this example with the GPU ones
+                // (single precision is more efficient on GPUs).
+                // This is recommended for use cases where speed is more important than
+                // accuracy, such as visualization.
+                float sma = (float)orbit[i].semi_major_axis;
+                float ecc = (float)orbit[i].eccentricity;
+                float inc = (float)orbit[i].inclination;
+                float raan = (float)orbit[i].raan;
+                float aop = (float)orbit[i].arg_of_perigee;
+                float phi = (float)orbit[i].mean_anomaly;
 
                 // Define some auxiliary constants.
                 float PI = 3.1415926f;
@@ -167,12 +171,12 @@ class BasicCPP: public OPI::Propagator
                 if (arg > EPSILON) r = p / arg;
 
                 // Write the position vector into the OPI::Population array.
-                position[i].x = w.x*r;
-                position[i].y = w.y*r;
-                position[i].z = w.z*r;
+                position[i].x = (double)(w.x*r);
+                position[i].y = (double)(w.y*r);
+                position[i].z = (double)(w.z*r);
 
                 // Finally, also write back the new mean anomaly into the orbit.
-                orbit[i].mean_anomaly = mean_anomaly;
+                orbit[i].mean_anomaly = (double)mean_anomaly;
             }
         }
 

@@ -40,12 +40,15 @@ __global__ void kernel_propagate(OPI::Orbit* orbit, OPI::Vector3* position, floa
     if (idx < size)
     {
         // Store orbit data from the object this kernel is responsible for.
-        float sma = orbit[idx].semi_major_axis;
-        float ecc = orbit[idx].eccentricity;
-        float inc = orbit[idx].inclination;
-        float raan = orbit[idx].raan;
-        float aop = orbit[idx].arg_of_perigee;
-        float phi = orbit[idx].mean_anomaly;
+        // We will use float internally since it is more efficient on the GPU.
+        // This is recommended for use cases where speed is more important than
+        // accuracy, such as visualization.
+        float sma = (float)orbit[idx].semi_major_axis;
+        float ecc = (float)orbit[idx].eccentricity;
+        float inc = (float)orbit[idx].inclination;
+        float raan = (float)orbit[idx].raan;
+        float aop = (float)orbit[idx].arg_of_perigee;
+        float phi = (float)orbit[idx].mean_anomaly;
 
         // Define some auxiliary constants.
         float PI = 3.1415926f;
@@ -79,9 +82,9 @@ __global__ void kernel_propagate(OPI::Orbit* orbit, OPI::Vector3* position, floa
         if (arg > EPSILON) r = p / arg;
 
         // Write the position vector into the OPI::Population array.
-        position[idx].x = w.x*r;
-        position[idx].y = w.y*r;
-        position[idx].z = w.z*r;
+        position[idx].x = (double)(w.x*r);
+        position[idx].y = (double)(w.y*r);
+        position[idx].z = (double)(w.z*r);
 
         // Finally, also write back the new mean anomaly into the orbit.
         orbit[idx].mean_anomaly = mean_anomaly;

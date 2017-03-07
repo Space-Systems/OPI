@@ -496,7 +496,7 @@ namespace OPI
 
 		std::stringstream result;
 		result.str("");
-		const float twopi = 6.2831853f;
+        const double twopi = 6.2831853;
 		for (int i=0; i<getSize(); i++) {
 
 			// SMA is smaller than Earth's radius but object has not been marked as decayed
