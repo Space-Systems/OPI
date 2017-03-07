@@ -98,21 +98,22 @@ class PropertiesCPP: public OPI::Propagator
 		}
 
         // When disabling and enabling the propagator, the host will expect it to reset
-        // to its default state, so we will reset the PropagatorProperties
-        // to the default values. On enabling, call loadConfigFile() to try reading
+        // to its initial state, so we will reset the PropagatorProperties
+        // to the default values. On disabling, call loadConfigFile() to try reading
         // the default configuration file that was specified when the propagator was
         // first loaded. You can also call loadConfigFile(std::string filename) to
         // load a configuration from a different file.
-        virtual OPI::ErrorCode runEnable()
+        // Note that runEnable() may be called after the host set its own values for
+        // the PropagatorProperties so if you have to reset them, do it in runDisable()!
+        virtual OPI::ErrorCode runDisable()
         {
             setDefaultPropertyValues();
             loadConfigFile();
             return OPI::SUCCESS;
         }
 
-        virtual OPI::ErrorCode runDisable()
+        virtual OPI::ErrorCode runEnable()
         {
-            setDefaultPropertyValues();
             return OPI::SUCCESS;
         }
 
