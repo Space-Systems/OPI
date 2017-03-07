@@ -134,6 +134,15 @@ namespace OPI
 	{
 		return false;
 	}
+
+    ReferenceFrame Propagator::referenceFrame()
+    {
+        if (cartesianCoordinates())
+        {
+            return REF_UNSPECIFIED;
+        }
+        else return REF_NONE;
+    }
 	
 	int Propagator::requiresCUDA()
 	{

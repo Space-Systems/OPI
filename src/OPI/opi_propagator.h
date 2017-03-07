@@ -93,6 +93,9 @@ namespace OPI
 			//! Check if this propagator supports generation of cartesian state vectors
 			virtual bool cartesianCoordinates();
 
+            //! Return the reference frame for the cartesian state vectors
+            virtual ReferenceFrame referenceFrame();
+
             /**
              * @brief requiresCUDA Check whether this propagator requires CUDA to function.
              * @return 0 if CUDA is not required, or the major number of
