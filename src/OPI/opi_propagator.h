@@ -52,7 +52,27 @@ namespace OPI
 			Propagator();
 			virtual ~Propagator();
 
+            /**
+             * @brief loadConfigFile Attempts to load the standard configuration file.
+             *
+             * The standard configuration file resides in the same directory as the plugin
+             * with a .cfg suffix instead of the platform's library extension (.dll, .so,
+             * .dynlib). This file is automatically loaded by the host on initialization using
+             * the second variant of this function below.
+             * It is recommended for plugin authors to call this function on runDisable()
+             * as part of resetting the propagator to its default state.
+             */
             void loadConfigFile();
+
+            /**
+             * @brief loadConfigFile Attempts to load a config file. Called by the host upon initialization.
+             *
+             * This function will automatically be called by OPI (and, in most cases, should
+             * only ever be called by OPI) when the plugin is first loaded.
+             * The given config file name will be stored in the propagator. Plugin authors
+             * should use the above variant of this function when resetting the propagator.
+             * @param filename The name of the config file to load.
+             */
             void loadConfigFile(const std::string& filename);
 
             /**
@@ -62,8 +82,8 @@ namespace OPI
              * orbit and position/velocity vectors (if supported) are written back to the
              * given Population. The propagation result shall reflect the state of the
              * population at the point in time defined by julian_day + dt seconds.
-             * @param data The population to be propagated
-             * @param julian_day The base date in Julian date format
+             * @param data The population to be propagated.
+             * @param julian_day The base date in Julian date format.
              * @param dt The time step, in seconds, from last propagation.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
@@ -93,7 +113,16 @@ namespace OPI
 			//! Check if this propagator supports generation of cartesian state vectors
 			virtual bool cartesianCoordinates();
 
-            //! Return the reference frame for the cartesian state vectors
+            /**
+             * @brief referenceFrame Return the reference frame for the cartesian state vectors.
+             *
+             * Set by the propagator to specify in which reference frame the state vectors (position,
+             * velocity, and acceleration) are given. Defaults to REF_NONE if cartesianCoordinates()
+             * returns false, or REF_UNSPECIFIED otherwise. Set to REF_UNLISTED if the reference frame
+             * is non-standard or otherwise does not appear in the ReferenceFrame enum. Since frames come
+             * in many different flavours always consult the plugin's documentation for specifics.
+             * @return A value of the ReferenceFrame enum matching the propagator's output.
+             */
             virtual ReferenceFrame referenceFrame();
 
             /**
@@ -103,10 +132,11 @@ namespace OPI
              */
 			virtual int requiresCUDA();
 
-			//! Check whether this propagator requires OpenCL to function.
-			/** Set to zero if OpenCL is not required, otherwise set this to the major number of
-			*  the required compute capability.
-			*/
+            /**
+             * @brief Check whether this propagator requires OpenCL to function.
+             * @return 0 if OpenCL is not required, otherwise set this to the major number of
+             * the required OpenCL version.
+             */
 			virtual int requiresOpenCL();
 
             /**
