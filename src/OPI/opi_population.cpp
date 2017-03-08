@@ -422,6 +422,67 @@ namespace OPI
 		}
 	}
 
+    void Population::insert(Population& source, IndexList& list)
+    {
+        int* listdata = list.getData(DEVICE_HOST);
+
+        Orbit* orbits = source.getOrbit(DEVICE_HOST, false);
+        ObjectProperties* props = source.getObjectProperties(DEVICE_HOST, false);
+        Vector3* pos = source.getCartesianPosition(DEVICE_HOST, false);
+        Vector3* vel = source.getVelocity(DEVICE_HOST, false);
+        Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
+        char* bytes = source.getBytes(DEVICE_HOST, false);
+
+        Orbit* thisOrbit = getOrbit();
+        ObjectProperties* thisProps = getObjectProperties();
+        Vector3* thisPos = getCartesianPosition();
+        Vector3* thisVel = getVelocity();
+        Vector3* thisAcc = getAcceleration();
+        char* thisBytes = getBytes();
+
+        if (getByteArraySize() != source.getByteArraySize())
+        {
+            std::cout << "Warning: Cannot insert byte array into population!" << std::endl;
+        }
+
+        if (list.getSize() >= source.getSize())
+        {
+            for(int i = 0; i < list.getSize(); ++i)
+            {
+                int l = listdata[i];
+                if (l < getSize())
+                {
+                    thisOrbit[l] = orbits[i];
+                    thisProps[l] = props[i];
+                    thisPos[l] = pos[i];
+                    thisVel[l] = vel[i];
+                    thisAcc[l] = acc[i];
+                    if (getByteArraySize() == source.getByteArraySize())
+                    {
+                        int b = getByteArraySize();
+                        for (int j=0; j<b; j++)
+                        {
+                            thisBytes[l*b+j] = bytes[i*b+j];
+                        }
+                    }
+                }
+                else {
+                    std::cout << "Cannot insert - index out of range: " << l << std::endl;
+                }
+            }
+        }
+        else {
+            std::cout << "Cannot insert - not enough elements in index list!" << std::endl;
+        }
+
+        update(DATA_ORBIT);
+        update(DATA_PROPERTIES);
+        update(DATA_CARTESIAN);
+        update(DATA_VELOCITY);
+        update(DATA_ACCELERATION);
+        update(DATA_BYTES);
+    }
+
 	void Population::remove(int index)
 	{
 		data->data_acceleration.remove(index);

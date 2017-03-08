@@ -83,6 +83,20 @@ namespace OPI
              */
             void setLastPropagatorName(std::string propagatorName);
 
+            /**
+             * @brief insert Insert all elements from another population into this one.
+             *
+             * The given index list states at which positions the elements are inserted,
+             * e.g. if list[0] == 2 then the first element from the source population will
+             * be copied into the third element from this population (overwriting the data
+             * that may have been stored there). Therefore, the IndexList must have at least
+             * as many elements as the source population, and values stored within may not
+             * exceed the size of this population.
+             * @param source The Population from which the elements are copied.
+             * @param list A list of indices into the destination population.
+             */
+            void insert(Population& source, IndexList& list);
+
 			//! Removes an object
 			void remove(int index);
 			//! Removes a number of objects
