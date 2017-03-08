@@ -17,6 +17,7 @@
 #include "opi_propagator.h"
 #include "opi_host.h"
 #include "opi_perturbation_module.h"
+#include "opi_indexlist.h"
 #include <iostream>
 #include <fstream>
 namespace OPI
@@ -76,7 +77,7 @@ namespace OPI
 		if(status == SUCCESS)
 			status = runPropagation(objectdata, julian_day, dt);
 		getHost()->sendError(status);
-        if (status == OPI::SUCCESS && objectdata.getLastPropagatorName() != getName())
+        if (status == SUCCESS && objectdata.getLastPropagatorName() != getName())
         {
             objectdata.setLastPropagatorName(getName());
         }
@@ -92,9 +93,13 @@ namespace OPI
 		ErrorCode status = SUCCESS;
 		status = runIndexedPropagation(objectdata, indices, julian_day, dt);
 		if(status == NOT_IMPLEMENTED)
-			status = propagate(objectdata, julian_day, dt);
+        {
+            Population indexedData = Population(objectdata, indices);
+            propagate(indexedData, julian_day, dt);
+            objectdata.insert(indexedData, indices);
+        }
 		getHost()->sendError(status);
-        if (status == OPI::SUCCESS && objectdata.getLastPropagatorName() != getName())
+        if (status == SUCCESS && objectdata.getLastPropagatorName() != getName())
         {
             objectdata.setLastPropagatorName(getName());
         }
@@ -112,13 +117,24 @@ namespace OPI
         {
             status = runPropagation(objectdata, julian_days[0], dt);
         }
-        else if (length == objectdata.getSize())
+        else if (length >= objectdata.getSize())
         {
             status = runMultiTimePropagation(objectdata, julian_days, dt);
+            if (status == NOT_IMPLEMENTED)
+            {
+                ErrorCode innerStatus;
+                for (int i=0; i<objectdata.getSize(); i++)
+                {
+                    IndexList indices(*getHost());
+                    indices.add(i);
+                    innerStatus = propagate(objectdata, indices, julian_days[i], dt);
+                }
+                if (innerStatus != SUCCESS) status = innerStatus;
+            }
         }
-        else status = INDEX_RANGE;
+        else status = INDEX_RANGE;                
         getHost()->sendError(status);
-        if (status == OPI::SUCCESS && objectdata.getLastPropagatorName() != getName())
+        if (status == SUCCESS && objectdata.getLastPropagatorName() != getName())
         {
             objectdata.setLastPropagatorName(getName());
         }
