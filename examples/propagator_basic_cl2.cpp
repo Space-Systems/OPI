@@ -24,6 +24,8 @@
 
 // Basic propagator that calculates cartesian position and unperturbed mean motion.
 // This is the OpenCL version. There are equivalent C++ and CUDA plugins in the examples folder.
+// OpenCL code is more complex to set up than CUDA but you'll get a much wider variety of
+// supported platforms, including multicore CPUs.
 class BasicCL: public OPI::Propagator
 {
 	public:
@@ -33,8 +35,9 @@ class BasicCL: public OPI::Propagator
             baseDay = 0;
 
             // Get GPU support module from host.
-            // The OpenCL version will provide important additional information such as the
-            // OpenCL context and default command queue.
+            // The OpenCL version of the support module will provide important additional
+            // information compared to the CUDA version, such as the OpenCL context and
+            // default command queue which are required to run kernels.
             clSupport = host.getGPUSupport();
 		}
 
@@ -43,6 +46,8 @@ class BasicCL: public OPI::Propagator
 
 		}
 
+        // Auxiliary function to create the OpenCL kernel containing the propagation code.
+        // It is executed the first time runPropagation() is called.
         cl::Kernel createPropagator()
 		{
 			// cl_int for OpenCL error reporting
@@ -72,6 +77,7 @@ class BasicCL: public OPI::Propagator
 			return kernel;
 		}
 
+        // This is the main function every plugin needs to implement to do the actual propagation.
 		virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
 		{
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
@@ -81,30 +87,30 @@ class BasicCL: public OPI::Propagator
             if (baseDay == 0) baseDay = julian_day;
             float seconds = (julian_day-baseDay)*86400.0 + dt;
 
-            // Create OpenCL kernel on first run
+            // Create the OpenCL kernel on the first run.
             if (!initialized) {
                 propagator = createPropagator();
                 initialized = true;
             }
 
-			// cl_int for OpenCL error reporting
+            // cl_int for OpenCL error reporting.
             cl_int err;
 
             // Calling getOrbit, getObjectProperties, etc. with the DEVICE_CUDA flag will return
             // cl_mem instances in the OpenCL implementation. They must be explicitly cast to
             // cl_mem before they can be used as kernel arguments. This step will also trigger
-            // the memory transfer from host to OpenCL device.            
+            // the memory transfer from host to OpenCL device if required.
             cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
             cl_mem position = reinterpret_cast<cl_mem>(data.getCartesianPosition(OPI::DEVICE_CUDA));
 
             // To use the OpenCL C++ API, we also need to create a cl::Buffer object from
-            // the cl_mem instance. The retainObject flag of the cl::Buffer constructor
+            // the cl_mem instance. Again, the retainObject flag of the cl::Buffer constructor
             // must be set to true, otherwise OPI will lose ownership of the memory pointer
             // which will cause subsequent copy operations to fail.
             cl::Buffer orbitBuffer = cl::Buffer(orbit, true);
             cl::Buffer positionBuffer = cl::Buffer(position, true);
 
-            // The cl::Buffer object can then be used as a kernel argument.
+            // The cl::Buffer objects can then be used as kernel arguments.
             err = propagator.setArg(0, orbitBuffer);
             if (err != CL_SUCCESS) std::cout << "Error setting orbit data: " << err << std::endl;
             err = propagator.setArg(1, positionBuffer);
@@ -114,12 +120,13 @@ class BasicCL: public OPI::Propagator
             propagator.setArg(2, seconds);
             propagator.setArg(3, data.getSize());
 
-            // Enqueue the kernel.
+            // Get the command queue (retainOwnership = true, you get the idea...)
             cl::CommandQueue queue = cl::CommandQueue(*clSupport->getOpenCLQueue(), true);
+            // Enqueue the kernel with a 1-dimensional NDRange matching the size of the population.
             err = queue.enqueueNDRangeKernel(propagator, cl::NullRange, cl::NDRange(data.getSize()), cl::NullRange);
             if (err != CL_SUCCESS) std::cout << "Error running kernel: " << err << std::endl;
 
-            // wait for the kernel to finish
+            // Wait for the kernel to finish.
             queue.finish();
 
             // The kernel writes to the Population's position and orbit vectors, so
@@ -130,52 +137,84 @@ class BasicCL: public OPI::Propagator
             return OPI::SUCCESS;
 		}
 
+        // Especially with GPU-based propagators, you'll almost certainly also want to override
+        // runIndexedPropagation() and runMultiTimePropagation(). The former propagates only
+        // objects that appear in the given index list while the latter propgates objects to
+        // individual Julian dates given in an array.
+        // OPI provides basic implementations that call the (mandatory) runPropagation()
+        // function in a loop but they are very inefficient and likely to severly impact the
+        // performance of a CUDA- or OpenCL-based propagator.
+        // I'll leave this to you to implement them properly. For runIndexedPropagation() it
+        // is helpful to know that the IndexList synchronizes with the GPU just like the
+        // Population - the functions IndexList::getData() and IndexList::update() work
+        // just like their Population counterparts.
+        OPI::ErrorCode runIndexedPropagation(OPI::Population& data, OPI::IndexList& indices, double julian_day, float dt)
+        {
+            return OPI::NOT_IMPLEMENTED;
+        }
+
+        OPI::ErrorCode runMultiTimePropagation(OPI::Population& data, double* julian_days, float dt)
+        {
+            return OPI::NOT_IMPLEMENTED;
+        }
+
         // Saving a member variable like baseDay in the propagator can lead to problems because
         // the host might change the propagation times or even the entire population without
         // notice. Therefore, plugin authors need to make sure that at least when disabling
         // and subsquently enabling the propagator, hosts can expect the propagator to
         // reset to its initial state.
-        virtual OPI::ErrorCode runEnable()
-        {
-            baseDay = 0;
-            initialized = false;
-            return OPI::SUCCESS;
-        }
-
         virtual OPI::ErrorCode runDisable()
         {
-            baseDay = 0;
             initialized = false;
+            baseDay = 0;
             return OPI::SUCCESS;
         }
 
+        virtual OPI::ErrorCode runEnable()
+        {
+            return OPI::SUCCESS;
+        }
+
+        // The following functions need to be overridden to provide some information on
+        // the plugin's capabilities.
+
         // Theoretically, the algorithm can handle backward propagation,
-        // but the simplified handling of the input time cannot. Therefore, we'll return false
-        // in this function.
+        // but the simplified handling of the input time cannot. Therefore, we'll
+        // return false in this function. Also defaults to false if not overridden.
         bool backwardPropagation()
         {
             return false;
         }
 
-        // This propagator returns a position vector.
+        // This propagator returns a position vector so we'll set this to true.
+        // Defaults to false if not overridden.
         bool cartesianCoordinates()
         {
             return true;
         }
 
-        // This plugin does not require CUDA.
+        // This propagator generates state vectors in an Earth-centered intertial
+        // (ECI) reference frame. If not overridden, the default value is REF_NONE
+        // if no cartesian coordinates are generated, REF_UNSPECIFIED otherwise.
+        OPI::ReferenceFrame referenceFrame()
+        {
+            return OPI::REF_ECI;
+        }
+
+        // This plugin does not require CUDA so we return zero here.
+        // This is also the default if not overridden.
         int requiresCUDA()
         {
             return 0;
         }
 
-        // This plugin requires OpenCL.
+        // This plugin requires OpenCL version 1.0 or greater.
         int requiresOpenCL()
         {
             return 1;
         }
 
-        // This plugin is written for OPI version 1.0.
+        // This plugin is written for OPI version 1.0. (Default: 0)
         int minimumOPIVersionRequired()
         {
             return 1;

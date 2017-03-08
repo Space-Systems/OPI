@@ -106,6 +106,7 @@ class BasicCUDA: public OPI::Propagator
 
         }
 
+        // This is the main function every plugin needs to implement to do the actual propagation.
         virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
         {
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
@@ -142,22 +143,45 @@ class BasicCUDA: public OPI::Propagator
             else return OPI::CUDA_REQUIRED;
         }
 
+        // Especially with GPU-based propagators, you'll almost certainly also want to override
+        // runIndexedPropagation() and runMultiTimePropagation(). The former propagates only
+        // objects that appear in the given index list while the latter propgates objects to
+        // individual Julian dates given in an array.
+        // OPI provides basic implementations that call the (mandatory) runPropagation()
+        // function in a loop but they are very inefficient and likely to severly impact the
+        // performance of a CUDA- or OpenCL-based propagator.
+        // I'll leave this to you to implement them properly. For runIndexedPropagation() it
+        // is helpful to know that the IndexList synchronizes with the GPU just like the
+        // Population - the functions IndexList::getData() and IndexList::update() work
+        // just like their Population counterparts.
+        OPI::ErrorCode runIndexedPropagation(OPI::Population& data, OPI::IndexList& indices, double julian_day, float dt)
+        {
+            return OPI::NOT_IMPLEMENTED;
+        }
+
+        OPI::ErrorCode runMultiTimePropagation(OPI::Population& data, double* julian_days, float dt)
+        {
+            return OPI::NOT_IMPLEMENTED;
+        }
+
         // Saving a member variable like baseDay in the propagator can lead to problems because
         // the host might change the propagation times or even the entire population without
         // notice. Therefore, plugin authors need to make sure that at least when disabling
         // and subsquently enabling the propagator, hosts can expect the propagator to
         // reset to its initial state.
-        virtual OPI::ErrorCode runEnable()
-        {
-            baseDay = 0;
-            return OPI::SUCCESS;
-        }
-
         virtual OPI::ErrorCode runDisable()
         {
             baseDay = 0;
             return OPI::SUCCESS;
         }
+
+        virtual OPI::ErrorCode runEnable()
+        {
+            return OPI::SUCCESS;
+        }
+
+        // The following functions need to be overridden to provide some information on
+        // the plugin's capabilities.
 
         // Theoretically, the algorithm inside the CUDA kernel can handle backward propagation,
         // but the simplified handling of the input time cannot. Therefore, we'll return false
@@ -167,10 +191,19 @@ class BasicCUDA: public OPI::Propagator
             return false;
         }
 
-        // This propagator returns a position vector.
+        // This propagator returns a position vector so we'll set this to true.
+        // Defaults to false if not overridden.
         bool cartesianCoordinates()
         {
             return true;
+        }
+
+        // This propagator generates state vectors in an Earth-centered intertial
+        // (ECI) reference frame. If not overridden, the default value is REF_NONE
+        // if no cartesian coordinates are generated, REF_UNSPECIFIED otherwise.
+        OPI::ReferenceFrame referenceFrame()
+        {
+            return OPI::REF_ECI;
         }
 
         // CUDA compute capability 3 is required for this plugin.
@@ -179,13 +212,14 @@ class BasicCUDA: public OPI::Propagator
             return 3;
         }
 
-        // This plugin does not require OpenCL.
+        // This plugin does not require OpenCL so we return zero here.
+        // This is also the default if not overridden.
         int requiresOpenCL()
         {
             return 0;
         }
 
-        // This plugin is written for OPI version 1.0.
+        // This plugin is written for OPI version 1.0. (Default: 0)
         int minimumOPIVersionRequired()
         {
             return 1;
