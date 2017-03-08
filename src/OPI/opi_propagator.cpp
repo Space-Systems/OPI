@@ -127,7 +127,7 @@ namespace OPI
 
 	bool Propagator::backwardPropagation()
 	{
-		return true;
+        return false;
 	}
 
 	bool Propagator::cartesianCoordinates()
