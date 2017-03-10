@@ -270,9 +270,13 @@ namespace OPI
 			reservedSize = num_Objects;
 			// store the number of allocated objects
 		}
-		else
+        else if (num_Objects < reservedSize)
 		{
-			// FIXME: implement shrink operation
+            for (int i=reservedSize-1; i>=num_Objects; i--)
+            {
+                // FIXME: Untested - is this enough?
+                remove(i);
+            }
 		}
 	}
 
