@@ -207,7 +207,17 @@ namespace OPI
 				// if the propagator was created, add it to the list
 
 				if(propagator) {
-					if (propagator->requiresCUDA() <= 0 && propagator->requiresOpenCL() <= 0) {
+                    if (propagator->minimumOPIVersionRequired() < 1)
+                    {
+                        std::cout << propagator->getName() << ": Skipped because it is outdated." << std::endl
+                                  << "You should update this plugin, or delete it from the plugin folder." << std::endl;
+                    }
+                    else if (propagator->minimumOPIVersionRequired() > 1)
+                    {
+                        std::cout << propagator->getName() << ": Skipped because it needs at least OPI version "
+                                  << propagator->minimumOPIVersionRequired() << "." << std::endl;
+                    }
+                    else if (propagator->requiresCUDA() <= 0 && propagator->requiresOpenCL() <= 0) {
 						// no GPU support required; load plugin
                         propagator->loadConfigFile(configfile);
 						addPropagator(propagator);
