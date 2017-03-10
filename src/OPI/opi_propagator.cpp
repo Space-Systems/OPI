@@ -122,7 +122,7 @@ namespace OPI
             status = runMultiTimePropagation(objectdata, julian_days, dt);
             if (status == NOT_IMPLEMENTED)
             {
-                ErrorCode innerStatus;
+                ErrorCode innerStatus = SUCCESS;
                 for (int i=0; i<objectdata.getSize(); i++)
                 {
                     IndexList indices(*getHost());
