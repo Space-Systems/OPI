@@ -539,14 +539,6 @@ namespace OPI
         return data->host;
     }
 
-	/**
-	 * @details
-	 * Call on a population to perform some validity checks of all orbits and properties. This is a host
-	 * function so the data will be synched to the host when calling this function. It is comparatively
-	 * slow and should be used for debugging or once after population data is read from input files.
-	 * The return value is a string that can be printed to the screen or a log file. If no problems were
-	 * found, an empty string is returned.
-	 */
 	std::string Population::sanityCheck()
 	{
 		if (getSize()==0) return std::string("Population is empty.");

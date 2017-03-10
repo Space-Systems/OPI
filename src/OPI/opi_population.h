@@ -42,44 +42,92 @@ namespace OPI
 	class OPI_API_EXPORT Population
 	{
 		public:
-			//! Constructor
+            /**
+             * @brief Population Creates a new empty Population, optionally with a given size.
+             * @param host A pointer to the OPI Host that this Population is intended for.
+             * @param size The number of elements of the Population. Defaults to zero if unset.
+             */
 			Population(Host& host, int size = 0);
 
-            /*! Copy constructor
-            *
-            * This function performs a deep copy of the population on the host. Device data
-            * will be downloaded as part of this operation. The copy does not contain any
-            * device data so synchronization will happen again in the other direction as soon
-            * as the copy is requested on the device. This function may therefore severely
-            * slow down CUDA/OpenCL propagation when used in every propagation step.
-            * In such cases, if possible, use the respective CUDA/OpenCL functions
-            * to copy individual device buffers as required.
-            */
+            /**
+             * @brief Population Copy constructor
+             *
+             * This function creates a deep copy of a Population on the host. Device data
+             * will be downloaded as part of this operation. The copy does not contain any
+             * device data so synchronization will happen again in the other direction as soon
+             * as the copy is requested on the device. This function may therefore impact
+             * the performance of CUDA/OpenCL propagators when used in every propagation step.
+             *
+             * @param source The Population to be copied from.
+             */
             Population(const Population& source);
 
-            /*! Indexed copy
+            /**
+             * @brief Population Copy constructor (indexed copy)
              *
-             * Slower than copy constructor
+             * Creates a selective deep copy of a Population on the host. Only
+             * elements that appear in the given index list are copied to the new Population.
+             * Like the full copy, the operation happens entirely on the host so device
+             * data is synchronized. This may be even slower than the full copy in some cases.
+             *
+             * @param source The Population to be copied from.
+             * @param list An IndexList containing the indices of the elements of the source
+             * Population that should be copied.
              */
             Population(const Population& source, IndexList &list);
 
-			//! Destructor
+            /**
+             * @brief Destructor. Cleans up host and device memory.
+             */
 			~Population();
 
-			//! Resizes the internal memory buffers
+            /**
+             * @brief resize Sets the number of elements of the Population.
+             *
+             * @param size The new number of elements the Population should contain.
+             * @param byteArraySize The per-object size of the byte array that can be queried
+             * with the getBytes() function. Defaults to 1 if unset.
+             */
             void resize(int size, int byteArraySize = 1);
-            //! Set the per-object size of the bytes buffer
+
+            /**
+             * @brief resizeByteArray Set the per-object size of the byte array.
+             *
+             * Every object has a byte buffer that can be used to store arbitrary per-object
+             * information. This function sets the number of bytes that are available to each
+             * object in the Population.
+             * @param size The new byte array size.
+             */
             void resizeByteArray(int size);
-			//! Returns the number of objects the internal buffers can hold
-			int getSize() const;
+
+            /**
+             * @brief getSize Returns the number of elements in the Population.
+             * @return Number of elements.
+             */
+            int getSize() const;
+
             //! Returns the per-object size of the byte buffer
+
+            /**
+             * @brief getByteArraySize Returns the per-object size of the byte array.
+             * @return Number of bytes every object can store in the byte array.
+             */
             int getByteArraySize() const;
-            //! Returns the name of the last plugin the population was propagated with.
+
+            /**
+             * @brief getLastPropagatorName Returns the name of the last plugin the Population
+             * was propagated with.
+             * @return The Propagator name as defined by the plugin last used on this Population.
+             */
             std::string getLastPropagatorName() const;
-            /*! Set the name of the last propagator the population was propagated with.
+
+            /**
+             * @brief setLastPropagatorName Set the name of the last Propagator the population was
+             * propagated with.
              *
              * This is done automatically by OPI on successful propagation
              * and should not require any extra effort from the plugin author.
+             * @param propagatorName The name of the Propagator as returned by its getName() function.
              */
             void setLastPropagatorName(std::string propagatorName);
 
@@ -93,7 +141,7 @@ namespace OPI
              * as many elements as the source population, and values stored within may not
              * exceed the size of this population.
              * @param source The Population from which the elements are copied.
-             * @param list A list of indices into the destination population.
+             * @param list A list of indices into the destination Population.
              */
             void insert(Population& source, IndexList& list);
 
@@ -123,7 +171,19 @@ namespace OPI
             //! Retrieve the arbitrary binary information on the specified device
             char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
-            //! Perform a sanity check on the current population data and generate debug information
+            /**
+             * @brief sanityCheck Performs various checks on the Population data and generate a debug string.
+             *
+             * Call on this Population to perform some validity checks of all orbits and properties. Checks
+             * include orbit height (must be larger than Earth radius or end-of-life date must be set),
+             * eccentricity between 0 and 1, range of angles (within -2PI and +2PI) and sensible values for drag
+             * and reflectivity coefficients.
+             * This is a host function so the data will be synched to the host when calling this function. It is
+             * comparatively slow and should be used for debugging or once after Population data is read from
+             * input files.
+             * @return Human-readable string that can be printed to the screen or a log file. If no problems are
+             * found, an empty string is returned.
+             */
 			std::string sanityCheck();
 
         protected:
