@@ -76,21 +76,57 @@ namespace OPI
             void loadConfigFile(const std::string& filename);
 
             /**
-             * @brief propagate Starts the propagation for the given time frame.
+             * @brief propagate Starts the propagation for the given time step.
              *
-             * This function calls the propagator and performs propagation. The resulting
+             * This function calls the propagator and performs propagation via the
+             * runPropagation() function that must be implemented by the plugin. The resulting
              * orbit and position/velocity vectors (if supported) are written back to the
              * given Population. The propagation result shall reflect the state of the
-             * population at the point in time defined by julian_day + dt seconds.
-             * @param data The population to be propagated.
+             * Population at the point in time defined by julian_day + dt seconds.
+             * @param data The Population to be propagated.
              * @param julian_day The base date in Julian date format.
              * @param dt The time step, in seconds, from last propagation.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
-			ErrorCode propagate(Population& data, double julian_day, float dt );
-			//! Starts the index-based propagation for the given time frame
+            ErrorCode propagate(Population& data, double julian_day, float dt);
+
+            /**
+             * @brief propagate Starts the index-based propagation for the given time step.
+             *
+             * Like the propagate() function above, but
+             * only those Population elements that appear in the given IndexList will be
+             * propagated. This function will call the runIndexedPropagation() function that
+             * should be implemented by the plugin. If the plugin returns NOT_IMPLEMENTED, the
+             * operation will still be performed by calling the runPropagation() function on
+             * individual elements which is likely to be very inefficient.
+             * @param data The Population to be propagated.
+             * @param indices An IndexList containing the indices of the Population elements that
+             * should be propagated.
+             * @param julian_day The base date in Julian date format.
+             * @param dt The time step, in seconds, from last propagation.
+             * @return OPI::SUCCESS if propagation was successful; OPI::NOT_IMPLEMENTED if propagation
+             * was performed with OPI's inherent method (which should still give you valid results); or
+             * any other error code returned by the plugin.
+             */
 			ErrorCode propagate(Population& data, IndexList& indices, double julian_day, float dt);
-            //! Starts propagation with individual times for each object
+
+            /**
+             * @brief propagate Starts propagation with individual times for each object.
+             *
+             * Like the propagate) function above, but every object receives an individual base date.
+             * This is useful e.g. when doing fine-grained conjunction analysis between two
+             * regular time steps. This function will call runMultiTimePropagation() which should be
+             * implemented by the plugin. If the plugin returns NOT_IMPLEMENTED, the operation will
+             * be performed by instead calling runPropagation() on individual objects with individual
+             * times. While this should yield valid results, it is likely to be very inefficient.
+             * @param data The Population to be propagated.
+             * @param julian_days An array of Julian dates, one for each element in the Population.
+             * @param length The length of the julian_days array. Must be the same size as the Population's.
+             * @param dt The time step, in seconds, from last propagation.
+             * @return OPI::SUCCESS if propagation was successful; OPI::NOT_IMPLEMENTED if propagation
+             * was performed with OPI's inherent method (which should still give you valid results); or
+             * any other ErrorCode returned by the plugin.
+             */
             ErrorCode propagate(Population& data, double* julian_days, int length, float dt);
 
 			//! Assigns a module to this propagator
