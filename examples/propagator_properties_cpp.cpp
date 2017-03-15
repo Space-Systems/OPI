@@ -89,7 +89,7 @@ class PropertiesCPP: public OPI::Propagator
         // The actual propagation function does nothing, except print some of the
         // property values. To see how actual propagation works, check the "basic"
         // examples in this folder.
-		virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
 		{
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;

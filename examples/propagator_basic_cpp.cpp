@@ -31,7 +31,7 @@ class BasicCPP: public OPI::Propagator
         }
 
         // This is the main function every plugin needs to implement to do the actual propagation.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
         {
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
             // look at the seconds that have elapsed since the first call of the propagator. The first
@@ -66,12 +66,12 @@ class BasicCPP: public OPI::Propagator
         // is helpful to know that the IndexList synchronizes with the GPU just like the
         // Population - the functions IndexList::getData() and IndexList::update() work
         // just like their Population counterparts.
-        OPI::ErrorCode runIndexedPropagation(OPI::Population& data, OPI::IndexList& indices, double julian_day, float dt)
+        OPI::ErrorCode runIndexedPropagation(OPI::Population& data, OPI::IndexList& indices, double julian_day, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }
 
-        OPI::ErrorCode runMultiTimePropagation(OPI::Population& data, double* julian_days, float dt)
+        OPI::ErrorCode runMultiTimePropagation(OPI::Population& data, double* julian_days, int length, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }

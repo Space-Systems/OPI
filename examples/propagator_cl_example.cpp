@@ -55,7 +55,7 @@ class TestPropagator:
 			// define kernel source code
 			const char* kernelCode = "\n" \
 				"struct Orbit {float semi_major_axis;float eccentricity;float inclination;float raan;float arg_of_perigee;float mean_anomaly;float bol;float eol;}; \n" \
-				"__kernel void propagate(__global struct Orbit* orbit, double julian_day, float dt) { \n" \
+                "__kernel void propagate(__global struct Orbit* orbit, double julian_day, double dt) { \n" \
 				"int i = get_global_id(0); \n" \
 				"orbit[i].semi_major_axis += i + julian_day + dt; \n" \
 				"} \n";
@@ -82,7 +82,7 @@ class TestPropagator:
 			return kernel;
 		}
 
-		virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
 		{
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;

@@ -45,7 +45,7 @@ namespace OPI
 		impl->integrator = integrator;
 	}
 
-	ErrorCode CustomPropagator::runPropagation(Population& data, double julian_day, float dt )
+    ErrorCode CustomPropagator::runPropagation(Population& data, double julian_day, double dt )
 	{
 		return SUCCESS;
 	}

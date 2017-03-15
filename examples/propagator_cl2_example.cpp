@@ -65,7 +65,7 @@ class TestPropagator:
                 struct Orbit {float semi_major_axis;float eccentricity;float inclination;float raan;float arg_of_perigee;float mean_anomaly;float bol;float eol;};
                 typedef struct Aux {double a; char c; int i; double b;};
                 void test(global struct Aux* b) { b->i = b->i + 1; }
-                __kernel void propagate(__global struct Orbit* orbit, __global char* bytes, double julian_day, float dt) {
+                __kernel void propagate(__global struct Orbit* orbit, __global char* bytes, double julian_day, double dt) {
                 int i = get_global_id(0);                
                 __global struct Aux* b = (__global struct Aux*)&bytes[i*sizeof(__global struct Aux)];
                 test(b);
@@ -96,7 +96,7 @@ class TestPropagator:
 			return kernel;
 		}
 
-		virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, float dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
 		{
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;
