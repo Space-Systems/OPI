@@ -194,7 +194,7 @@ namespace OPI
             virtual ErrorCode runIndexedPropagation(Population& data, IndexList& indices, double julian_day, double dt);
             //! Override this to implement propagation with individual times.
             //! OPI will make sure that the julian_days vector length matches that of the Population.
-            virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, float dt);
+            virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, int length, double dt);
             //! Variable to hold the appropriate name for the config file.
             std::string configFileName;
 

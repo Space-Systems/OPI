@@ -34,6 +34,7 @@ namespace OPI
 		}
 		proc_propagate = (pluginPropagateFunction)(handle->loadFunction("OPI_Plugin_propagate", true));
 		proc_propagate_indexed = (pluginPropagateFunctionIndexed)(handle->loadFunction("OPI_Plugin_propagateIndexed", true));
+        proc_propagate_multitime = (pluginPropagateFunctionMultiTime)(handle->loadFunction("OPI_Plugin_propagateMultiTime", true));
 		setName(plugin->getName());
 		setAuthor(plugin->getAuthor());
 		setDescription(plugin->getDescription());
@@ -68,10 +69,19 @@ namespace OPI
 		return NOT_IMPLEMENTED;
 	}
 
+    ErrorCode PropagatorPlugin::runMultiTimePropagation(Population& data, double* julian_days, int length, double dt)
+    {
+        if(proc_propagate_multitime)
+            return proc_propagate_multitime(this, &data, julian_days, length, dt);
+        return NOT_IMPLEMENTED;
+    }
+
 	int PropagatorPlugin::requiresCUDA()
 	{
 		return 0;
 	}
+
+    //FIXME Implement missing interface functions
 
 	/**
 	 * \endcond INTERNAL_DOCUMENTATION

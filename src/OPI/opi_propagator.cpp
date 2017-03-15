@@ -119,7 +119,7 @@ namespace OPI
         }
         else if (length >= objectdata.getSize())
         {
-            status = runMultiTimePropagation(objectdata, julian_days, dt);
+            status = runMultiTimePropagation(objectdata, julian_days, length, dt);
             if (status == NOT_IMPLEMENTED)
             {
                 ErrorCode innerStatus = SUCCESS;
@@ -180,7 +180,7 @@ namespace OPI
 		return NOT_IMPLEMENTED;
 	}
 
-    ErrorCode Propagator::runMultiTimePropagation(Population& data, double* julian_days, float dt)
+    ErrorCode Propagator::runMultiTimePropagation(Population& data, double* julian_days, int length, double dt)
     {
         return NOT_IMPLEMENTED;
     }
