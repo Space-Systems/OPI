@@ -2,7 +2,7 @@
 #include "OPI/opi_cpp.h"
 
 // some plugin information
-#define OPI_PLUGIN_NAME "CUDA Example Propagator"
+#define OPI_PLUGIN_NAME "CUDA Multi-Device Example Propagator"
 #define OPI_PLUGIN_AUTHOR "ILR TU BS"
 #define OPI_PLUGIN_DESC "A simple test"
 // the plugin version
@@ -24,15 +24,15 @@ __global__ void device_cuda_init2(OPI::Orbit* orbit, size_t size)
 	}
 }
 
-class TestPropagator:
+class CudaMultideviceExample:
 		public OPI::Propagator
 {
 	public:
-		TestPropagator(OPI::Host& host)
+        CudaMultideviceExample(OPI::Host& host)
 		{
 		}
 
-		virtual ~TestPropagator()
+        virtual ~CudaMultideviceExample()
 		{
 
 		}
@@ -79,7 +79,7 @@ class TestPropagator:
 
 };
 
-#define OPI_IMPLEMENT_CPP_PROPAGATOR TestPropagator
+#define OPI_IMPLEMENT_CPP_PROPAGATOR CudaMultideviceExample
 
 #include "OPI/opi_implement_plugin.h"
 
