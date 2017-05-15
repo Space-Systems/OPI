@@ -69,6 +69,14 @@ class TestPropagator:
 			return 3;
 		}
 
+        int requiresOpenCL() {
+            return 0;
+        }
+
+        int minimumOPIVersionRequired() {
+            return 1;
+        }
+
 };
 
 #define OPI_IMPLEMENT_CPP_PROPAGATOR TestPropagator

@@ -141,6 +141,11 @@ class TestPropagator:
 			return 0;
 		}
 
+        int minimumOPIVersionRequired()
+        {
+            return 1;
+        }
+
 	private:
 		int testproperty_int;
 		float testproperty_float;
