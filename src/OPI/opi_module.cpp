@@ -346,8 +346,8 @@ namespace OPI
 		if(!isEnabled())
 			status = runEnable();
 		if(status == SUCCESS)
-			data->enabled = true;
-		data->host->sendError(status);
+            data->enabled = true;
+        data->host->sendError(status);
 		return status;
 	}
 
@@ -756,5 +756,20 @@ namespace OPI
 	{
 		return getPropertySize(getPropertyName(index));
 	}
+
+    int Module::requiresCUDA()
+    {
+        return 0;
+    }
+
+    int Module::requiresOpenCL()
+    {
+        return 0;
+    }
+
+    int Module::minimumOPIVersionRequired()
+    {
+        return 0;
+    }
 
 }

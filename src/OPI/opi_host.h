@@ -21,6 +21,7 @@
 #include "opi_common.h"
 #include "opi_error.h"
 #include "opi_pimpl_helper.h"
+#include "opi_module.h"
 
 struct cudaDeviceProp;
 
@@ -186,6 +187,8 @@ namespace OPI
 			Host(const Host& other);
 			//! Load a specific plugin
             void loadPlugin(Plugin* plugin, gpuPlatform platform, const std::string& configfile);
+            bool pluginSupported(Module *plugin, gpuPlatform platform);
+            std::string getPluginTypeString(int pluginType);
 			Pimpl<HostImpl> impl;
 	};
 }

@@ -156,6 +156,27 @@ namespace OPI
 			virtual ErrorCode runEnable();
 			//! Override this if you want to change the disable behaviour
 			virtual ErrorCode runDisable();
+            /**
+             * @brief requiresCUDA Check whether this module requires CUDA to function.
+             * @return 0 if CUDA is not required, or the major number of
+             *  the minimum required compute capability.
+             */
+            virtual int requiresCUDA();
+
+            /**
+             * @brief Check whether this module requires OpenCL to function.
+             * @return 0 if OpenCL is not required, otherwise set this to the major number of
+             * the required OpenCL version.
+             */
+            virtual int requiresOpenCL();
+
+            /**
+             * @brief minimumOPIVersionRequired Returns the minimum OPI API level that this module requires.
+             *
+             * API level is equal to OPI's major version number.
+             * @return An integer representing the minimum API level required.
+             */
+            virtual int minimumOPIVersionRequired();
 
 		private:
 			//! \cond INTERNAL_DOCUMENTATION

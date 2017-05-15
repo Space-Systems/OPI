@@ -159,21 +159,6 @@ namespace OPI
         }
         else return REF_NONE;
     }
-	
-	int Propagator::requiresCUDA()
-	{
-		return 0;
-	}
-
-	int Propagator::requiresOpenCL()
-	{
-		return 0;
-	}
-
-    int Propagator::minimumOPIVersionRequired()
-    {
-        return 0;
-    }
 
     ErrorCode Propagator::runIndexedPropagation(Population& data, IndexList& indices, double julian_day, double dt)
 	{
@@ -199,7 +184,7 @@ namespace OPI
                 std::ifstream in(filename.c_str(), std::ifstream::in);
                 if (in.is_open())
                 {
-                    std::cout << "Initialising " << getName() << " from config file" << std::endl;
+                    std::cout << "Applying settings for " << getName() << " from config file" << std::endl;
                     while (in.good())
                     {
                         std::string line;
@@ -238,7 +223,7 @@ namespace OPI
                     in.close();
                 }
                 else {
-                    std::cout << "No config file found for propagator " << getName() << std::endl;
+                    //std::cout << "No config file found for propagator " << getName() << std::endl;
                 }
             }
             else {

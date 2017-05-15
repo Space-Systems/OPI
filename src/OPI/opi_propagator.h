@@ -159,29 +159,7 @@ namespace OPI
              * in many different flavours always consult the plugin's documentation for specifics.
              * @return A value of the ReferenceFrame enum matching the propagator's output.
              */
-            virtual ReferenceFrame referenceFrame();
-
-            /**
-             * @brief requiresCUDA Check whether this propagator requires CUDA to function.
-             * @return 0 if CUDA is not required, or the major number of
-             *  the minimum required compute capability.
-             */
-			virtual int requiresCUDA();
-
-            /**
-             * @brief Check whether this propagator requires OpenCL to function.
-             * @return 0 if OpenCL is not required, otherwise set this to the major number of
-             * the required OpenCL version.
-             */
-			virtual int requiresOpenCL();
-
-            /**
-             * @brief minimumOPIVersionRequired Returns the minimum OPI API level that this propagator requires.
-             *
-             * API level is equal to OPI's major version number.
-             * @return An integer representing the minimum API level required.
-             */
-            virtual int minimumOPIVersionRequired();           
+            virtual ReferenceFrame referenceFrame();      
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules

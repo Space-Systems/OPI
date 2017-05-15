@@ -156,7 +156,8 @@ namespace OPI
                   )
 				{
 					// try to load the plugin
-					DynLib* lib = new DynLib(plugindir + "/" + entry_name);
+                    std::string pluginpath = plugindir + "/" + entry_name;
+                    DynLib* lib = new DynLib(pluginpath);
 					if(lib->isValid()) {
 						// if it is valid load the plugin
 						Plugin* plugin = new Plugin(lib);
@@ -166,6 +167,8 @@ namespace OPI
                         {
                             configFileName = plugindir + "/" + entry_name.substr(0,entry_name.find_last_of(".")) + ".cfg";
                         }
+
+                        std::cout << "Found " << getPluginTypeString(plugin->getInfo().type) << " " << plugin->getInfo().name << " (" << pluginpath << ")" << std::endl;
                         loadPlugin(plugin,platformSupport,configFileName);
 					}
 					else
@@ -185,115 +188,152 @@ namespace OPI
 		return status;
 	}
 
+    std::string Host::getPluginTypeString(int pluginType)
+    {
+        switch (pluginType)
+        {
+            case OPI_PROPAGATOR_PLUGIN:
+                return "propagator plugin";
+
+            case OPI_PROPAGATOR_MODULE_PLUGIN:
+                return "propagator module";
+
+            case OPI_PROPAGATOR_INTEGRATOR_PLUGIN:
+                return "integrator plugin";
+
+            case OPI_DISTANCE_QUERY_PLUGIN:
+                return "distance query plugin";
+
+            case OPI_COLLISION_DETECTION_PLUGIN:
+                return "collision detection plugin";
+
+            case OPI_COLLISION_HANDLING_PLUGIN:
+                return "collision handling plugin";
+
+            default:
+                return "unknown plugin";
+        };
+    }
+
+    bool Host::pluginSupported(Module *plugin, gpuPlatform platform)
+    {
+        bool support = false;
+        if (plugin->minimumOPIVersionRequired() < 1)
+        {
+            std::cout << plugin->getName() << ": Skipped because it is outdated. "
+                      << "You should update this plugin, or delete it from the plugin folder." << std::endl;
+            support = false;
+        }
+        else if (plugin->minimumOPIVersionRequired() > 1)
+        {
+            std::cout << plugin->getName() << ": Skipped because it needs at least OPI version "
+                      << plugin->minimumOPIVersionRequired() << "." << std::endl;
+            support = false;
+        }
+        else if (plugin->requiresCUDA() <= 0 && plugin->requiresOpenCL() <= 0) {
+            // no GPU support required; load plugin
+            support = true;
+        }
+        else if (plugin->requiresCUDA() > 0) {
+            if (platform != PLATFORM_CUDA) {
+                std::cout << plugin->getName()
+                << ": Skipped - no CUDA support available." << std::endl;
+                support = false;
+            }
+            else if (getCurrentCudaDeviceCapability() <= 0) {
+                std::cout << "[OPI] Warning: Cannot determine CUDA compute capability of selected device "
+                    << "(perhaps no CUDA device was selected?). " << std::endl;
+                std::cout << "[OPI] Propagator " << plugin->getName() << " requires at least "
+                    << plugin->requiresCUDA() << ".x - "
+                    << "otherwise propagation might fail." << std::endl;
+                support = true;
+            }
+            else if (plugin->requiresCUDA() <= getCurrentCudaDeviceCapability()) {
+                support = true;
+            }
+            else {
+                std::cout << plugin->getName()
+                << ": Skipped - Compute capability too low (" <<
+                getCurrentCudaDeviceCapability() << ", needs at least" <<
+                plugin->requiresCUDA() << ")" << std::endl;
+                support = false;
+            }
+        }
+        else if (plugin->requiresOpenCL() > 0) {
+            if (platform == PLATFORM_OPENCL) {
+                support = true;
+            }
+            else {
+                std::cout << plugin->getName()
+                << ": Skipped - no OpenCL support available." << std::endl;
+                support = false;
+            }
+        }
+        return support;
+    }
+
     void Host::loadPlugin(Plugin *plugin, gpuPlatform platform, const std::string& configfile)
 	{
-		// we have a functional plugin loaded
-		// now create the correct type for it
-		switch(plugin->getInfo().type)
-		{
-			// propagator plugin
-			case OPI_PROPAGATOR_PLUGIN:
-			{
-				Propagator* propagator = 0;
-				// this plugin uses the cpp interface
-				if(plugin->getInfo().cppPlugin) {
-					pluginPropagatorFunction proc_create = (pluginPropagatorFunction)plugin->getHandle()->loadFunction("OPI_Plugin_createPropagator");
-					if(proc_create)
-						propagator = proc_create(this);
-				}
-				// c plugin interface
-				else
-					propagator = new PropagatorPlugin(plugin);
-				// if the propagator was created, add it to the list
+        // we have a functional plugin loaded
+        // now create the correct type for it
+        switch(plugin->getInfo().type)
+        {
+        // propagator plugin
+        case OPI_PROPAGATOR_PLUGIN:
+        {
+            Propagator* propagator = 0;
+            // this plugin uses the cpp interface
+            if(plugin->getInfo().cppPlugin) {
+                pluginPropagatorFunction proc_create = (pluginPropagatorFunction)plugin->getHandle()->loadFunction("OPI_Plugin_createPropagator");
+                if(proc_create)
+                    propagator = proc_create(this);
+            }
+            // c plugin interface
+            else
+                propagator = new PropagatorPlugin(plugin);
+            // if the propagator was created, add it to the list
 
-				if(propagator) {
-                    if (propagator->minimumOPIVersionRequired() < 1)
-                    {
-                        std::cout << propagator->getName() << ": Skipped because it is outdated." << std::endl
-                                  << "You should update this plugin, or delete it from the plugin folder." << std::endl;
-                    }
-                    else if (propagator->minimumOPIVersionRequired() > 1)
-                    {
-                        std::cout << propagator->getName() << ": Skipped because it needs at least OPI version "
-                                  << propagator->minimumOPIVersionRequired() << "." << std::endl;
-                    }
-                    else if (propagator->requiresCUDA() <= 0 && propagator->requiresOpenCL() <= 0) {
-						// no GPU support required; load plugin
-                        propagator->loadConfigFile(configfile);
-						addPropagator(propagator);
-					}
-					else if (propagator->requiresCUDA() > 0) {
-						if (platform != PLATFORM_CUDA) {
-							std::cout << propagator->getName()
-							<< ": Skipped - no CUDA support available." << std::endl;
-						}
-						else if (getCurrentCudaDeviceCapability() <= 0) {
-							std::cout << "[OPI] Warning: Cannot determine CUDA compute capability of selected device "
-								<< "(perhaps no CUDA device was selected?). " << std::endl;
-							std::cout << "[OPI] Propagator " << propagator->getName() << " requires at least " 
-								<< propagator->requiresCUDA() << ".x - "
-								<< "otherwise propagation might fail." << std::endl;
-                            propagator->loadConfigFile(configfile);
-							addPropagator(propagator);
-						}
-						else if (propagator->requiresCUDA() <= getCurrentCudaDeviceCapability()) {
-                            propagator->loadConfigFile(configfile);
-							addPropagator(propagator);
-						}
-						else {
-							std::cout << propagator->getName()
-							<< ": Skipped - Compute capability too low (" <<
-							getCurrentCudaDeviceCapability() << ", needs at least" <<
-							propagator->requiresCUDA() << ")" << std::endl;
-						}
-					}
-					else if (propagator->requiresOpenCL() > 0) {
-						if (platform == PLATFORM_OPENCL) {
-                            propagator->loadConfigFile(configfile);
-							addPropagator(propagator);
-						}
-						else {
-							std::cout << propagator->getName()
-							<< ": Skipped - no OpenCL support available." << std::endl;
-						}
-					}
-				}
-				break;
-			}
-			// a distance query plugin
-			case OPI_DISTANCE_QUERY_PLUGIN:
-			{
-				DistanceQuery* query = 0;
-				// this plugin uses the cpp interface
-				if(plugin->getInfo().cppPlugin) {
-					pluginDistanceQueryFunction proc_create = (pluginDistanceQueryFunction)plugin->getHandle()->loadFunction("OPI_Plugin_createDistanceQuery");
-					if(proc_create)
-						query = proc_create(this);
-				}
-				// if the query plugin is valid, add it to the list
-				if(query)
-					addDistanceQuery(query);
-				break;
-			}
-			// a collison detection plugin
-			case OPI_COLLISION_DETECTION_PLUGIN:
-			{
-				CollisionDetection* cppplugin = 0;
-				// this plugin uses the cpp interface
-				if(plugin->getInfo().cppPlugin) {
-					pluginCollisionDetectionFunction proc_create = (pluginCollisionDetectionFunction)plugin->getHandle()->loadFunction("OPI_Plugin_createCollisionDetection");
-					if(proc_create)
-						cppplugin = proc_create(this);
-				}
-				// if the plugin is valid, add it to the corresponding list
-				if(cppplugin)
-					addCollisionDetection(cppplugin);
-				break;
-			}
-			// unknown/ not implemented plugin types
-			default:
-				std::cout << "[OPI] Unknown Plugin Type: " << plugin->getInfo().name << plugin->getInfo().type << std::endl;
-		}
+            if(propagator && pluginSupported(propagator, platform)) {
+                propagator->loadConfigFile(configfile);
+                addPropagator(propagator);
+            }
+            break;
+        }
+            // a distance query plugin
+        case OPI_DISTANCE_QUERY_PLUGIN:
+        {
+            DistanceQuery* query = 0;
+            // this plugin uses the cpp interface
+            if(plugin->getInfo().cppPlugin) {
+                pluginDistanceQueryFunction proc_create = (pluginDistanceQueryFunction)plugin->getHandle()->loadFunction("OPI_Plugin_createDistanceQuery");
+                if(proc_create)
+                    query = proc_create(this);
+            }
+            // if the query plugin is valid, add it to the list
+            if(query && pluginSupported(query, platform))
+                addDistanceQuery(query);
+            break;
+        }
+            // a collison detection plugin
+        case OPI_COLLISION_DETECTION_PLUGIN:
+        {
+            CollisionDetection* cppplugin = 0;
+            // this plugin uses the cpp interface
+            if(plugin->getInfo().cppPlugin) {
+                pluginCollisionDetectionFunction proc_create = (pluginCollisionDetectionFunction)plugin->getHandle()->loadFunction("OPI_Plugin_createCollisionDetection");
+                if(proc_create)
+                    cppplugin = proc_create(this);
+            }
+            // if the plugin is valid, add it to the corresponding list
+            if(cppplugin && pluginSupported(cppplugin, platform))
+                addCollisionDetection(cppplugin);
+            break;
+        }
+            // unknown/ not implemented plugin types
+        default:
+            std::cout << "Skipping unknown plugin " << plugin->getInfo().name << "." << std::endl;
+        }
+
     }
 
 	Propagator* Host::getPropagator(const std::string& name) const
@@ -458,7 +498,7 @@ namespace OPI
 
 	cudaDeviceProp* Host::getCUDAProperties(int device) const
 	{
-		if(impl->gpuSupport)
+        if(hasCUDASupport())
 			return impl->gpuSupport->getDeviceProperties(device);
 		return 0;
 	}
