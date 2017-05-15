@@ -1,4 +1,3 @@
-#include <cuda.h>
 #include "OPI/opi_cpp.h"
 
 // Basic information about the plugin that can be queried by the host.
