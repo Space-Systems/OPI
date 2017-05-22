@@ -55,6 +55,9 @@ namespace OPI
 
 	Host::Host()
 	{
+#ifdef WIN32
+		freopen("opi.log", "w", stdout);
+#endif
 		impl->errorCallback = 0;
 		impl->lastError = SUCCESS;
 		impl->errorCallbackParameter = 0;
@@ -93,6 +96,10 @@ namespace OPI
 		for(size_t i = 0; i < impl->pluginlist.size(); ++i)
 			delete impl->pluginlist[i];
 
+#ifdef WIN32
+		freopen("CON", "w", stdout);
+#endif
+
 	}
 
 	void Host::setErrorCallback(OPI_ErrorCallback callback, void* privatedata)
@@ -118,6 +125,7 @@ namespace OPI
 			// try to load cuda plugin
 			std::string pluginName = (platformSupport == PLATFORM_OPENCL ? "OPI-cl" : "OPI-cuda");
             std::string libraryFileName = std::string(plugindir + "/support/" + pluginName + suffix);
+			std::cout << "Loading support library " << libraryFileName << std::endl;
 
 			impl->gpuSupportPluginHandle = new DynLib(libraryFileName, true);
 			if(impl->gpuSupportPluginHandle)
