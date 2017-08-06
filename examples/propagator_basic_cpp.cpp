@@ -41,7 +41,7 @@ class BasicCPP: public OPI::Propagator
 
             // Get the orbit and position vectors from the given Population.
             OPI::Orbit* orbit = data.getOrbit(OPI::DEVICE_HOST);
-            OPI::Vector3* position = data.getCartesianPosition(OPI::DEVICE_HOST);
+            OPI::Vector3* position = data.getPosition(OPI::DEVICE_HOST);
 
             // Call the propagation function.
             cpp_propagate(orbit, position, seconds, data.getSize());

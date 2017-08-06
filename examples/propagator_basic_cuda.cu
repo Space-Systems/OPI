@@ -123,7 +123,7 @@ class BasicCUDA: public OPI::Propagator
             if(deviceCount >= 1)
             {
                 OPI::Orbit* orbit = data.getOrbit(OPI::DEVICE_CUDA);
-                OPI::Vector3* position = data.getCartesianPosition(OPI::DEVICE_CUDA);
+                OPI::Vector3* position = data.getPosition(OPI::DEVICE_CUDA);
 
                 // Set kernel grid and block sizes based on the size of the population.
                 // See CUDA manual for details on choosing proper block and grid sizes.

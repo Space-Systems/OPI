@@ -3,7 +3,7 @@ BIND_CLASS( Population
   DESTRUCTOR NAME "destroyData"
   FUNCTION getOrbit RETURN Orbit*
   FUNCTION getObjectProperties RETURN ObjectProperties*
-  FUNCTION getCartesianPosition RETURN Vector3*
+  FUNCTION getPosition RETURN Vector3*
   FUNCTION getVelocity RETURN Vector3*
   FUNCTION getAcceleration RETURN Vector3*
   FUNCTION getSize RETURN int

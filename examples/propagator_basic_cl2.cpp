@@ -101,7 +101,7 @@ class BasicCL: public OPI::Propagator
             // cl_mem before they can be used as kernel arguments. This step will also trigger
             // the memory transfer from host to OpenCL device if required.
             cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
-            cl_mem position = reinterpret_cast<cl_mem>(data.getCartesianPosition(OPI::DEVICE_CUDA));
+            cl_mem position = reinterpret_cast<cl_mem>(data.getPosition(OPI::DEVICE_CUDA));
 
             // To use the OpenCL C++ API, we also need to create a cl::Buffer object from
             // the cl_mem instance. Again, the retainObject flag of the cl::Buffer constructor

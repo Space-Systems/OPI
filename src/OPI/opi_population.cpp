@@ -89,7 +89,7 @@ namespace OPI
         // TODO Use std::copy instead
         memcpy(getOrbit(), source.getOrbit(), s*sizeof(Orbit));
         memcpy(getObjectProperties(), source.getObjectProperties(), s*sizeof(ObjectProperties));
-        memcpy(getCartesianPosition(), source.getCartesianPosition(), s*sizeof(Vector3));
+        memcpy(getPosition(), source.getPosition(), s*sizeof(Vector3));
         memcpy(getVelocity(), source.getVelocity(), s*sizeof(Vector3));
         memcpy(getAcceleration(), source.getAcceleration(), s*sizeof(Vector3));
         memcpy(getBytes(), source.getBytes(), b*s*sizeof(char));
@@ -115,14 +115,14 @@ namespace OPI
 
         Orbit* orbits = source.getOrbit(DEVICE_HOST, false);
         ObjectProperties* props = source.getObjectProperties(DEVICE_HOST, false);
-        Vector3* pos = source.getCartesianPosition(DEVICE_HOST, false);
+        Vector3* pos = source.getPosition(DEVICE_HOST, false);
         Vector3* vel = source.getVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
         Orbit* thisOrbit = getOrbit();
         ObjectProperties* thisProps = getObjectProperties();
-        Vector3* thisPos = getCartesianPosition();
+        Vector3* thisPos = getPosition();
         Vector3* thisVel = getVelocity();
         Vector3* thisAcc = getAcceleration();
         char* thisBytes = getBytes();
@@ -197,7 +197,7 @@ namespace OPI
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
                 temp = sizeof(Vector3);
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getCartesianPosition()), sizeof(Vector3) * data->size);
+                out.write(reinterpret_cast<char*>(getPosition()), sizeof(Vector3) * data->size);
             }
             if(data->data_velocity.hasData())
             {
@@ -282,7 +282,7 @@ namespace OPI
                             case DATA_CARTESIAN:
                                 if(size == sizeof(Vector3))
                                 {
-                                    Vector3* pos = getCartesianPosition(DEVICE_HOST, true);
+                                    Vector3* pos = getPosition(DEVICE_HOST, true);
                                     in.read(reinterpret_cast<char*>(pos), sizeof(Vector3) * number_of_objects);
                                     data->data_position.update(DEVICE_HOST);
                                     break;
@@ -400,7 +400,7 @@ namespace OPI
 	 * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
 	 * requested device.
 	 */
-	Vector3* Population::getCartesianPosition(Device device, bool no_sync) const
+    Vector3* Population::getPosition(Device device, bool no_sync) const
 	{
 		return data->data_position.getData(device, no_sync);
 	}
@@ -448,14 +448,14 @@ namespace OPI
 
         Orbit* orbits = source.getOrbit(DEVICE_HOST, false);
         ObjectProperties* props = source.getObjectProperties(DEVICE_HOST, false);
-        Vector3* pos = source.getCartesianPosition(DEVICE_HOST, false);
+        Vector3* pos = source.getPosition(DEVICE_HOST, false);
         Vector3* vel = source.getVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
         Orbit* thisOrbit = getOrbit();
         ObjectProperties* thisProps = getObjectProperties();
-        Vector3* thisPos = getCartesianPosition();
+        Vector3* thisPos = getPosition();
         Vector3* thisVel = getVelocity();
         Vector3* thisAcc = getAcceleration();
         char* thisBytes = getBytes();
