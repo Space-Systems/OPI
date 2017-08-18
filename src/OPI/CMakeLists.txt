@@ -3,6 +3,10 @@ include(GenerateType)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+if (ENABLE_CL_SUPPORT AND OPENCL_FOUND)
+include_directories(${OpenCL_INCLUDE_DIR})
+endif()
+
 set( OPI_SOURCE_FILES
   opi_population.cpp
   opi_error.cpp
