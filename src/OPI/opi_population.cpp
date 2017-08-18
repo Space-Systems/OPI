@@ -54,11 +54,14 @@ namespace OPI
 			SynchronizedData<Vector3> data_velocity;
             SynchronizedData<Vector3> data_acceleration;
             SynchronizedData<char> data_bytes;
+
+            // non-synchronized data
+            std::vector<std::string> object_names;
+            std::string lastPropagatorName;
+
 			// data size
 			int size;
             int byteArraySize;
-            std::string lastPropagatorName;
-
 	};
 	/**
 	 * \endcond
@@ -333,6 +336,7 @@ namespace OPI
 			data->data_velocity.resize(size);
             data->data_acceleration.resize(size);
             data->data_bytes.resize(size*byteArraySize);
+            data->object_names.resize(size);
 			data->size = size;
             data->byteArraySize = byteArraySize;
 		}
@@ -352,6 +356,22 @@ namespace OPI
     void Population::setLastPropagatorName(std::string propagatorName)
     {
         data->lastPropagatorName = propagatorName;
+    }
+
+    std::string Population::getObjectName(int index)
+    {
+        if (index < data->size)
+            return data->object_names[index];
+        else return "";
+    }
+
+    void Population::setObjectName(int index, std::string name)
+    {
+        if (index < data->size)
+        {
+            data->object_names[index] = name;
+        }
+        else std::cout << "Cannot set object name: Index (" << index << ") out of range!" << std::endl;
     }
 
 

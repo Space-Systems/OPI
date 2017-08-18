@@ -122,6 +122,22 @@ namespace OPI
             std::string getLastPropagatorName() const;
 
             /**
+             * @brief getObjectName Returns the name of the given object.
+             * Names are host-only attributes and do not get synchronized to the GPU.
+             * @return The object name as a string. If no name has been set or the index is out of
+             * range, an empty string is returned.
+             */
+            std::string getObjectName(int index);
+
+            /**
+             * @brief setObjectName Set the name of the given object.
+             * Names are host-only attributes and do not get synchronized to the GPU.
+             * @param index The index of the object.
+             * @param name The new name for the object.
+             */
+            void setObjectName(int index, std::string name);
+
+            /**
              * @brief setLastPropagatorName Set the name of the last Propagator the population was
              * propagated with.
              *
