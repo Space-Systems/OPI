@@ -22,5 +22,5 @@ endforeach( )
 
 install(
   TARGETS OPI-cl
-  LIBRARY DESTINATION plugins/support
+  DESTINATION plugins/support
 )

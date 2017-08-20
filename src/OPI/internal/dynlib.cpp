@@ -27,7 +27,7 @@ namespace OPI
 		handle = LoadLibrary(buffer.c_str());
 		if((!handle) && (!silentfail))
 		{
-			std::cout << "Error loading lib" << std::endl;
+			std::cout << "Error loading library " << name << std::endl;
 		}
 #else
 		std::string buffer = name;
