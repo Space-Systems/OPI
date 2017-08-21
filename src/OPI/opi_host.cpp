@@ -124,7 +124,8 @@ namespace OPI
 		{
 			// try to load cuda plugin
 			std::string pluginName = (platformSupport == PLATFORM_OPENCL ? "OPI-cl" : "OPI-cuda");
-            std::string libraryFileName = std::string(plugindir + "/support/" + pluginName + suffix);
+			std::string gpuFrameworkName = (platformSupport == PLATFORM_OPENCL ? "OpenCL" : "CUDA");
+			std::string libraryFileName = std::string(plugindir + "/support/" + pluginName + suffix);
 			std::cout << "Loading support library " << libraryFileName << std::endl;
 
 			impl->gpuSupportPluginHandle = new DynLib(libraryFileName, true);
@@ -139,12 +140,23 @@ namespace OPI
 				}
 				else {
 					platformSupport = PLATFORM_NONE;
-					std::cout << "[OPI] Unable to load GPU support library." << std::endl;
+#ifdef WIN32
+					DWORD errorMessageID = ::GetLastError();
+					LPSTR messageBuffer = nullptr;
+					size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+						NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+					std::string message(messageBuffer, size);
+#else
+					std::string message = "";
+#endif
+					std::cout << "[OPI] Unable to load GPU support library. " << message << std::endl;
 				}
 			}
 			else {
 				platformSupport = PLATFORM_NONE;
-				std::cout << "[OPI] Cannot find GPU support library (" << libraryFileName << ")"<< std::endl;
+				std::cout << "[OPI] Cannot find GPU support library (" << libraryFileName << ")."<< std::endl
+					<< "Check your path and make sure your " << gpuFrameworkName << " drivers are installed correctly." << std::endl;
 			}
 		}
 
