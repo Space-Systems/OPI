@@ -152,12 +152,6 @@ namespace OPI
 #endif
 					std::cout << "[OPI] Unable to load GPU support library. " << message << std::endl;
 				}
-				else {
-					std::cout << "[OPI] Unable to load CUDA support library." << std::endl;
-				}
-			}
-			else {
-				std::cout << "[OPI] Cannot find CUDA support library (" << libraryFileName << ")"<< std::endl;
 			}
 			else {
 				platformSupport = PLATFORM_NONE;
