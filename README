@@ -13,14 +13,15 @@ by providing a common way of handling propagation. Propagators using OPI are
 designed as plugins/shared libraries that can be loaded by a host program via
 the interface.
 
-OPI currently supports C, C++ and Fortran, as well as CUDA for propagators.
-The C API can also be used for integration into other languages like Python.
-Hosts and plugins don't have to be written in the same language in order to
-collaborate. OPI itself is written in C++, with auto-generated bindings for
-C and Fortran. For CUDA, it supplies a plugin that scans for capable devices
-and helps to initialize CUDA-enabled propagators.
+OPI currently supports C, C++ and Fortran, as well as CUDA  and OpenCL for
+propagators. The C API can also be used for integration into other languages
+like Python or C#. Hosts and plugins don't have to be written in the same
+language in order to collaborate. OPI itself is written in C++, with
+auto-generated bindings for C and Fortran. For GPU support, it supplies a plugin
+that scans for capable devices and helps to initialize CUDA or OpenCL-enabled
+propagators.
 
-Please note that this software is still in an early stage and the interface
+Please note that this software is still under development and the interface
 functions are subject to change. Your feedback is appreciated.
 
 
