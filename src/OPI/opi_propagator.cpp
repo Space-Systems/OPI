@@ -20,6 +20,7 @@
 #include "opi_indexlist.h"
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 namespace OPI
 {
 	/**
@@ -189,14 +190,14 @@ namespace OPI
                     {
                         std::string line;
                         std::getline(in, line);
-                        //trim
+                        line = trim(line);
                         if (line[0] != '#')
                         {
                             std::vector<std::string> setting = tokenize(line, "=");
                             if (setting.size() >= 2)
                             {
-                                std::string property = setting[0];
-                                std::string value = setting[1];
+                                std::string property = trim(setting[0]);
+                                std::string value = trim(setting[1]);
                                 if (hasProperty(property))
                                 {
                                     if (value.substr(0,1) == "\"" && value.substr(value.length()-1, value.length()) == "\"")
@@ -247,6 +248,13 @@ namespace OPI
             pos = line.find_first_of(delimiter, lastPos);
         }
         return elements;
+    }
+
+    std::string Propagator::trim(const std::string &s)
+    {
+        auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c){return isspace(c); });
+        auto wsback = std::find_if_not(s.rbegin(), s.rend(), [](int c){return isspace(c); }).base();
+        return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
     }
 
 }

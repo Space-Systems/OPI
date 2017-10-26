@@ -177,8 +177,10 @@ namespace OPI
             std::string configFileName;
 
 		private:
-            //! Auxiliary function for loadConfig
+            //! Auxiliary functions for loadConfig
             std::vector<std::string> tokenize(std::string line, std::string delimiter);
+            std::string trim(const std::string &s);
+
 			Pimpl<PropagatorImpl> data;
 
 	};
