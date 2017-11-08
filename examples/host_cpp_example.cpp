@@ -14,10 +14,10 @@ void ErrorCallback(OPI_Host c_host, int code, void* privateData)
 }
 
 struct tTest {
-    cl_double a;
-    cl_char c;
-    cl_int i;
-    cl_double b;
+    double a;
+    char c;
+    int i;
+    double b;
 };
 
 int main(int argc, char* argv[])
