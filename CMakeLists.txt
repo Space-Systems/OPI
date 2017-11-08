@@ -47,7 +47,7 @@ if(ENABLE_CL_SUPPORT)
   endif()
 endif()
 if(NOT ENABLE_CL_SUPPORT)
-  add_definitions( -DOPI_DISABLE_CL )
+    add_definitions( -DOPI_DISABLE_OPENCL )
 endif()
 
 # enable all warnings
