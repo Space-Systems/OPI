@@ -37,10 +37,11 @@ namespace OPI
 			ObjectRawData(Host& _host):
 				host(_host),
 				data_orbit(host),
-				data_properties(host),
+                data_properties(host),
 				data_position(host),
 				data_velocity(host),
                 data_acceleration(host),
+                data_covariance(host),
                 data_bytes(host)
 			{
 
@@ -53,6 +54,7 @@ namespace OPI
 			SynchronizedData<Vector3> data_position;
 			SynchronizedData<Vector3> data_velocity;
             SynchronizedData<Vector3> data_acceleration;
+            SynchronizedData<Covariance> data_covariance;
             SynchronizedData<char> data_bytes;
 
             // non-synchronized data
@@ -92,6 +94,7 @@ namespace OPI
         memcpy(getPosition(), source.getPosition(), s*sizeof(Vector3));
         memcpy(getVelocity(), source.getVelocity(), s*sizeof(Vector3));
         memcpy(getAcceleration(), source.getAcceleration(), s*sizeof(Vector3));
+        memcpy(getCovariance(), source.getCovariance(), s*sizeof(Covariance));
         memcpy(getBytes(), source.getBytes(), b*s*sizeof(char));
 
         update(DATA_ORBIT);
@@ -99,6 +102,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
+        update(DATA_COVARIANCE);
         update(DATA_BYTES);
     }
 
@@ -118,6 +122,7 @@ namespace OPI
         Vector3* pos = source.getPosition(DEVICE_HOST, false);
         Vector3* vel = source.getVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
+        Covariance* cov = source.getCovariance(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
         Orbit* thisOrbit = getOrbit();
@@ -125,6 +130,7 @@ namespace OPI
         Vector3* thisPos = getPosition();
         Vector3* thisVel = getVelocity();
         Vector3* thisAcc = getAcceleration();
+        Covariance* thisCov = getCovariance();
         char* thisBytes = getBytes();
 
         for(int i = 0; i < list.getSize(); ++i)
@@ -134,6 +140,7 @@ namespace OPI
             thisPos[i] = pos[listdata[i]];
             thisVel[i] = vel[listdata[i]];
             thisAcc[i] = acc[listdata[i]];
+            thisCov[i] = cov[listdata[i]];
             for (int j=0; j<b; j++)
             {
                 thisBytes[i*b+j] = bytes[listdata[i]*b+j];
@@ -145,6 +152,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
+        update(DATA_COVARIANCE);
         update(DATA_BYTES);
     }
 
@@ -214,6 +222,14 @@ namespace OPI
                 temp = sizeof(Vector3);
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
                 out.write(reinterpret_cast<char*>(getAcceleration()), sizeof(Vector3) * data->size);
+            }
+            if(data->data_covariance.hasData())
+            {
+                temp = DATA_COVARIANCE;
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                temp = sizeof(Covariance);
+                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+                out.write(reinterpret_cast<char*>(getCovariance()), sizeof(Covariance) * data->size);
             }
             if(data->data_bytes.hasData())
             {
@@ -303,6 +319,14 @@ namespace OPI
                                     data->data_acceleration.update(DEVICE_HOST);
                                     break;
                                 }
+                            case DATA_COVARIANCE:
+                                if(size == sizeof(Covariance))
+                                {
+                                    Covariance* cov = getCovariance(DEVICE_HOST, true);
+                                    in.read(reinterpret_cast<char*>(cov), sizeof(Covariance) * number_of_objects);
+                                    data->data_covariance.update(DEVICE_HOST);
+                                    break;
+                                }
                             case DATA_BYTES:
                                 if(size == size) //TODO
                                 {
@@ -335,6 +359,7 @@ namespace OPI
 			data->data_position.resize(size);
 			data->data_velocity.resize(size);
             data->data_acceleration.resize(size);
+            data->data_covariance.resize(size);
             data->data_bytes.resize(size*byteArraySize);
             data->object_names.resize(size);
 			data->size = size;
@@ -425,6 +450,16 @@ namespace OPI
 		return data->data_acceleration.getData(device, no_sync);
     }
 
+    /**
+     * @details
+     * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
+     * requested device.
+     */
+    Covariance* Population::getCovariance(Device device, bool no_sync) const
+    {
+        return data->data_covariance.getData(device, no_sync);
+    }
+
     char* Population::getBytes(Device device, bool no_sync) const
     {
         return data->data_bytes.getData(device, no_sync);
@@ -451,6 +486,7 @@ namespace OPI
         Vector3* pos = source.getPosition(DEVICE_HOST, false);
         Vector3* vel = source.getVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
+        Covariance* cov = source.getCovariance(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
         Orbit* thisOrbit = getOrbit();
@@ -458,6 +494,7 @@ namespace OPI
         Vector3* thisPos = getPosition();
         Vector3* thisVel = getVelocity();
         Vector3* thisAcc = getAcceleration();
+        Covariance* thisCov = getCovariance();
         char* thisBytes = getBytes();
 
         if (getByteArraySize() != source.getByteArraySize())
@@ -477,6 +514,7 @@ namespace OPI
                     thisPos[l] = pos[i];
                     thisVel[l] = vel[i];
                     thisAcc[l] = acc[i];
+                    thisCov[l] = cov[i];
                     if (getByteArraySize() == source.getByteArraySize())
                     {
                         int b = getByteArraySize();
@@ -500,6 +538,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
+        update(DATA_COVARIANCE);
         update(DATA_BYTES);
     }
 
@@ -510,6 +549,7 @@ namespace OPI
 		data->data_position.remove(index);
 		data->data_properties.remove(index);
         data->data_velocity.remove(index);
+        data->data_covariance.remove(index);
         data->data_bytes.remove(index*data->byteArraySize, data->byteArraySize);
 		data->size--;
 	}
@@ -533,6 +573,9 @@ namespace OPI
 				break;
 			case DATA_ACCELERATION:
 				data->data_acceleration.update(device);
+                break;
+            case DATA_COVARIANCE:
+                data->data_covariance.update(device);
                 break;
             case DATA_BYTES:
                 data->data_bytes.update(device);

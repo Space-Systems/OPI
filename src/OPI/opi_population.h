@@ -184,6 +184,8 @@ namespace OPI
 			Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the acceleration in cartesian coordinates on the specified device
             Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Retrieve the covariance information on the specified device
+            Covariance* getCovariance(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the arbitrary binary information on the specified device
             char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 

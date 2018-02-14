@@ -161,6 +161,11 @@ namespace OPI
         else return REF_NONE;
     }
 
+    CovarianceType Propagator::covarianceType()
+    {
+        return CV_NONE;
+    }
+
     ErrorCode Propagator::runIndexedPropagation(Population& data, IndexList& indices, double julian_day, double dt)
 	{
 		return NOT_IMPLEMENTED;

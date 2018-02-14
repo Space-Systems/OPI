@@ -155,11 +155,26 @@ namespace OPI
              * Set by the propagator to specify in which reference frame the state vectors (position,
              * velocity, and acceleration) are given. Defaults to REF_NONE if cartesianCoordinates()
              * returns false, or REF_UNSPECIFIED otherwise. Set to REF_UNLISTED if the reference frame
-             * is non-standard or otherwise does not appear in the ReferenceFrame enum. Since frames come
+             * is non-standard or otherwise does not appear in the ReferenceFrame enum. If the propagator
+             * supports multiple reference frames, this can be set to REF_MULTIPLE, and a
+             * PropagatorProperty can be used to let the user select the desired option. Since frames come
              * in many different flavours always consult the plugin's documentation for specifics.
              * @return A value of the ReferenceFrame enum matching the propagator's output.
              */
-            virtual ReferenceFrame referenceFrame();      
+            virtual ReferenceFrame referenceFrame();
+
+            /**
+             * @brief covarianceType Return the setup of the covariance matrix.
+             *
+             * Set by the propagator to specify the meaning of the kinematic (k1-k6) and dynamic (d1-d2)
+             * elements of the covariance matrix. Defaults to CV_NONE meaning the propagator does not
+             * support covariances. Set to CV_STATE_VECTORS if the kinematic parameters are state vectors
+             * (k1-k3 for position x/y/z and k4-k6 for velocity x/y/z). Set to CV_EQUINOCTIALS if the
+             * kinematic parameters are equinoctial elements, or CV_KEPLERIAN if they are orbital elements
+             * (k1-k6 for semi major axis, eccentricity, inclination, raan, argument of perigee and mean
+             * anomaly). The options ending in _NO_DYNAMICS state that the dynamic parameters are unused.
+             */
+            virtual CovarianceType covarianceType();
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
