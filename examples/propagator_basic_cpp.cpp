@@ -48,7 +48,7 @@ class BasicCPP: public OPI::Propagator
 
             // The propagation function writes to the Population's position and orbit vectors, so
             // these two have to be marked for updated values on the host device.
-            data.update(OPI::DATA_CARTESIAN, OPI::DEVICE_HOST);
+            data.update(OPI::DATA_POSITION, OPI::DEVICE_HOST);
             data.update(OPI::DATA_ORBIT, OPI::DEVICE_HOST);
 
             return OPI::SUCCESS;

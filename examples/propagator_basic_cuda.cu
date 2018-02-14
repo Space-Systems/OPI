@@ -135,7 +135,7 @@ class BasicCUDA: public OPI::Propagator
 
                 // The kernel writes to the Population's position and orbit vectors, so
                 // these two have to be marked for updated values on the CUDA device.
-                data.update(OPI::DATA_CARTESIAN, OPI::DEVICE_CUDA);
+                data.update(OPI::DATA_POSITION, OPI::DEVICE_CUDA);
                 data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
 
                 return OPI::SUCCESS;

@@ -96,7 +96,7 @@ namespace OPI
 
         update(DATA_ORBIT);
         update(DATA_PROPERTIES);
-        update(DATA_CARTESIAN);
+        update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
         update(DATA_BYTES);
@@ -142,7 +142,7 @@ namespace OPI
 
         update(DATA_ORBIT);
         update(DATA_PROPERTIES);
-        update(DATA_CARTESIAN);
+        update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
         update(DATA_BYTES);
@@ -193,7 +193,7 @@ namespace OPI
 			}
             if(data->data_position.hasData())
             {
-                temp = DATA_CARTESIAN;
+                temp = DATA_POSITION;
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
                 temp = sizeof(Vector3);
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
@@ -209,7 +209,7 @@ namespace OPI
             }
             if(data->data_acceleration.hasData())
             {
-                temp = DATA_VELOCITY;
+                temp = DATA_ACCELERATION;
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
                 temp = sizeof(Vector3);
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
@@ -279,7 +279,7 @@ namespace OPI
                                     data->data_properties.update(DEVICE_HOST);
                                     break;
                                 }
-                            case DATA_CARTESIAN:
+                            case DATA_POSITION:
                                 if(size == sizeof(Vector3))
                                 {
                                     Vector3* pos = getPosition(DEVICE_HOST, true);
@@ -497,7 +497,7 @@ namespace OPI
 
         update(DATA_ORBIT);
         update(DATA_PROPERTIES);
-        update(DATA_CARTESIAN);
+        update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
         update(DATA_BYTES);
@@ -528,7 +528,7 @@ namespace OPI
 			case DATA_VELOCITY:
 				data->data_velocity.update(device);
 				break;
-			case DATA_CARTESIAN:
+            case DATA_POSITION:
 				data->data_position.update(device);
 				break;
 			case DATA_ACCELERATION:
