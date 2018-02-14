@@ -17,12 +17,14 @@ add_example(
 )
 
 # a simple fortran example
-add_example(
-  HostFortranExample
-  FORTRAN
-  SOURCES
-    host_fortran_example.f90
-)
+if(ENABLE_FORTRAN_SUPPORT)
+  add_example(
+    HostFortranExample
+    FORTRAN
+    SOURCES
+      host_fortran_example.f90
+  )
+endif()
 
 # a simple cpp plugin showing PropagatorProperties
 add_example_plugin(
@@ -32,12 +34,14 @@ add_example_plugin(
 )
 
 # a simple fortran example plugin
-add_example_plugin(
-  PropagatorFortranExample
-  FORTRAN
-  SOURCES
-    propagator_fortran_example.f90
-)
+if(ENABLE_FORTRAN_SUPPORT)
+  add_example_plugin(
+    PropagatorFortranExample
+    FORTRAN
+    SOURCES
+      propagator_fortran_example.f90
+  )
+endif()
 
 # cpp basic example
 add_example_plugin(
@@ -47,41 +51,51 @@ add_example_plugin(
 )
 
 # cuda basic example
-add_example_plugin(
-  PropagatorCUDABasic
-  CUDA
-  SOURCES
-    propagator_basic_cuda.cu
-)
+if(ENABLE_CUDA_SUPPORT)
+  add_example_plugin(
+    PropagatorCUDABasic
+    CUDA
+    SOURCES
+      propagator_basic_cuda.cu
+  )
+endif()
 
 # opencl basic example (C++ API)
-add_example_plugin(
-  PropagatorCL2Basic
-  OPENCL
-  SOURCES
-    propagator_basic_cl2.cpp
-)
+if (ENABLE_CL_SUPPORT)
+  add_example_plugin(
+    PropagatorCL2Basic
+    OPENCL
+    SOURCES
+      propagator_basic_cl2.cpp
+  )
+endif()
 
 # cuda example
-add_example_plugin(
-  PropagatorCUDAMultiDevice
-  CUDA
-  SOURCES
-    propagator_cuda_multidevice_example.cu
-)
+if(ENABLE_CUDA_SUPPORT)
+  add_example_plugin(
+    PropagatorCUDAMultiDevice
+    CUDA
+    SOURCES
+      propagator_cuda_multidevice_example.cu
+  )
+endif()
 
 # a simple OpenCL example plugin (C API)
-add_example_plugin(
-	PropagatorCLExample
-	OPENCL
-	SOURCES
-		propagator_cl_example.cpp
-)
+if (ENABLE_CL_SUPPORT)
+  add_example_plugin(
+  	PropagatorCLExample
+  	OPENCL
+  	SOURCES
+  		propagator_cl_example.cpp
+  )
+endif()
 
 # a simple OpenCL example plugin (C++ API)
-add_example_plugin(
-  PropagatorCL2Example
-  OPENCL
-  SOURCES
-    propagator_cl2_example.cpp
-)
+if (ENABLE_CL_SUPPORT)
+  add_example_plugin(
+    PropagatorCL2Example
+    OPENCL
+    SOURCES
+     propagator_cl2_example.cpp
+  )
+endif()
