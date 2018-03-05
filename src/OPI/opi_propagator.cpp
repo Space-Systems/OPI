@@ -203,25 +203,43 @@ namespace OPI
                             {
                                 std::string property = trim(setting[0]);
                                 std::string value = trim(setting[1]);
-                                if (hasProperty(property))
+
+                                if (value.substr(0,1) == "\"" && value.substr(value.length()-1, value.length()) == "\"")
                                 {
-                                    if (value.substr(0,1) == "\"" && value.substr(value.length()-1, value.length()) == "\"")
+                                    if (!hasProperty(property))
                                     {
-                                        setProperty(property, value.substr(1,value.length()-2));
+                                        std::cout << "Registering new PropagatorProperty from config file: " << property << " (string)" << std::endl;
+                                        createProperty(property, value.substr(1,value.length()-2));
                                     }
-                                    else if (value.find_first_of(".") != std::string::npos)
+                                    else setProperty(property, value.substr(1,value.length()-2));
+                                }
+                                else if (value.find_first_of(".") != std::string::npos)
+                                {
+                                    if (value.substr(value.length()-1,1) == "f")
                                     {
-                                        if (value.substr(value.length()-1,1) == "f")
-                                            setProperty(property, (float)atof(value.substr(0,value.length()-2).c_str()));
-                                        else
-                                            setProperty(property, atof(value.c_str()));
+                                        if (!hasProperty(property))
+                                        {
+                                            std::cout << "Registering new PropagatorProperty from config file: " << property << " (float)" << std::endl;
+                                            createProperty(property, (float)atof(value.substr(0,value.length()-2).c_str()));
+                                        }
+                                        else setProperty(property, (float)atof(value.substr(0,value.length()-2).c_str()));
                                     }
                                     else {
-                                        setProperty(property, atoi(value.c_str()));
+                                        if (!hasProperty(property))
+                                        {
+                                            std::cout << "Registering new PropagatorProperty from config file: " << property << " (double)" << std::endl;
+                                            createProperty(property, atof(value.c_str()));
+                                        }
+                                        else setProperty(property, atof(value.c_str()));
                                     }
                                 }
                                 else {
-                                    std::cout << "Not setting unknown property " << property << std::endl;
+                                    if (!hasProperty(property))
+                                    {
+                                        std::cout << "Registering new PropagatorProperty from config file: " << property << " (int)" << std::endl;
+                                        createProperty(property, atoi(value.c_str()));
+                                    }
+                                    else setProperty(property, atoi(value.c_str()));
                                 }
                             }
                         }
