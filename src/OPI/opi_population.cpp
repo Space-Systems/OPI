@@ -665,4 +665,287 @@ namespace OPI
 		}
 		return result.str();
 	}
+
+    // adapted from SGP4 reference implementation by D. Vallado e.a.
+    // https://celestrak.com/publications/AIAA/2006-6753/
+    ErrorCode Population::convertOrbitsToStateVectors()
+    {
+        if (data->data_orbit.hasData())
+        {
+            for (int i=0; i<getSize(); i++)
+            {
+                Orbit o = getOrbit()[i];
+
+                double ta = trueAnomaly(o);
+                double argp = o.arg_of_perigee;
+                const double arglat = argp + ta;
+                double raan = o.raan;
+                const double small = 1e-15;
+
+                if (o.eccentricity < small)
+                {
+                    // circular equatorial
+                    if ((o.inclination < small) || (fabs(o.inclination-M_PI) < small))
+                    {
+                        argp = 0.0;
+                        raan = 0.0;
+                        ta = o.raan + arglat;
+                    }
+                    else {
+                        // circular inclined
+                        argp = 0.0;
+                        ta = arglat;
+                    }
+                }
+                else {
+                    // elliptical equatorial
+                    if ((o.inclination < small) || (fabs(o.inclination-M_PI) < small))
+                    {
+                        argp = o.raan + o.arg_of_perigee;
+                        raan = 0.0;
+                    }
+                }
+
+                // ----------  form pqw position and velocity vectors ----------
+                double p = o.semi_major_axis * (1.0 - pow(o.eccentricity, 2.0));
+                const double mu = 398600.4418;
+                const double temp = p / (1.0 + o.eccentricity * cos(ta));
+                Vector3 r = {temp*cos(ta), temp*sin(ta), 0.0};
+                if (fabs(p) < 1e-8 ) p = 1e-8;
+
+                Vector3 v = {
+                    -sin(ta) * sqrt(mu/p),
+                    (o.eccentricity + cos(ta)) * sqrt(mu/p),
+                    0.0
+                };
+
+                r = rotateZ(r,-argp);
+                r = rotateX(r,-o.inclination);
+                r = rotateZ(r,-raan);
+                getPosition()[i] = r;
+
+                v = rotateZ(v,-argp);
+                v = rotateX(v,-o.inclination);
+                v = rotateZ(v,-raan);
+                getVelocity()[i] = v;
+            }
+
+            update(DATA_POSITION);
+            update(DATA_VELOCITY);
+            return SUCCESS;
+        }
+        else return INVALID_DATA;
+    }
+
+    // adapted from SGP4 reference implementation by D. Vallado e.a.
+    // https://celestrak.com/publications/AIAA/2006-6753/
+    ErrorCode Population::convertStateVectorsToOrbits()
+    {
+        ErrorCode e = SUCCESS;
+        if (data->data_position.hasData() && data->data_velocity.hasData())
+        {
+            enum typeorbit_t {
+                CIRCULAR_EQUATORIAL,
+                CIRCULAR_INCLINED,
+                ELLIPTICAL_EQUATORIAL,
+                ELLIPTICAL_INCLINED
+            } typeorbit;
+
+            const double twopi = 2.0 * M_PI;
+            const double halfpi = 0.5 * M_PI;
+            const double small = 1e-15;
+            const double mu = 398600.4418;
+            const double nan = std::numeric_limits<double>::quiet_NaN();
+
+            for (int i=0; i<getSize(); i++)
+            {
+                Vector3 r = getPosition()[i];
+                Vector3 v = getVelocity()[i];
+                Orbit o;
+
+                const double magr = length(r);
+                const double magv = length(v);
+
+                Vector3 hbar = cross(r,v);
+                const double magh = length(hbar);
+
+                if (magh > small)
+                {
+                    // ------------------  find h n and e vectors   ----------------
+                    Vector3 nbar = {-hbar.y, hbar.x, 0.0 };
+                    const double magn = length(nbar);
+                    const double c1 = magv*magv - mu/magr;
+                    const double rdotv = r * v;
+                    Vector3 ebar = (r*c1 - v*rdotv) / mu;
+                    o.eccentricity = length(ebar);
+
+                    // ------------  find a e and semi-latus rectum   ----------
+                    const double sme = (magv*magv*0.5) - (mu / magr);
+                    if (fabs(sme) > small)
+                    {
+                        o.semi_major_axis = -mu / (2.0 *sme);
+                    }
+                    else {
+                        o.semi_major_axis = std::numeric_limits<double>::infinity();
+                        e = INVALID_DATA;
+                    }
+                    //const double p = magh*magh / mu;
+
+                    // -----------------  find inclination   -------------------
+                    const double hk = hbar.z / magh;
+                    o.inclination = acos(hk);
+
+                    // --------  determine type of orbit for later use  --------
+                    // ------ elliptical, parabolic, hyperbolic inclined -------
+                    typeorbit = ELLIPTICAL_INCLINED;
+                    if (o.eccentricity < small)
+                    {
+                        // ----------------  circular equatorial ---------------
+                        if ((o.inclination < small) || (fabs(o.inclination - M_PI) < small))
+                            typeorbit = CIRCULAR_EQUATORIAL;
+                        else
+                            // --------------  circular inclined ---------------
+                            typeorbit = CIRCULAR_INCLINED;
+                    }
+                    else {
+                        // - elliptical, parabolic, hyperbolic equatorial --
+                        if ((o.inclination < small) || (fabs(o.inclination - M_PI) < small))
+                            typeorbit = ELLIPTICAL_EQUATORIAL;
+                    }
+
+                    // ----------  find longitude of ascending node ------------
+                    if (magn > small)
+                    {
+                        double temp = nbar.x / magn;
+                        if (temp > 1.0) temp = 1.0;
+                        else if (temp < -1.0) temp = -1.0;
+                        o.raan = acos(temp);
+                        if (nbar.y < 0.0) o.raan = twopi - o.raan;
+                    }
+                    else {
+                        o.raan = nan;
+                        e = INVALID_DATA;
+                    }
+
+                    // ---------------- find argument of perigee ---------------
+                    if (typeorbit == ELLIPTICAL_INCLINED)
+                    {
+                        o.arg_of_perigee = angle(nbar,ebar);
+                        if (ebar.z < 0.0) o.arg_of_perigee = twopi - o.arg_of_perigee;
+                    }
+                    else {
+                        o.arg_of_perigee = nan;
+                        e = INVALID_DATA;
+                    }
+
+                    // ------------  find true anomaly at epoch    -------------
+                    double nu = nan;
+                    if (typeorbit == ELLIPTICAL_EQUATORIAL || typeorbit == ELLIPTICAL_INCLINED)
+                    {
+                        nu = angle(ebar,r);
+                        if (rdotv < 0.0) nu = twopi - nu;
+                    }
+
+                    // ----  find argument of latitude - circular inclined -----
+                    double arglat = nan;
+                    if (typeorbit == CIRCULAR_INCLINED)
+                    {
+                        arglat = angle(nbar,r);
+                        if (r.z < 0.0) arglat = twopi - arglat;
+                        o.mean_anomaly = arglat;
+                    }
+
+                    // -- find longitude of perigee - elliptical equatorial ----
+                    double lonper = nan;
+                    if ((o.eccentricity > small) && (typeorbit == ELLIPTICAL_EQUATORIAL))
+                    {
+                        double temp = ebar.x / o.eccentricity;
+                        if (temp > 1.0) temp = 1.0;
+                        else if (temp < -1.0) temp = -1.0;
+                        lonper = acos(temp);
+                        if (ebar.y < 0.0) lonper = twopi - lonper;
+                        if (o.inclination > halfpi) lonper = twopi - lonper;
+                    }
+
+                    // -------- find true longitude - circular equatorial ------
+                    double truelon = nan;
+                    if ((magr>small) && (typeorbit == CIRCULAR_EQUATORIAL))
+                    {
+                        double temp = r.x / magr;
+                        if (temp > 1.0) temp = 1.0;
+                        else if (temp < -1.0) temp = -1.0;
+                        truelon = acos(temp);
+                        if (r.y < 0.0) truelon = twopi - truelon;
+                        if (o.inclination > halfpi) truelon = twopi - truelon;
+                        o.mean_anomaly = truelon;
+                    }
+
+                    // ------------ find mean anomaly for all orbits -----------
+                    if (typeorbit == ELLIPTICAL_EQUATORIAL || typeorbit == ELLIPTICAL_INCLINED)
+                    {
+                        // get mean anomaly from true anomaly
+                        const double ecc = o.eccentricity;
+                        double ea = std::numeric_limits<double>::infinity();
+                        double ma = std::numeric_limits<double>::infinity();
+                        double small = 1e-15;
+
+                        if (fabs(ecc) < small)
+                        {
+                            // circular
+                            ea = nu;
+                            ma = nu;
+                        }
+                        else if (ecc < 1.0 - small)
+                        {
+                            // elliptical
+                            const double sine = (sqrt(1.0 - pow(ecc,2.0)) * sin(nu)) / (1.0 + ecc*cos(nu));
+                            const double cose = (ecc + cos(nu)) / (1.0 + ecc*cos(nu));
+                            ea = atan2(sine, cose);
+                            ma = ea - ecc*sin(ea);
+                        }
+                        else if (ecc > 1.0 + small)
+                        {
+                            // hyperbolic
+                            if ((ecc > 1.0) && (fabs(nu) + 0.00001 < M_PI - acos(1.0 / ecc)))
+                            {
+                                const double sine = (sqrt(pow(ecc, 2.0) - 1.0) * sin(nu)) / (1.0 + ecc*cos(nu));
+                                ea = asinh(sine);
+                                ma = ecc*sinh(ea) - ea;
+                            }
+                        }
+                        else if (fabs(nu) < 168.0*M_PI / 180.0)
+                        {
+                            // parabolic
+                            ea = tan(nu*0.5);
+                            ma = ea + pow(ea,3.0)/3.0;
+                        }
+
+                        if (ecc < 1.0)
+                        {
+                            ma = fmod(ma, 2.0 * M_PI);
+                            if (ma < 0.0) ma += 2.0*M_PI;
+                        }
+
+                        o.mean_anomaly = ma;
+                    }
+                }
+                else {
+                    o.semi_major_axis = nan;
+                    o.eccentricity = nan;
+                    o.inclination = nan;
+                    o.raan = nan;
+                    o.arg_of_perigee = nan;
+                    o.mean_anomaly = nan;
+                    e = INVALID_DATA;
+                }
+                o.bol = 0.0;
+                o.eol = 0.0;
+                getOrbit()[i] = o;
+            }
+            update(DATA_ORBIT);
+            return e;
+        }
+        else return INVALID_DATA;
+    }
+
 }

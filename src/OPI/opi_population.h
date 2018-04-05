@@ -148,6 +148,25 @@ namespace OPI
             void setLastPropagatorName(std::string propagatorName);
 
             /**
+             * @brief convertOrbitsToStateVectors convert the population's orbit information to state vectors.
+             *
+             * This function can be called after setting orbit data to fill the population's position
+             * and velocity vectors by converting the orbits.
+             * @return INVALID_DATA if orbit data has not been set, SUCCESS otherwise.
+             */
+            ErrorCode convertOrbitsToStateVectors();
+
+            /**
+             * @brief convertStateVectorsToOrbits convert the population's state vectors to orbits.
+             *
+             * This function can be called after setting position and velocity vectors to fill the population's
+             * orbit data by converting them into orbits.
+             * @return INVALID_DATA if position/velocity data has not been set or any of the oprations results
+             * in NaN, SUCCESS otherwise.
+             */
+            ErrorCode convertStateVectorsToOrbits();
+
+            /**
              * @brief insert Insert all elements from another population into this one.
              *
              * The given index list states at which positions the elements are inserted,
