@@ -23,6 +23,8 @@
 
 #include "OPI/opi_types.h"
 #include <cmath>
+#include <limits>
+
 namespace OPI
 {
 	//! Addition operator for Orbit
@@ -76,6 +78,37 @@ namespace OPI
 		out.mean_anomaly = a.mean_anomaly / b;
 		return out;
 	}
+
+    //! Calculate eccentric anomaly from given orbit
+    OPI_CUDA_PREFIX inline double eccentricAnomaly(const Orbit& o)
+    {
+        double ea = o.mean_anomaly;
+        int maxloop = 5;
+        double fcte, fctes;
+
+        for (int i=0; i<maxloop; i++) {
+            fcte  = ea - o.eccentricity * sin(ea) - o.mean_anomaly;
+            fctes = 1.0 - o.eccentricity * cos(ea);
+            ea -= fcte/fctes;
+        }
+        return ea;
+    }
+
+    //! Calculate true anomaly from given orbit
+    OPI_CUDA_PREFIX inline double trueAnomaly(const Orbit& o)
+    {
+        double ea = eccentricAnomaly(o);
+        const double sin_ea = sin(ea/2.0);
+        double cos_ea = cos(ea/2.0);
+        const double epsilon = 1e-15;
+
+        if (fabs(cos_ea) < epsilon) cos_ea = epsilon * (cos_ea < 0.0 ? -1.0 : 1.0);
+
+        double ta = 2.0 * atan(
+            sqrt((1.0 + o.eccentricity)/(1.0 - o.eccentricity)) * sin_ea/cos_ea
+        );
+        return ta;
+    }
 
 	//! Addition operator for Vector3
 	OPI_CUDA_PREFIX inline Vector3 operator+(const Vector3& a, const Vector3& b)
@@ -181,6 +214,52 @@ namespace OPI
 		else
 			return v.y > v.z ? v.y : v.z;
 	}
+
+    //! Returns the given vector, rotate by angle degrees around the X axis
+    OPI_CUDA_PREFIX inline Vector3 rotateX(const Vector3& v, const double angle)
+    {
+        Vector3 r;
+        r.x = v.x;
+        r.y = cos(angle) * v.y + sin(angle) * v.z;
+        r.z = cos(angle) * v.z - sin(angle) * v.y;
+        return r;
+    }
+
+    //! Returns the given vector, rotate by angle degrees around the Y axis
+    OPI_CUDA_PREFIX inline Vector3 rotateY(const Vector3& v, const double angle)
+    {
+        Vector3 r;
+        r.x = cos(angle) * v.x - sin(angle) * v.z;
+        r.y = v.y;
+        r.z = cos(angle) * v.z + sin(angle) * v.x;
+        return r;
+    }
+
+    //! Returns the given vector, rotate by angle degrees around the Z axis
+    OPI_CUDA_PREFIX inline Vector3 rotateZ(const Vector3& v, const double angle)
+    {
+        Vector3 r;
+        r.x = cos(angle) * v.x + sin(angle) * v.y;
+        r.y = cos(angle) * v.y - sin(angle) * v.x;
+        r.z = v.z;
+        return r;
+    }
+
+    //! Returns the angle, in radians, between two given vectors, nan if undefined
+    OPI_CUDA_PREFIX inline double angle(const Vector3& a, const Vector3& b)
+    {
+        const double magnitude = length(a) * length(b);
+        const double epsilon = 1e-15;
+        if (magnitude > pow(epsilon,2.0))
+        {
+            double cosAngle = (a*b) / magnitude;
+            if (cosAngle > 1.0) cosAngle = 1.0;
+            else if (cosAngle < -1.0) cosAngle = -1.0;
+            return acos(cosAngle);
+        }
+        else return std::numeric_limits<double>::quiet_NaN();
+    }
+
 }
 
 #endif
