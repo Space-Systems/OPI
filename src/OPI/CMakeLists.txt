@@ -9,6 +9,7 @@ endif()
 
 set( OPI_SOURCE_FILES
   opi_population.cpp
+  opi_perturbations.cpp
   opi_error.cpp
   opi_host.cpp
   opi_plugininfo.cpp
@@ -37,6 +38,7 @@ set( OPI_LIBRARY_HEADER
   opi_error.h
   opi_datatypes.h
   opi_population.h
+  opi_perturbations.h
   opi_host.h
   opi_plugininfo.h
   opi_custom_propagator.h

@@ -15,20 +15,14 @@ namespace OPI
 	{
 	}
 
-	ErrorCode PerturbationModule::calculate(Population& data, Orbit* delta, float dt )
+    ErrorCode PerturbationModule::calculate(Population& data, Perturbations& delta, double julian_day, double dt )
 	{
-		return runCalculation(data, delta, dt);
+        return runCalculation(data, delta, julian_day, dt);
 	}
 
-	ErrorCode PerturbationModule::runCalculation(Population& data, Orbit* delta, float dt )
+    ErrorCode PerturbationModule::runCalculation(Population& data, Perturbations& delta, double julian_day, double dt )
 	{
 		return NOT_IMPLEMENTED;
-	}
-
-	ErrorCode setTimeStep(double julian_day)
-	{
-		// overload if necessary
-		return OPI::SUCCESS;
 	}
 
 };
