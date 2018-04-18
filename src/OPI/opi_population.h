@@ -223,7 +223,7 @@ namespace OPI
              */
 			std::string sanityCheck();
 
-        protected:
+        //protected:
             Host& getHostPointer() const;
 
 		private:
