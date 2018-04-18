@@ -120,7 +120,16 @@ namespace OPI
 		return out;
 	}
 
-	//! Subtraction operator for Vector3
+    //! Addition assignment operator for Vector3
+    OPI_CUDA_PREFIX inline Vector3& operator+=(Vector3& a, const Vector3& b)
+    {
+        a.x += b.x;
+        a.y += b.y;
+        a.z += b.z;
+        return a;
+    }
+
+    //! Subtraction operator for Vector3
 	OPI_CUDA_PREFIX inline Vector3 operator-(const Vector3& a, const Vector3& b)
 	{
 		Vector3 out;
