@@ -329,7 +329,7 @@ namespace OPI
 
     void Perturbations::resize(int size, int byteArraySize)
     {
-        if(data->size != size)
+        if (data->size != size)
         {
             data->data_orbit.resize(size);
             data->data_position.resize(size);
@@ -337,6 +337,23 @@ namespace OPI
             data->data_acceleration.resize(size);
             data->data_vmatrix.resize(size);
             data->data_bytes.resize(size*byteArraySize);
+            //initialize new elements to zero
+            if (size > data->size)
+            {
+                for (int i=data->size; i<size; i++)
+                {
+                    data->data_orbit.set(Orbit(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0),i);
+                    data->data_position.set(Vector3(0.0,0.0,0.0),i);
+                    data->data_velocity.set(Vector3(0.0,0.0,0.0),i);
+                    data->data_acceleration.set(Vector3(0.0,0.0,0.0),i);
+                    data->data_vmatrix.set(VMatrix(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0),i);
+                }
+                data->data_orbit.update(DEVICE_HOST);
+                data->data_position.update(DEVICE_HOST);
+                data->data_velocity.update(DEVICE_HOST);
+                data->data_acceleration.update(DEVICE_HOST);
+                data->data_vmatrix.update(DEVICE_HOST);
+            }
             data->size = size;
             data->byteArraySize = byteArraySize;
         }
