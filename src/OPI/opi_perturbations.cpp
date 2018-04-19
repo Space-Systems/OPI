@@ -346,7 +346,7 @@ namespace OPI
                     data->data_position.set(Vector3(0.0,0.0,0.0),i);
                     data->data_velocity.set(Vector3(0.0,0.0,0.0),i);
                     data->data_acceleration.set(Vector3(0.0,0.0,0.0),i);
-                    data->data_vmatrix.set(VMatrix(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0),i);
+                    data->data_vmatrix.set(VMatrix(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0),i);
                 }
                 data->data_orbit.update(DEVICE_HOST);
                 data->data_position.update(DEVICE_HOST);
