@@ -157,3 +157,20 @@ if(ENABLE_FORTRAN_SUPPORT)
     LIBRARY DESTINATION lib
   )
 endif()
+
+
+if (ENABLE_PYTHON)
+  # Path to SWIG interface file
+  set (OPI_INTERFACE_FILE bindings/opi.i)
+  # Include SWIG-specific CMake commands.
+  include(${SWIG_USE_FILE})
+  # Add Python headers and generated OPI headers to the include path.
+  include_directories(${PYTHON_INCLUDE_PATH} ${CMAKE_BINARY_DIR}/generated/OPI)
+  # Put SWIG in C++ mode.
+  set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES CPLUSPLUS ON)
+  # Create python module from interface definition file.
+  swig_add_module(OPI python ${OPI_INTERFACE_FILE})
+  # Link Python module to the library we created earlier,
+  # as well as the necessary Python libraries.
+  swig_link_libraries(OPI ${PYTHON_LIBRARIES} OPI)
+ endif()
