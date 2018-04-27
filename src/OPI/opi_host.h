@@ -136,6 +136,7 @@ namespace OPI
 			 */
 			CustomPropagator* createCustomPropagator(const std::string& name);
 
+            /* NOT YET IMPLEMENTED
 			//! Find a propagator module by name, returns 0 (null pointer) if not found
 			PerturbationModule* getPerturbationModule(const std::string& name) const;
 			//! Find a propagator module by index, returns 0 (null pointer) if not found
@@ -150,6 +151,7 @@ namespace OPI
 
 			//! Returns the number of known Intergrators
 			int getPropagatorIntegratorCount() const;
+            */
 
 			//! Adds and registers a Distance query which is not implemented by a plugin
 			void addDistanceQuery(DistanceQuery* query);

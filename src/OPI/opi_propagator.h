@@ -128,11 +128,11 @@ namespace OPI
              */
             ErrorCode propagate(Population& data, double* julian_days, int length, double dt);
 
-			//! Assigns a module to this propagator
+            //! Assigns a module to this propagator (not yet implemented)
 			/**
 			 * It depends on the used Propagator if the assigned modules will be used
 			 */
-			PerturbationModule* assignPerturbationModule(const std::string& name);
+            //PerturbationModule* assignPerturbationModule(const std::string& name);
 			//! Returns true if the propagator is able to use Perturbation Modules
 			bool usesModules() const;
 

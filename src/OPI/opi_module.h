@@ -56,6 +56,7 @@ namespace OPI
 			//! Returns the description of this module
 			const std::string& getDescription() const;
 
+            /* NOT YET IMPLEMENTED
 			//! Sets the version number of this module
 			void setVersion(int major, int minor, int patch);
 			//! Gets the major version of this module
@@ -64,6 +65,7 @@ namespace OPI
 			int getVersionMinor() const;
 			//! Gets the patch version of this module
 			int getVersionPatch() const;
+            */
 
 			// property access functions
 			//! registers a property
@@ -89,12 +91,15 @@ namespace OPI
 			void createProperty(const std::string& name, double value);
 			//! creates a new property of type string, the memory will be managed by OPI
 			void createProperty(const std::string &name, const std::string& value);
+
+            /* NOT YET IMPLEMENTED
 			//! creates a new property array of type int, the memory will be managed by OPI
 			void createProperty(const std::string& name, int* value, int size);
 			//! creates a new property array of type float, the memory will be managed by OPI
 			void createProperty(const std::string& name, float* value, int size);
 			//! creates a new property array of type double, the memory will be managed by OPI
 			void createProperty(const std::string& name, double* value, int size);
+            */
 
 			//! Sets a property
 			ErrorCode setProperty(const std::string& name, int value);
