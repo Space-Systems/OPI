@@ -50,6 +50,18 @@ if(NOT ENABLE_CL_SUPPORT)
     add_definitions( -DOPI_DISABLE_OPENCL )
 endif()
 
+option(ENABLE_PYTHON "Generate Python bindings using SWIG" ON)
+if (ENABLE_PYTHON)
+  find_package(SWIG)
+  find_package(PythonLibs)
+  if (${SWIG_FOUND} AND ${PYTHONLIBS_FOUND})
+    message("Python support enabled")
+  else()
+    message("SWIG and/or python libraries missing. Python interface will not be built.")
+    set(ENABLE_PYTHON OFF)
+  endif()
+endif()
+
 # enable all warnings
 add_definitions( -Wall )
 # add drop down menu for build type to gui
@@ -86,7 +98,6 @@ include_directories( ${CMAKE_BINARY_DIR}/generated)
 
 add_subdirectory(src)
 add_subdirectory(examples)
-
 
 install(
   EXPORT OPI-libs
