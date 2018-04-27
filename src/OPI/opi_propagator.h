@@ -45,8 +45,7 @@ namespace OPI
 	 * implementation for runIndexPropagation
 	 * \see Module, Host
 	 */
-	class OPI_API_EXPORT Propagator:
-			public Module
+	class OPI_API_EXPORT Propagator: public Module
 	{
 		public:
 			Propagator();
