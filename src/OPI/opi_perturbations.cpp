@@ -66,13 +66,12 @@ namespace OPI
      * \endcond
      */
 
-    Perturbations::Perturbations(Host& host, int size):
-        data(host)
+    Perturbations::Perturbations(const Population& population): data(population.getHostPointer())
     {
         data->size = 0;
         data->byteArraySize = 1;
-        data->lastPropagatorName = "None";
-        resize(size);
+        data->lastPropagatorName = population.getLastPropagatorName();
+        resize(population.getSize());
     }
 
     Perturbations::Perturbations(const Perturbations& source) : data(source.getHostPointer())
