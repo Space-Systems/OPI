@@ -25,6 +25,8 @@
 #include <fstream>
 #include <sstream>
 #include <string.h> //memcpy
+#define _USE_MATH_DEFINES
+#include <math.h>
 namespace OPI
 {
 	/**
