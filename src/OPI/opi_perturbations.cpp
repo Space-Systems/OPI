@@ -32,9 +32,9 @@ namespace OPI
      */
 
     // this holds all internal Perturbations variables (pimpl)
-    struct ObjectRawData
+    struct PerturbationRawData
     {
-            ObjectRawData(Host& _host):
+		PerturbationRawData(Host& _host) :
                 host(_host),
                 data_orbit(host),
                 data_position(host),

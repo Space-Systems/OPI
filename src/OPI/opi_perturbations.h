@@ -24,7 +24,7 @@
 #include <string>
 namespace OPI
 {
-    class ObjectRawData;
+    class PerturbationRawData;
     class Host;
     class ObjectProperties;
     class Vector3;
@@ -175,7 +175,7 @@ namespace OPI
 
         private:
             //! Private implementation data
-            Pimpl<ObjectRawData> data;
+            Pimpl<PerturbationRawData> data;
     };
 }
 
