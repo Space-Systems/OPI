@@ -36,17 +36,16 @@ namespace OPI
 	 * \ingroup CPP_API_GROUP
 	 * \see Module, Host
 	 */
-	class OPI_API_EXPORT PerturbationModule:
-			public Module
+	class PerturbationModule: public Module
 	{
 		public:
-			PerturbationModule();
-			virtual ~PerturbationModule();
+			OPI_API_EXPORT PerturbationModule();
+			OPI_API_EXPORT virtual ~PerturbationModule();
             //! Calculates the Perturbation for the passed dataset
 			/**
              * The calculated perturbation forces will be added to the values present in delta
 			 */
-            ErrorCode calculate(Population& data, Perturbations& delta, double julian_day, double dt );
+			OPI_API_EXPORT ErrorCode calculate(Population& data, Perturbations& delta, double julian_day, double dt);
 
 		protected:
             virtual ErrorCode runCalculation(Population& data, Perturbations& delta, double julian_day, double dt );

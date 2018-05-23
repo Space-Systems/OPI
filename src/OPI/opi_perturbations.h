@@ -38,7 +38,7 @@ namespace OPI
      * Perturbation Module applies to a given population. Like the Population class it can
      * be synchronized to a GPU computing device automatically.
      */
-    class OPI_API_EXPORT Perturbations
+    class Perturbations
     {
         public:
             /**
@@ -46,7 +46,7 @@ namespace OPI
              * @param host A pointer to the OPI Host that this instance is intended for.
              * @param size The number of elements. It should match the size of the corresponding Population.
              */
-            Perturbations(const Population& population);
+			OPI_API_EXPORT Perturbations(const Population& population);
 
             /**
              * @brief Population Copy constructor
@@ -59,7 +59,7 @@ namespace OPI
              *
              * @param source The Population to be copied from.
              */
-            Perturbations(const Perturbations& source);
+			OPI_API_EXPORT Perturbations(const Perturbations& source);
 
             /**
              * @brief Population Copy constructor (indexed copy)
@@ -73,12 +73,12 @@ namespace OPI
              * @param list An IndexList containing the indices of the elements of the source
              * Population that should be copied.
              */
-            Perturbations(const Perturbations& source, IndexList &list);
+			OPI_API_EXPORT Perturbations(const Perturbations& source, IndexList &list);
 
             /**
              * @brief Destructor. Cleans up host and device memory.
              */
-            ~Perturbations();
+			OPI_API_EXPORT ~Perturbations();
 
             /**
              * @brief resize Sets the number of elements of the Population.
@@ -87,7 +87,7 @@ namespace OPI
              * @param byteArraySize The per-object size of the byte array that can be queried
              * with the getBytes() function. Defaults to 1 if unset.
              */
-            void resize(int size, int byteArraySize = 1);
+			OPI_API_EXPORT void resize(int size, int byteArraySize = 1);
 
             /**
              * @brief resizeByteArray Set the per-object size of the byte array.
@@ -97,13 +97,13 @@ namespace OPI
              * object in the Population.
              * @param size The new byte array size.
              */
-            void resizeByteArray(int size);
+			OPI_API_EXPORT void resizeByteArray(int size);
 
             /**
              * @brief getSize Returns the number of elements in the Population.
              * @return Number of elements.
              */
-            int getSize() const;
+			OPI_API_EXPORT int getSize() const;
 
             //! Returns the per-object size of the byte buffer
 
@@ -111,14 +111,14 @@ namespace OPI
              * @brief getByteArraySize Returns the per-object size of the byte array.
              * @return Number of bytes every object can store in the byte array.
              */
-            int getByteArraySize() const;
+			OPI_API_EXPORT int getByteArraySize() const;
 
             /**
              * @brief getLastPropagatorName Returns the name of the last plugin the Population
              * was propagated with.
              * @return The Propagator name as defined by the plugin last used on this Population.
              */
-            std::string getLastPropagatorName() const;
+			OPI_API_EXPORT std::string getLastPropagatorName() const;
 
             /**
              * @brief setLastPropagatorName Set the name of the last Propagator the population was
@@ -128,7 +128,7 @@ namespace OPI
              * and should not require any extra effort from the plugin author.
              * @param propagatorName The name of the Propagator as returned by its getName() function.
              */
-            void setLastPropagatorName(std::string propagatorName);
+			OPI_API_EXPORT void setLastPropagatorName(std::string propagatorName);
 
             /**
              * @brief insert Insert all elements from another population into this one.
@@ -142,33 +142,33 @@ namespace OPI
              * @param source The Population from which the elements are copied.
              * @param list A list of indices into the destination Population.
              */
-            void insert(Perturbations& source, IndexList& list);
+			OPI_API_EXPORT void insert(Perturbations& source, IndexList& list);
 
             //! Removes an object
-            void remove(int index);
+			OPI_API_EXPORT void remove(int index);
             //! Removes a number of objects
-            void remove(IndexList& list);
+			OPI_API_EXPORT void remove(IndexList& list);
 
             //! Stores the Object Data to disk
-            void write(const std::string& filename);
+			OPI_API_EXPORT void write(const std::string& filename);
             //! Loads the Object Data from disk
-            ErrorCode read(const std::string& filename);
+			OPI_API_EXPORT ErrorCode read(const std::string& filename);
 
             //! Notify about updates on the specified device
-            ErrorCode update(int type, Device device = DEVICE_HOST);
+			OPI_API_EXPORT ErrorCode update(int type, Device device = DEVICE_HOST);
 
             //! Retrieve the orbital parameters on the specified device
-            Orbit* getDeltaOrbit(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Orbit* getDeltaOrbit(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the position in cartesian coordinates on the specified device
-            Vector3* getDeltaPosition(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Vector3* getDeltaPosition(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the velocity in cartesian coordinates on the specified device
-            Vector3* getDeltaVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Vector3* getDeltaVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the acceleration in cartesian coordinates on the specified device
-            Vector3* getDeltaAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Vector3* getDeltaAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the V matrix on the specified device
-            VMatrix* getVMatrix(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT VMatrix* getVMatrix(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the arbitrary binary information on the specified device
-            char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
         protected:
             Host& getHostPointer() const;

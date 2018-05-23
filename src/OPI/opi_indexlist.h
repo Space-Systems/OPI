@@ -28,27 +28,27 @@ namespace OPI
 
 	//! \brief This class represents a list of object indices
 	//! \ingroup CPP_API_GROUP
-	class OPI_API_EXPORT IndexList
+	class IndexList
 	{
 		public:
 			//! The host object must be valid
-			IndexList(Host& host);
-			~IndexList();
+			OPI_API_EXPORT IndexList(Host& host);
+			OPI_API_EXPORT ~IndexList();
 
 			//! Adds an index to the list
-			void add(int index);
+			OPI_API_EXPORT void add(int index);
 			//! Sorts the list
-			void sort();
+			OPI_API_EXPORT void sort();
 			//! Reserve memory to hold space for numPairs indices
-			void reserve(int numPairs);
+			OPI_API_EXPORT void reserve(int numPairs);
 			//! Update the data on a specific device
-			void update(Device device, int numPairs);
+			OPI_API_EXPORT void update(Device device, int numPairs);
 			//! Returns the amount of stored indicies
-			int getSize() const;
+			OPI_API_EXPORT int getSize() const;
 			//! Returns the amount of indices this list can store
-			int getTotalSpace() const;
+			OPI_API_EXPORT int getTotalSpace() const;
 			//! Returns a device-specific pointer to the data
-			int* getData(Device device, bool no_sync = false) const;
+			OPI_API_EXPORT int* getData(Device device, bool no_sync = false) const;
 
 			//! Removes duplicate entries from this list
 			void removeDuplicates();

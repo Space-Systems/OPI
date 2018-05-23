@@ -32,19 +32,19 @@ namespace OPI
 	//! \brief This class represents a way to query the Population about objects which
 	//! are in a certain range to each other
 	//! \ingroup CPP_API_GROUP
-	class OPI_API_EXPORT DistanceQuery:
+	class DistanceQuery:
 		public Module
 	{
 		public:
-			DistanceQuery();
-			virtual ~DistanceQuery();
+			OPI_API_EXPORT DistanceQuery();
+			OPI_API_EXPORT virtual ~DistanceQuery();
 
 			//! Rebuilds the internal structure
-			ErrorCode rebuild(Population& data);
+			OPI_API_EXPORT ErrorCode rebuild(Population& data);
 			//! Make a query about objects which resides inside a cube of cube_size
-			ErrorCode queryCubicPairs(Population& data, IndexPairList& pairs, float cube_size);
+			OPI_API_EXPORT ErrorCode queryCubicPairs(Population& data, IndexPairList& pairs, float cube_size);
 			//! Tell the query object to visualize its internal structure
-			void debugDraw();
+			OPI_API_EXPORT void debugDraw();
 
 
 		protected:

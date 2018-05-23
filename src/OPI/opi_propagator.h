@@ -45,11 +45,11 @@ namespace OPI
 	 * implementation for runIndexPropagation
 	 * \see Module, Host
 	 */
-	class OPI_API_EXPORT Propagator: public Module
+	class Propagator: public Module
 	{
 		public:
-			Propagator();
-			virtual ~Propagator();
+			OPI_API_EXPORT Propagator();
+			OPI_API_EXPORT virtual ~Propagator();
 
             /**
              * @brief loadConfigFile Attempts to load the standard configuration file.
@@ -61,7 +61,7 @@ namespace OPI
              * It is recommended for plugin authors to call this function on runDisable()
              * as part of resetting the propagator to its default state.
              */
-            void loadConfigFile();
+			OPI_API_EXPORT void loadConfigFile();
 
             /**
              * @brief loadConfigFile Attempts to load a config file. Called by the host upon initialization.
@@ -72,7 +72,7 @@ namespace OPI
              * should use the above variant of this function when resetting the propagator.
              * @param filename The name of the config file to load.
              */
-            void loadConfigFile(const std::string& filename);
+			OPI_API_EXPORT void loadConfigFile(const std::string& filename);
 
             /**
              * @brief propagate Starts the propagation for the given time step.
@@ -87,7 +87,7 @@ namespace OPI
              * @param dt The time step, in seconds, from last propagation.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
-            ErrorCode propagate(Population& data, double julian_day, double dt);
+			OPI_API_EXPORT ErrorCode propagate(Population& data, double julian_day, double dt);
 
             /**
              * @brief propagate Starts the index-based propagation for the given time step.
@@ -107,7 +107,7 @@ namespace OPI
              * was performed with OPI's inherent method (which should still give you valid results); or
              * any other error code returned by the plugin.
              */
-            ErrorCode propagate(Population& data, IndexList& indices, double julian_day, double dt);
+			OPI_API_EXPORT ErrorCode propagate(Population& data, IndexList& indices, double julian_day, double dt);
 
             /**
              * @brief propagate Starts propagation with individual times for each object.
@@ -126,7 +126,7 @@ namespace OPI
              * was performed with OPI's inherent method (which should still give you valid results); or
              * any other ErrorCode returned by the plugin.
              */
-            ErrorCode propagate(Population& data, double* julian_days, int length, double dt);
+			OPI_API_EXPORT ErrorCode propagate(Population& data, double* julian_days, int length, double dt);
 
             //! Assigns a module to this propagator (not yet implemented)
 			/**
@@ -134,19 +134,19 @@ namespace OPI
 			 */
             //PerturbationModule* assignPerturbationModule(const std::string& name);
 			//! Returns true if the propagator is able to use Perturbation Modules
-			bool usesModules() const;
+			OPI_API_EXPORT bool usesModules() const;
 
 			//! Returns the assigned Perturbation modules
-			PerturbationModule* getPerturbationModule(int index);
+			OPI_API_EXPORT PerturbationModule* getPerturbationModule(int index);
 
 			//! Returns the number of assigned Perturbation modules
-			int getPerturbationModuleCount() const;
+			OPI_API_EXPORT int getPerturbationModuleCount() const;
 
 			//! Check if this propagator is able to propagate backwards
-			virtual bool backwardPropagation();
+			OPI_API_EXPORT virtual bool backwardPropagation();
 	
 			//! Check if this propagator supports generation of cartesian state vectors
-			virtual bool cartesianCoordinates();
+			OPI_API_EXPORT virtual bool cartesianCoordinates();
 
             /**
              * @brief referenceFrame Return the reference frame for the cartesian state vectors.
@@ -160,7 +160,7 @@ namespace OPI
              * in many different flavours always consult the plugin's documentation for specifics.
              * @return A value of the ReferenceFrame enum matching the propagator's output.
              */
-            virtual ReferenceFrame referenceFrame();
+			OPI_API_EXPORT virtual ReferenceFrame referenceFrame();
 
             /**
              * @brief covarianceType Return the setup of the covariance matrix.
@@ -173,7 +173,7 @@ namespace OPI
              * (k1-k6 for semi major axis, eccentricity, inclination, raan, argument of perigee and mean
              * anomaly). The options ending in _NO_DYNAMICS state that the dynamic parameters are unused.
              */
-            virtual CovarianceType covarianceType();
+			OPI_API_EXPORT virtual CovarianceType covarianceType();
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules

@@ -39,7 +39,7 @@ namespace OPI
      * used to store arbitrary, per-object information. Its per-object size (default: 1 byte)
      * can be adjusted using the resizeByteArray function.
 	 */
-	class OPI_API_EXPORT Population
+	class Population
 	{
 		public:
             /**
@@ -47,7 +47,7 @@ namespace OPI
              * @param host A pointer to the OPI Host that this Population is intended for.
              * @param size The number of elements of the Population. Defaults to zero if unset.
              */
-			Population(Host& host, int size = 0);
+			OPI_API_EXPORT Population(Host& host, int size = 0);
 
             /**
              * @brief Population Copy constructor
@@ -60,7 +60,7 @@ namespace OPI
              *
              * @param source The Population to be copied from.
              */
-            Population(const Population& source);
+			OPI_API_EXPORT Population(const Population& source);
 
             /**
              * @brief Population Copy constructor (indexed copy)
@@ -74,12 +74,12 @@ namespace OPI
              * @param list An IndexList containing the indices of the elements of the source
              * Population that should be copied.
              */
-            Population(const Population& source, IndexList &list);
+			OPI_API_EXPORT Population(const Population& source, IndexList &list);
 
             /**
              * @brief Destructor. Cleans up host and device memory.
              */
-			~Population();
+			OPI_API_EXPORT ~Population();
 
             /**
              * @brief resize Sets the number of elements of the Population.
@@ -88,7 +88,7 @@ namespace OPI
              * @param byteArraySize The per-object size of the byte array that can be queried
              * with the getBytes() function. Defaults to 1 if unset.
              */
-            void resize(int size, int byteArraySize = 1);
+			OPI_API_EXPORT void resize(int size, int byteArraySize = 1);
 
             /**
              * @brief resizeByteArray Set the per-object size of the byte array.
@@ -98,13 +98,13 @@ namespace OPI
              * object in the Population.
              * @param size The new byte array size.
              */
-            void resizeByteArray(int size);
+			OPI_API_EXPORT void resizeByteArray(int size);
 
             /**
              * @brief getSize Returns the number of elements in the Population.
              * @return Number of elements.
              */
-            int getSize() const;
+			OPI_API_EXPORT int getSize() const;
 
             //! Returns the per-object size of the byte buffer
 
@@ -112,14 +112,14 @@ namespace OPI
              * @brief getByteArraySize Returns the per-object size of the byte array.
              * @return Number of bytes every object can store in the byte array.
              */
-            int getByteArraySize() const;
+			OPI_API_EXPORT int getByteArraySize() const;
 
             /**
              * @brief getLastPropagatorName Returns the name of the last plugin the Population
              * was propagated with.
              * @return The Propagator name as defined by the plugin last used on this Population.
              */
-            std::string getLastPropagatorName() const;
+			OPI_API_EXPORT std::string getLastPropagatorName() const;
 
             /**
              * @brief getObjectName Returns the name of the given object.
@@ -127,7 +127,7 @@ namespace OPI
              * @return The object name as a string. If no name has been set or the index is out of
              * range, an empty string is returned.
              */
-            std::string getObjectName(int index);
+			OPI_API_EXPORT std::string getObjectName(int index);
 
             /**
              * @brief setObjectName Set the name of the given object.
@@ -135,7 +135,7 @@ namespace OPI
              * @param index The index of the object.
              * @param name The new name for the object.
              */
-            void setObjectName(int index, std::string name);
+			OPI_API_EXPORT void setObjectName(int index, std::string name);
 
             /**
              * @brief setLastPropagatorName Set the name of the last Propagator the population was
@@ -145,7 +145,7 @@ namespace OPI
              * and should not require any extra effort from the plugin author.
              * @param propagatorName The name of the Propagator as returned by its getName() function.
              */
-            void setLastPropagatorName(std::string propagatorName);
+			OPI_API_EXPORT void setLastPropagatorName(std::string propagatorName);
 
             /**
              * @brief convertOrbitsToStateVectors convert the population's orbit information to state vectors.
@@ -154,7 +154,7 @@ namespace OPI
              * and velocity vectors by converting the orbits.
              * @return INVALID_DATA if orbit data has not been set, SUCCESS otherwise.
              */
-            ErrorCode convertOrbitsToStateVectors();
+			OPI_API_EXPORT ErrorCode convertOrbitsToStateVectors();
 
             /**
              * @brief convertStateVectorsToOrbits convert the population's state vectors to orbits.
@@ -164,7 +164,7 @@ namespace OPI
              * @return INVALID_DATA if position/velocity data has not been set or any of the oprations results
              * in NaN, SUCCESS otherwise.
              */
-            ErrorCode convertStateVectorsToOrbits();
+			OPI_API_EXPORT ErrorCode convertStateVectorsToOrbits();
 
             /**
              * @brief insert Insert all elements from another population into this one.
@@ -178,35 +178,35 @@ namespace OPI
              * @param source The Population from which the elements are copied.
              * @param list A list of indices into the destination Population.
              */
-            void insert(Population& source, IndexList& list);
+			OPI_API_EXPORT void insert(Population& source, IndexList& list);
 
 			//! Removes an object
-			void remove(int index);
+			OPI_API_EXPORT void remove(int index);
 			//! Removes a number of objects
-			void remove(IndexList& list);
+			OPI_API_EXPORT void remove(IndexList& list);
 
 			//! Stores the Object Data to disk
-			void write(const std::string& filename);
+			OPI_API_EXPORT void write(const std::string& filename);
 			//! Loads the Object Data from disk
-			ErrorCode read(const std::string& filename);
+			OPI_API_EXPORT ErrorCode read(const std::string& filename);
 
 			//! Notify about updates on the specified device
-			ErrorCode update(int type, Device device = DEVICE_HOST);
+			OPI_API_EXPORT ErrorCode update(int type, Device device = DEVICE_HOST);
 
 			//! Retrieve the orbital parameters on the specified device
-			Orbit* getOrbit(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Orbit* getOrbit(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the object properties on the specified device
-			ObjectProperties* getObjectProperties(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT ObjectProperties* getObjectProperties(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the position in cartesian coordinates on the specified device
-            Vector3* getPosition(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Vector3* getPosition(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the velocity in cartesian coordinates on the specified device
-			Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the acceleration in cartesian coordinates on the specified device
-            Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the covariance information on the specified device
-            Covariance* getCovariance(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT Covariance* getCovariance(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the arbitrary binary information on the specified device
-            char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
+			OPI_API_EXPORT char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
             /**
              * @brief sanityCheck Performs various checks on the Population data and generate a debug string.
@@ -221,10 +221,10 @@ namespace OPI
              * @return Human-readable string that can be printed to the screen or a log file. If no problems are
              * found, an empty string is returned.
              */
-			std::string sanityCheck();
+			OPI_API_EXPORT std::string sanityCheck();
 
         //protected:
-            Host& getHostPointer() const;
+			OPI_API_EXPORT Host& getHostPointer() const;
 
 		private:
 			//! Private implementation data
