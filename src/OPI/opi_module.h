@@ -34,8 +34,8 @@ namespace OPI
 	class Module
 	{
 		public:
-			Module();
-			virtual ~Module();
+			OPI_API_EXPORT Module();
+			OPI_API_EXPORT virtual ~Module();
 
 			//! Checks if this propagator is enabled
 			OPI_API_EXPORT bool isEnabled() const;
