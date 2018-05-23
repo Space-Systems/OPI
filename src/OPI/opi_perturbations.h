@@ -24,11 +24,11 @@
 #include <string>
 namespace OPI
 {
-    class PerturbationRawData;
+    struct PerturbationRawData;
     class Host;
-    class ObjectProperties;
-    class Vector3;
-    class IndexPair;
+    struct ObjectProperties;
+    struct Vector3;
+    struct IndexPair;
     class IndexList;
 
     /*! \brief This class contains device-synchronizable perturbation information.

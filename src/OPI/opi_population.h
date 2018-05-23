@@ -23,11 +23,11 @@
 #include <string>
 namespace OPI
 {
-	class ObjectRawData;
+	struct ObjectRawData;
 	class Host;
-	class ObjectProperties;
-	class Vector3;
-	class IndexPair;
+	struct ObjectProperties;
+	struct Vector3;
+	struct IndexPair;
 	class IndexList;
 
 	/*! \brief This class contains all parameters required for processing orbital objects.

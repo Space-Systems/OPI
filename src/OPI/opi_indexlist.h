@@ -24,7 +24,7 @@ namespace OPI
 {
 	class IndexListImpl;
 	class Host;
-	class IndexPair;
+	struct IndexPair;
 
 	//! \brief This class represents a list of object indices
 	//! \ingroup CPP_API_GROUP

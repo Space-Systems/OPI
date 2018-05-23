@@ -23,7 +23,7 @@ namespace OPI
 {
 	class IndexPairListImpl;
 	class Host;
-	class IndexPair;
+	struct IndexPair;
 
 	//! \brief This class represents a list of object index pairs
 	//! \ingroup CPP_API_GROUP

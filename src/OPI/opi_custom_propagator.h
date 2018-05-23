@@ -24,7 +24,7 @@ namespace OPI
 	class PerturbationModule;
 	class PropagatorIntegrator;
 
-	class CustomPropagatorImpl;
+	struct CustomPropagatorImpl;
 
 	//! \brief This class represents a propagator which can be composed from different perturbation modules and an integrator at runtime.
 	//! \ingroup CPP_API_GROUP
