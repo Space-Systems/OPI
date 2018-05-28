@@ -20,7 +20,6 @@ set( OPI_SOURCE_FILES
   opi_indexlist.cpp
   opi_collisiondetection.cpp
   opi_module.cpp
-  opi_population_filter.cpp
 
   opi_perturbation_module.cpp
 
@@ -40,7 +39,6 @@ set( OPI_LIBRARY_HEADER
   opi_datatypes.h
   opi_population.h
   opi_perturbations.h
-  opi_population_filter.h
   opi_host.h
   opi_plugininfo.h
   opi_custom_propagator.h
