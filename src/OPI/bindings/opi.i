@@ -34,7 +34,7 @@
 
 // In python, the population getters are changed from C arrays to indexed setters and getters.
 // So instead of getOrbit()[i] in C++, use getOrbit(i) in python.
-// Instead of getOrbit()[i] = o, use setOrbit(o,i).
+// Instead of getOrbit()[i] = o, use setOrbit(i,o).
 
 %feature("shadow") Population::getOrbit() %{
 def getOrbit(index):
@@ -67,10 +67,10 @@ def getCovariance(index):
 %}
 
 %extend OPI::Population {
-        void setOrbit(Orbit o, int index) { if (index < $self->getSize()) $self->getOrbit()[index] = o; }
-        void setPosition(Vector3 pos, int index) { if (index < $self->getSize()) $self->getPosition()[index] = pos; }
-        void setVelocity(Vector3 vel, int index) { if (index < $self->getSize()) $self->getVelocity()[index] = vel; }
-        void setAcceleration(Vector3 acc, int index) { if (index < $self->getSize()) $self->getAcceleration()[index] = acc; }
-        void setObjectProperties(ObjectProperties props, int index) { if (index < $self->getSize()) $self->getObjectProperties()[index] = props; }
-        void setCovariance(Covariance c, int index) { if (index < $self->getSize()) $self->getCovariance()[index] = c; }
+        void setOrbit(int index, Orbit o) { if (index < $self->getSize()) $self->getOrbit()[index] = o; }
+        void setPosition(int index, Vector3 pos) { if (index < $self->getSize()) $self->getPosition()[index] = pos; }
+        void setVelocity(int index, Vector3 vel) { if (index < $self->getSize()) $self->getVelocity()[index] = vel; }
+        void setAcceleration(int index, Vector3 acc) { if (index < $self->getSize()) $self->getAcceleration()[index] = acc; }
+        void setObjectProperties(int index, ObjectProperties props) { if (index < $self->getSize()) $self->getObjectProperties()[index] = props; }
+        void setCovariance(int index, Covariance c) { if (index < $self->getSize()) $self->getCovariance()[index] = c; }
 };
