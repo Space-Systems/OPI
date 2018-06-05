@@ -97,7 +97,11 @@ endif()
 include_directories( ${CMAKE_BINARY_DIR}/generated)
 
 add_subdirectory(src)
+
+option(ENABLE_EXAMPLES "Build examples" ON)
+if(ENABLE_EXAMPLES)
 add_subdirectory(examples)
+endif()
 
 install(
   EXPORT OPI-libs
