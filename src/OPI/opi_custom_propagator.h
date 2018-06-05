@@ -33,12 +33,12 @@ namespace OPI
 	{
 		public:
 			//! Creates a new custom propagator with the specified name
-			CustomPropagator(const std::string& name);
-			~CustomPropagator();
+			OPI_API_EXPORT CustomPropagator(const std::string& name);
+			OPI_API_EXPORT ~CustomPropagator();
 			/// Adds a module to this propagator
-			void addModule(PerturbationModule* module);
+			OPI_API_EXPORT void addModule(PerturbationModule* module);
 			/// Sets the integrator for this propagator
-			void setIntegrator(PropagatorIntegrator* integrator);
+			OPI_API_EXPORT void setIntegrator(PropagatorIntegrator* integrator);
 
 		protected:
 			/// Override the propagation method
