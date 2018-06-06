@@ -73,7 +73,7 @@ namespace OPI
 			 * The parameter platformSupport states whether support for CUDA (default) or OpenCL should be loaded.
 			 * \returns an ErrorCode containing information on any errors that occurred during the operation.
 			 */
-			OPI_API_EXPORT ErrorCode loadPlugins(const std::string& plugindir, gpuPlatform platformSupport = PLATFORM_OPENCL);
+			OPI_API_EXPORT ErrorCode loadPlugins(const std::string& plugindir, gpuPlatform platformSupport = PLATFORM_NONE);
 
 			//! Sets an error callback for this host.
 			OPI_API_EXPORT void setErrorCallback(OPI_ErrorCallback callback, void* privatedata);
