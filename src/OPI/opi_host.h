@@ -57,7 +57,7 @@ namespace OPI
 			OPI_API_EXPORT Host();
 			OPI_API_EXPORT ~Host();
 	
-			OPI_API_EXPORT enum gpuPlatform {
+			enum gpuPlatform {
 				PLATFORM_NONE,
 				PLATFORM_CUDA,
 				PLATFORM_OPENCL
