@@ -73,7 +73,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # add option to enable c++11 compiler features
-option(ENABLE_CXX11 "Enable c++11" OFF)
+option(ENABLE_CXX11 "Enable c++11" ON)
 if(ENABLE_CXX11)
   add_definitions( --std=c++11)
   message( "C++11 enabled")
