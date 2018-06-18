@@ -1,5 +1,5 @@
-# No idea which version is actually required
-cmake_minimum_required (VERSION 2.8)
+# Minimum version required is 3.1 for CMAKE_CXX_STANDARD
+cmake_minimum_required (VERSION 3.1)
 
 # disable in source builds (these must be placed before project)
 if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
@@ -73,9 +73,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # add option to enable c++11 compiler features
-option(ENABLE_CXX11 "Enable c++11" ON)
+option(ENABLE_CXX11 "Enable C++11" ON)
 if(ENABLE_CXX11)
-  add_definitions( --std=c++11)
+  set(CMAKE_CXX_STANDARD 11)
   message( "C++11 enabled")
 endif()
 
