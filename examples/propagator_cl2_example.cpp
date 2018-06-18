@@ -137,7 +137,7 @@ class TestPropagator:
             propagator.setArg(3, dt);
 
             // Enqueue the kernel.
-            const size_t problemSize = data.getSize();
+            const size_t problemSize = population.getSize();
             cl::CommandQueue queue = cl::CommandQueue(*clSupport->getOpenCLQueue(), true);
             err = queue.enqueueNDRangeKernel(propagator, cl::NullRange, cl::NDRange(problemSize), cl::NullRange);
             if (err != CL_SUCCESS) std::cout << "Error running kernel: " << err << std::endl;
