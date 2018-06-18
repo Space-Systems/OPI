@@ -87,7 +87,7 @@ namespace OPI
              * @param dt The time step, in seconds, from last propagation.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
-			OPI_API_EXPORT ErrorCode propagate(Population& data, double julian_day, double dt);
+			OPI_API_EXPORT ErrorCode propagate(Population& population, double julian_day, double dt);
 
             /**
              * @brief propagate Starts the index-based propagation for the given time step.
@@ -107,7 +107,7 @@ namespace OPI
              * was performed with OPI's inherent method (which should still give you valid results); or
              * any other error code returned by the plugin.
              */
-			OPI_API_EXPORT ErrorCode propagate(Population& data, IndexList& indices, double julian_day, double dt);
+			OPI_API_EXPORT ErrorCode propagate(Population& population, IndexList& indices, double julian_day, double dt);
 
             /**
              * @brief propagate Starts propagation with individual times for each object.
@@ -126,7 +126,7 @@ namespace OPI
              * was performed with OPI's inherent method (which should still give you valid results); or
              * any other ErrorCode returned by the plugin.
              */
-			OPI_API_EXPORT ErrorCode propagate(Population& data, double* julian_days, int length, double dt);
+			OPI_API_EXPORT ErrorCode propagate(Population& population, double* julian_days, int length, double dt);
 
             //! Assigns a module to this propagator (not yet implemented)
 			/**
@@ -180,13 +180,13 @@ namespace OPI
 			void useModules();
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
-            virtual ErrorCode runPropagation(Population& data, double julian_day, double dt) = 0;
+            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt) = 0;
 			//! Override this to implement an index-based propagation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagateIndexed
-            virtual ErrorCode runIndexedPropagation(Population& data, IndexList& indices, double julian_day, double dt);
+            virtual ErrorCode runIndexedPropagation(Population& population, IndexList& indices, double julian_day, double dt);
             //! Override this to implement propagation with individual times.
             //! OPI will make sure that the julian_days vector length matches that of the Population.
-            virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, int length, double dt);
+            virtual ErrorCode runMultiTimePropagation(Population& population, double* julian_days, int length, double dt);
             //! Variable to hold the appropriate name for the config file.
             std::string configFileName;
 

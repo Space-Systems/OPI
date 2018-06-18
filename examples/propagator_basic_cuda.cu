@@ -107,7 +107,7 @@ class BasicCUDA: public OPI::Propagator
         }
 
         // This is the main function every plugin needs to implement to do the actual propagation.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
         {
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
             // look at the seconds that have elapsed since the first call of the propagator. The first
@@ -122,21 +122,21 @@ class BasicCUDA: public OPI::Propagator
 
             if(deviceCount >= 1)
             {
-                OPI::Orbit* orbit = data.getOrbit(OPI::DEVICE_CUDA);
-                OPI::Vector3* position = data.getPosition(OPI::DEVICE_CUDA);
+                OPI::Orbit* orbit = population.getOrbit(OPI::DEVICE_CUDA);
+                OPI::Vector3* position = population.getPosition(OPI::DEVICE_CUDA);
 
                 // Set kernel grid and block sizes based on the size of the population.
                 // See CUDA manual for details on choosing proper block and grid sizes.
                 int blockSize = 256;
-                int gridSize = (data.getSize()+blockSize-1)/blockSize;
+                int gridSize = (population.getSize()+blockSize-1)/blockSize;
 
                 // Call the CUDA kernel.
-                kernel_propagate<<<gridSize, blockSize>>>(orbit, position, seconds, data.getSize());
+                kernel_propagate<<<gridSize, blockSize>>>(orbit, position, seconds, population.getSize());
 
                 // The kernel writes to the Population's position and orbit vectors, so
                 // these two have to be marked for updated values on the CUDA device.
-                data.update(OPI::DATA_POSITION, OPI::DEVICE_CUDA);
-                data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
+				population.update(OPI::DATA_POSITION, OPI::DEVICE_CUDA);
+				population.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
 
                 return OPI::SUCCESS;
             }
@@ -154,12 +154,12 @@ class BasicCUDA: public OPI::Propagator
         // is helpful to know that the IndexList synchronizes with the GPU just like the
         // Population - the functions IndexList::getData() and IndexList::update() work
         // just like their Population counterparts.
-        OPI::ErrorCode runIndexedPropagation(OPI::Population& data, OPI::IndexList& indices, double julian_day, double dt)
+        OPI::ErrorCode runIndexedPropagation(OPI::Population& population, OPI::IndexList& indices, double julian_day, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }
 
-        OPI::ErrorCode runMultiTimePropagation(OPI::Population& data, double* julian_days, int length, double dt)
+        OPI::ErrorCode runMultiTimePropagation(OPI::Population& population, double* julian_days, int length, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }

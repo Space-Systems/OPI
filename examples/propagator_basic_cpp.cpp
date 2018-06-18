@@ -30,7 +30,7 @@ class BasicCPP: public OPI::Propagator
         }
 
         // This is the main function every plugin needs to implement to do the actual propagation.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
         {
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
             // look at the seconds that have elapsed since the first call of the propagator. The first
@@ -40,16 +40,16 @@ class BasicCPP: public OPI::Propagator
             float seconds = (julian_day-baseDay)*86400.0 + dt;
 
             // Get the orbit and position vectors from the given Population.
-            OPI::Orbit* orbit = data.getOrbit(OPI::DEVICE_HOST);
-            OPI::Vector3* position = data.getPosition(OPI::DEVICE_HOST);
+            OPI::Orbit* orbit = population.getOrbit(OPI::DEVICE_HOST);
+            OPI::Vector3* position = population.getPosition(OPI::DEVICE_HOST);
 
             // Call the propagation function.
-            cpp_propagate(orbit, position, seconds, data.getSize());
+            cpp_propagate(orbit, position, seconds, population.getSize());
 
             // The propagation function writes to the Population's position and orbit vectors, so
             // these two have to be marked for updated values on the host device.
-            data.update(OPI::DATA_POSITION, OPI::DEVICE_HOST);
-            data.update(OPI::DATA_ORBIT, OPI::DEVICE_HOST);
+			population.update(OPI::DATA_POSITION, OPI::DEVICE_HOST);
+			population.update(OPI::DATA_ORBIT, OPI::DEVICE_HOST);
 
             return OPI::SUCCESS;
         }
@@ -65,12 +65,12 @@ class BasicCPP: public OPI::Propagator
         // is helpful to know that the IndexList synchronizes with the GPU just like the
         // Population - the functions IndexList::getData() and IndexList::update() work
         // just like their Population counterparts.
-        OPI::ErrorCode runIndexedPropagation(OPI::Population& data, OPI::IndexList& indices, double julian_day, double dt)
+        OPI::ErrorCode runIndexedPropagation(OPI::Population& population, OPI::IndexList& indices, double julian_day, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }
 
-        OPI::ErrorCode runMultiTimePropagation(OPI::Population& data, double* julian_days, int length, double dt)
+        OPI::ErrorCode runMultiTimePropagation(OPI::Population& population, double* julian_days, int length, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }

@@ -45,10 +45,10 @@ namespace OPI
 			/**
              * The calculated perturbation forces will be added to the values present in delta
 			 */
-			OPI_API_EXPORT ErrorCode calculate(Population& data, Perturbations& delta, double julian_day, double dt);
+			OPI_API_EXPORT ErrorCode calculate(Population& population, Perturbations& delta, double julian_day, double dt);
 
 		protected:
-            virtual ErrorCode runCalculation(Population& data, Perturbations& delta, double julian_day, double dt );
+            virtual ErrorCode runCalculation(Population& population, Perturbations& delta, double julian_day, double dt );
 
 		private:
 			Pimpl<PerturbationModuleImpl> impl;

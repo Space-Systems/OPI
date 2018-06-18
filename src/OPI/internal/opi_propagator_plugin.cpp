@@ -55,24 +55,24 @@ namespace OPI
 		return plugin->disable();
 	}
 
-    ErrorCode PropagatorPlugin::runPropagation(Population& data, double julian_day, double dt)
+    ErrorCode PropagatorPlugin::runPropagation(Population& population, double julian_day, double dt)
 	{
 		if(proc_propagate)
-			return proc_propagate(this, (void*)(&data), julian_day, dt);
+			return proc_propagate(this, (void*)(&population), julian_day, dt);
 		return NOT_IMPLEMENTED;
 	}
 
-    ErrorCode PropagatorPlugin::runIndexedPropagation(Population& data, int *indices, int index_size, double julian_day, double dt)
+    ErrorCode PropagatorPlugin::runIndexedPropagation(Population& population, int *indices, int index_size, double julian_day, double dt)
 	{
 		if(proc_propagate_indexed)
-			return proc_propagate_indexed(this, &data, indices, index_size, julian_day, dt);
+			return proc_propagate_indexed(this, &population, indices, index_size, julian_day, dt);
 		return NOT_IMPLEMENTED;
 	}
 
-    ErrorCode PropagatorPlugin::runMultiTimePropagation(Population& data, double* julian_days, int length, double dt)
+    ErrorCode PropagatorPlugin::runMultiTimePropagation(Population& population, double* julian_days, int length, double dt)
     {
         if(proc_propagate_multitime)
-            return proc_propagate_multitime(this, &data, julian_days, length, dt);
+            return proc_propagate_multitime(this, &population, julian_days, length, dt);
         return NOT_IMPLEMENTED;
     }
 

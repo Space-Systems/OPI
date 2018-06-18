@@ -96,7 +96,7 @@ class TestPropagator:
 			return kernel;
 		}
 
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
 		{
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;
@@ -111,14 +111,14 @@ class TestPropagator:
 			// cl_int for OpenCL error reporting
             cl_int err;
 
-            std::cout << data.getSize() << std::endl;
+            std::cout << population.getSize() << std::endl;
 
             // Calling getOrbit and getObjectProperties with the DEVICE_CUDA flag will return
             // cl_mem instances in the OpenCL implementation. They must be explicitly cast to
             // cl_mem before they can be used as kernel arguments. This step will also trigger
             // the memory transfer from host to OpenCL device.            
-            cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
-            cl_mem bytes = reinterpret_cast<cl_mem>(data.getBytes(OPI::DEVICE_CUDA));
+            cl_mem orbit = reinterpret_cast<cl_mem>(population.getOrbit(OPI::DEVICE_CUDA));
+            cl_mem bytes = reinterpret_cast<cl_mem>(population.getBytes(OPI::DEVICE_CUDA));
 
             // To use the OpenCL C++ API, we also need to create a cl::Buffer object from
             // the cl_mem instance. The retainObject flag of the cl::Buffer constructor
@@ -146,8 +146,8 @@ class TestPropagator:
             queue.finish();
 
             // Don't forget to notify OPI of the updated data on the device!
-            data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
-            data.update(OPI::DATA_BYTES, OPI::DEVICE_CUDA);
+			population.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
+			population.update(OPI::DATA_BYTES, OPI::DEVICE_CUDA);
 
             return OPI::SUCCESS;
 		}

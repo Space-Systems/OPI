@@ -39,14 +39,14 @@ namespace OPI
 	{
 	}
 
-	ErrorCode CollisionDetection::detectPairs(Population &data, DistanceQuery *query, IndexPairList &pairs_out, float time_passed)
+	ErrorCode CollisionDetection::detectPairs(Population &population, DistanceQuery *query, IndexPairList &pairs_out, float time_passed)
 	{
 		ErrorCode status = SUCCESS;
 		// ensure this propagator is enabled
 		status = enable();
 		// an error occured?
 		if(status == SUCCESS)
-			status = runDetectPairs(data, query, pairs_out, time_passed);
+			status = runDetectPairs(population, query, pairs_out, time_passed);
 		getHost()->sendError(status);
 		return status;
 	}

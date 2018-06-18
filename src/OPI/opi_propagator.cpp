@@ -166,12 +166,12 @@ namespace OPI
         return CV_NONE;
     }
 
-    ErrorCode Propagator::runIndexedPropagation(Population& data, IndexList& indices, double julian_day, double dt)
+    ErrorCode Propagator::runIndexedPropagation(Population& objectdata, IndexList& indices, double julian_day, double dt)
 	{
 		return NOT_IMPLEMENTED;
 	}
 
-    ErrorCode Propagator::runMultiTimePropagation(Population& data, double* julian_days, int length, double dt)
+    ErrorCode Propagator::runMultiTimePropagation(Population& objectdata, double* julian_days, int length, double dt)
     {
         return NOT_IMPLEMENTED;
     }

@@ -15,12 +15,12 @@ namespace OPI
 	{
 	}
 
-    ErrorCode PerturbationModule::calculate(Population& data, Perturbations& delta, double julian_day, double dt )
+    ErrorCode PerturbationModule::calculate(Population& population, Perturbations& delta, double julian_day, double dt )
 	{
-        return runCalculation(data, delta, julian_day, dt);
+        return runCalculation(population, delta, julian_day, dt);
 	}
 
-    ErrorCode PerturbationModule::runCalculation(Population& data, Perturbations& delta, double julian_day, double dt )
+    ErrorCode PerturbationModule::runCalculation(Population& population, Perturbations& delta, double julian_day, double dt )
 	{
 		return NOT_IMPLEMENTED;
 	}

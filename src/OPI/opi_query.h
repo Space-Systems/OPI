@@ -40,18 +40,18 @@ namespace OPI
 			OPI_API_EXPORT virtual ~DistanceQuery();
 
 			//! Rebuilds the internal structure
-			OPI_API_EXPORT ErrorCode rebuild(Population& data);
+			OPI_API_EXPORT ErrorCode rebuild(Population& population);
 			//! Make a query about objects which resides inside a cube of cube_size
-			OPI_API_EXPORT ErrorCode queryCubicPairs(Population& data, IndexPairList& pairs, float cube_size);
+			OPI_API_EXPORT ErrorCode queryCubicPairs(Population& population, IndexPairList& pairs, float cube_size);
 			//! Tell the query object to visualize its internal structure
 			OPI_API_EXPORT void debugDraw();
 
 
 		protected:
 			//! Override this function to change the rebuild behaviour
-			virtual ErrorCode runRebuild(Population& data) = 0;
+			virtual ErrorCode runRebuild(Population& population) = 0;
 			//! Override this function to change the query behaviour
-			virtual ErrorCode runCubicPairQuery(Population& data, IndexPairList& pairs, float cube_size) = 0;
+			virtual ErrorCode runCubicPairQuery(Population& population, IndexPairList& pairs, float cube_size) = 0;
 			//! Override this function to change the debug draw command
 			virtual void runDebugDraw();
 

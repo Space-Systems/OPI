@@ -37,28 +37,28 @@ class CudaMultideviceExample:
 
 		}
 
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
 		{
 
 			int deviceCount;
 			cudaGetDeviceCount(&deviceCount);
 			if(deviceCount == 1)
 			{
-				OPI::Orbit* orbit = data.getOrbit(OPI::DEVICE_CUDA + 0);
-				device_cuda_init<<<dim3(1), dim3(1)>>>(orbit, data.getSize());
-				device_cuda_init2<<<dim3(1), dim3(1)>>>(orbit, data.getSize());
-				data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA + 0);
+				OPI::Orbit* orbit = population.getOrbit(OPI::DEVICE_CUDA + 0);
+				device_cuda_init<<<dim3(1), dim3(1)>>>(orbit, population.getSize());
+				device_cuda_init2<<<dim3(1), dim3(1)>>>(orbit, population.getSize());
+				population.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA + 0);
 			}
 			else if(deviceCount > 1)
 			{
-				OPI::Orbit* orbit = data.getOrbit(OPI::DEVICE_CUDA + 0);
+				OPI::Orbit* orbit = population.getOrbit(OPI::DEVICE_CUDA + 0);
 				cudaSetDevice(0);
-				device_cuda_init<<<dim3(1), dim3(1)>>>(orbit, data.getSize());
-				data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA + 0);
-				orbit = data.getOrbit(OPI::DEVICE_CUDA + 1);
+				device_cuda_init<<<dim3(1), dim3(1)>>>(orbit, population.getSize());
+				population.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA + 0);
+				orbit = population.getOrbit(OPI::DEVICE_CUDA + 1);
 				cudaSetDevice(1);
-				device_cuda_init2<<<dim3(1), dim3(1)>>>(orbit, data.getSize());
-				data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA + 1);
+				device_cuda_init2<<<dim3(1), dim3(1)>>>(orbit, population.getSize());
+				population.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA + 1);
 			}
 			else
 				return OPI::CUDA_REQUIRED;

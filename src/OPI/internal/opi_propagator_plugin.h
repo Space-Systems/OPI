@@ -35,9 +35,9 @@ namespace OPI
 
 			virtual ErrorCode enable();
 			virtual ErrorCode disable();
-            virtual ErrorCode runPropagation(Population& data, double julian_day, double dt);
-            virtual ErrorCode runIndexedPropagation(Population& data, int* indices, int index_size, double julian_day, double dt);
-            virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, int length, double dt);
+            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt);
+            virtual ErrorCode runIndexedPropagation(Population& population, int* indices, int index_size, double julian_day, double dt);
+            virtual ErrorCode runMultiTimePropagation(Population& population, double* julian_days, int length, double dt);
 			virtual int requiresCUDA();
 		private:
 			Plugin* plugin;

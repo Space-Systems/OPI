@@ -42,7 +42,7 @@ namespace OPI
 
 		protected:
 			/// Override the propagation method
-            virtual ErrorCode runPropagation(Population& data, double julian_day, double dt);
+            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt);
 			virtual int requiresCUDA();
 
 		private:
