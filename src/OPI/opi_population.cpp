@@ -889,7 +889,6 @@ namespace OPI
                         const double ecc = o.eccentricity;
                         double ea = std::numeric_limits<double>::infinity();
                         double ma = std::numeric_limits<double>::infinity();
-                        double small = 1e-15;
 
                         if (fabs(ecc) < small)
                         {
