@@ -712,14 +712,16 @@ namespace OPI
                 double p = o.semi_major_axis * (1.0 - pow(o.eccentricity, 2.0));
                 const double mu = 398600.4418;
                 const double temp = p / (1.0 + o.eccentricity * cos(ta));
-                Vector3 r = {temp*cos(ta), temp*sin(ta), 0.0};
+                Vector3 r;
+				r.x = temp*cos(ta);
+				r.y = temp*sin(ta);
+				r.z = 0.0;
                 if (fabs(p) < 1e-8 ) p = 1e-8;
 
-                Vector3 v = {
-                    -sin(ta) * sqrt(mu/p),
-                    (o.eccentricity + cos(ta)) * sqrt(mu/p),
-                    0.0
-                };
+                Vector3 v;
+				v.x = -sin(ta) * sqrt(mu/p);
+                v.y = (o.eccentricity + cos(ta)) * sqrt(mu/p);
+                v.z = 0.0;
 
                 r = rotateZ(r,-argp);
                 r = rotateX(r,-o.inclination);
@@ -774,7 +776,10 @@ namespace OPI
                 if (magh > small)
                 {
                     // ------------------  find h n and e vectors   ----------------
-                    Vector3 nbar = {-hbar.y, hbar.x, 0.0 };
+                    Vector3 nbar;
+					nbar.x = -hbar.y;
+					nbar.y = hbar.x;
+					nbar.z = 0.0;
                     const double magn = length(nbar);
                     const double c1 = magv*magv - mu/magr;
                     const double rdotv = r * v;
@@ -910,7 +915,10 @@ namespace OPI
                             if ((ecc > 1.0) && (fabs(nu) + 0.00001 < M_PI - acos(1.0 / ecc)))
                             {
                                 const double sine = (sqrt(pow(ecc, 2.0) - 1.0) * sin(nu)) / (1.0 + ecc*cos(nu));
-                                ea = asinh(sine);
+								//ea = asinh(sine);
+								//Unfortunately, some compilers don't implement all standard functions.
+								//Yes, I'm looking at you, Visual Studio!
+								ea = log(sine + sqrt(1+pow(sine,2.0)));
                                 ma = ecc*sinh(ea) - ea;
                             }
                         }
