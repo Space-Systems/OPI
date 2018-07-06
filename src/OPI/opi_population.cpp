@@ -184,7 +184,7 @@ namespace OPI
             out.write(reinterpret_cast<char*>(&versionNumber), sizeof(int));
 			out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
             out.write(reinterpret_cast<char*>(&nameLength), sizeof(int));
-            out.write(reinterpret_cast<char*>(&data->lastPropagatorName), data->lastPropagatorName.length());
+            out.write(reinterpret_cast<const char*>(data->lastPropagatorName.c_str()), data->lastPropagatorName.length());
 			if(data->data_orbit.hasData())
 			{
 				temp = DATA_ORBIT;
@@ -254,7 +254,6 @@ namespace OPI
         int magicNumber = 0;
         int versionNumber = 0;
         int propagatorNameLength = 0;
-        char* propagatorName;
 
         std::ifstream in(filename.c_str(), std::ifstream::binary);
 		if(in.is_open())
@@ -269,7 +268,8 @@ namespace OPI
                     resize(number_of_objects);
                     data->size = number_of_objects;
                     in.read(reinterpret_cast<char*>(&propagatorNameLength), sizeof(int));
-                    in.read(reinterpret_cast<char*>(&propagatorName), propagatorNameLength*sizeof(char));
+                    char propagatorName[propagatorNameLength];
+                    in.read(reinterpret_cast<char*>(&propagatorName), propagatorNameLength);
                     data->lastPropagatorName = std::string(propagatorName);
                     while(in.good())
                     {
