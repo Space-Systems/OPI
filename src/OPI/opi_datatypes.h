@@ -270,7 +270,7 @@ namespace OPI
     }
 
     //! Addition assignment operator for VMatrix
-    OPI_CUDA_PREFIX inline VMatrix& operator+=(VMatrix& a, const VMatrix& b)
+    OPI_CUDA_PREFIX inline PartialsMatrix& operator+=(PartialsMatrix& a, const PartialsMatrix& b)
     {
         a.accX_posX += b.accX_posX;
         a.accY_posX += b.accY_posX;
@@ -291,11 +291,32 @@ namespace OPI
         a.accX_velZ += b.accX_velZ;
         a.accY_velZ += b.accY_velZ;
         a.accZ_velZ += b.accZ_velZ;
+
+        a.accX_k1 += b.accX_k1;
+        a.accY_k1 += b.accY_k1;
+        a.accZ_k1 += b.accZ_k1;
+        a.accX_k2 += b.accX_k2;
+        a.accY_k2 += b.accY_k2;
+        a.accZ_k2 += b.accZ_k2;
+        a.accX_k3 += b.accX_k3;
+        a.accY_k3 += b.accY_k3;
+        a.accZ_k3 += b.accZ_k3;
+
+        a.accX_k4 += b.accX_k4;
+        a.accY_k4 += b.accY_k4;
+        a.accZ_k4 += b.accZ_k4;
+        a.accX_k5 += b.accX_k5;
+        a.accY_k5 += b.accY_k5;
+        a.accZ_k5 += b.accZ_k5;
+        a.accX_k6 += b.accX_k6;
+        a.accY_k6 += b.accY_k6;
+        a.accZ_k6 += b.accZ_k6;
+
         return a;
     }
 
-    //! writes the VMatrix to a C vector (no bounds check!)
-    OPI_CUDA_PREFIX inline void vMatrixToArray(const VMatrix m, double* v)
+    //! writes the PartialsMatrix to a C vector (no bounds check!)
+    OPI_CUDA_PREFIX inline void partialsToArray(const PartialsMatrix m, double* v)
     {
         v[0] = m.accX_posX;
         v[1] = m.accY_posX;
@@ -316,6 +337,30 @@ namespace OPI
         v[15] = m.accX_velZ;
         v[16] = m.accY_velZ;
         v[17] = m.accZ_velZ;
+
+        v[18] = m.accX_k1;
+        v[19] = m.accY_k1;
+        v[20] = m.accZ_k1;
+
+        v[21] = m.accX_k2;
+        v[22] = m.accY_k2;
+        v[23] = m.accZ_k2;
+
+        v[24] = m.accX_k3;
+        v[25] = m.accY_k3;
+        v[26] = m.accZ_k3;
+
+        v[27] = m.accX_k4;
+        v[28] = m.accY_k4;
+        v[29] = m.accZ_k4;
+
+        v[30] = m.accX_k5;
+        v[31] = m.accY_k5;
+        v[32] = m.accZ_k5;
+
+        v[33] = m.accX_k6;
+        v[34] = m.accY_k6;
+        v[35] = m.accZ_k6;
     }
 
 }

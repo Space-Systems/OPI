@@ -40,7 +40,7 @@ namespace OPI
                 data_position(host),
                 data_velocity(host),
                 data_acceleration(host),
-                data_vmatrix(host),
+                data_partials(host),
                 data_bytes(host)
             {
 
@@ -52,7 +52,7 @@ namespace OPI
             SynchronizedData<Vector3> data_position;
             SynchronizedData<Vector3> data_velocity;
             SynchronizedData<Vector3> data_acceleration;
-            SynchronizedData<VMatrix> data_vmatrix;
+            SynchronizedData<PartialsMatrix> data_partials;
             SynchronizedData<char> data_bytes;
 
             // non-synchronized data
@@ -70,7 +70,7 @@ namespace OPI
     {
         data->size = 0;
         data->byteArraySize = 1;
-        data->lastPropagatorName = population.getLastPropagatorName();
+        //data->lastPropagatorName = population.getLastPropagatorName();
         resize(population.getSize());
     }
 
@@ -78,7 +78,7 @@ namespace OPI
     {
         data->size = 0;
         data->byteArraySize = 1;
-        data->lastPropagatorName = source.getLastPropagatorName();
+        //data->lastPropagatorName = source.getLastPropagatorName();
         int s = source.getSize();
         int b = source.getByteArraySize();
         resize(s);
@@ -89,7 +89,7 @@ namespace OPI
         memcpy(getDeltaPosition(), source.getDeltaPosition(), s*sizeof(Vector3));
         memcpy(getDeltaVelocity(), source.getDeltaVelocity(), s*sizeof(Vector3));
         memcpy(getDeltaAcceleration(), source.getDeltaAcceleration(), s*sizeof(Vector3));
-        memcpy(getVMatrix(), source.getVMatrix(), s*sizeof(VMatrix));
+        memcpy(getPartialsMatrix(), source.getPartialsMatrix(), s*sizeof(PartialsMatrix));
         memcpy(getBytes(), source.getBytes(), b*s*sizeof(char));
 
         update(DATA_ORBIT);
@@ -97,7 +97,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
-        update(DATA_VMATRIX);
+        update(DATA_PARTIALS);
         update(DATA_BYTES);
     }
 
@@ -105,7 +105,7 @@ namespace OPI
     {
         data->size = 0;
         data->byteArraySize = 1;
-        data->lastPropagatorName = source.getLastPropagatorName();
+        //data->lastPropagatorName = source.getLastPropagatorName();
         int s = list.getSize();
         int b = source.getByteArraySize();
         resize(s);
@@ -116,14 +116,14 @@ namespace OPI
         Vector3* pos = source.getDeltaPosition(DEVICE_HOST, false);
         Vector3* vel = source.getDeltaVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getDeltaAcceleration(DEVICE_HOST, false);
-        VMatrix* vmx = source.getVMatrix(DEVICE_HOST, false);
+        PartialsMatrix* pmx = source.getPartialsMatrix(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
         Orbit* thisOrbit = getDeltaOrbit();
         Vector3* thisPos = getDeltaPosition();
         Vector3* thisVel = getDeltaVelocity();
         Vector3* thisAcc = getDeltaAcceleration();
-        VMatrix* thisVmx = getVMatrix();
+        PartialsMatrix* thisPmx = getPartialsMatrix();
         char* thisBytes = getBytes();
 
         for(int i = 0; i < list.getSize(); ++i)
@@ -132,7 +132,7 @@ namespace OPI
             thisPos[i] = pos[listdata[i]];
             thisVel[i] = vel[listdata[i]];
             thisAcc[i] = acc[listdata[i]];
-            thisVmx[i] = vmx[listdata[i]];
+            thisPmx[i] = pmx[listdata[i]];
             for (int j=0; j<b; j++)
             {
                 thisBytes[i*b+j] = bytes[listdata[i]*b+j];
@@ -144,7 +144,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
-        update(DATA_VMATRIX);
+        update(DATA_PARTIALS);
         update(DATA_BYTES);
     }
 
@@ -207,13 +207,13 @@ namespace OPI
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
                 out.write(reinterpret_cast<char*>(getDeltaAcceleration()), sizeof(Vector3) * data->size);
             }
-            if(data->data_vmatrix.hasData())
+            if(data->data_partials.hasData())
             {
-                temp = DATA_VMATRIX;
+                temp = DATA_PARTIALS;
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                temp = sizeof(VMatrix);
+                temp = sizeof(PartialsMatrix);
                 out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getVMatrix()), sizeof(VMatrix) * data->size);
+                out.write(reinterpret_cast<char*>(getPartialsMatrix()), sizeof(PartialsMatrix) * data->size);
             }
             if(data->data_bytes.hasData())
             {
@@ -295,12 +295,12 @@ namespace OPI
                                     data->data_acceleration.update(DEVICE_HOST);
                                     break;
                                 }
-                            case DATA_VMATRIX:
-                                if(size == sizeof(VMatrix))
+                            case DATA_PARTIALS:
+                                if(size == sizeof(PartialsMatrix))
                                 {
-                                    VMatrix* vmx = getVMatrix(DEVICE_HOST, true);
-                                    in.read(reinterpret_cast<char*>(vmx), sizeof(VMatrix) * number_of_objects);
-                                    data->data_vmatrix.update(DEVICE_HOST);
+                                    PartialsMatrix* pmx = getPartialsMatrix(DEVICE_HOST, true);
+                                    in.read(reinterpret_cast<char*>(pmx), sizeof(PartialsMatrix) * number_of_objects);
+                                    data->data_partials.update(DEVICE_HOST);
                                     break;
                                 }
                             case DATA_BYTES:
@@ -334,7 +334,7 @@ namespace OPI
             data->data_position.resize(size);
             data->data_velocity.resize(size);
             data->data_acceleration.resize(size);
-            data->data_vmatrix.resize(size);
+            data->data_partials.resize(size);
             data->data_bytes.resize(size*byteArraySize);
             //initialize new elements to zero
             if (size > data->size)
@@ -345,13 +345,13 @@ namespace OPI
                     data->data_position.set(Vector3(0.0,0.0,0.0),i);
                     data->data_velocity.set(Vector3(0.0,0.0,0.0),i);
                     data->data_acceleration.set(Vector3(0.0,0.0,0.0),i);
-                    data->data_vmatrix.set(VMatrix(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0),i);
+                    data->data_partials.set(PartialsMatrix(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0),i); //FIXME: This sucks
                 }
                 data->data_orbit.update(DEVICE_HOST);
                 data->data_position.update(DEVICE_HOST);
                 data->data_velocity.update(DEVICE_HOST);
                 data->data_acceleration.update(DEVICE_HOST);
-                data->data_vmatrix.update(DEVICE_HOST);
+                data->data_partials.update(DEVICE_HOST);
             }
             data->size = size;
             data->byteArraySize = byteArraySize;
@@ -419,9 +419,9 @@ namespace OPI
      * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
      * requested device.
      */
-    VMatrix* Perturbations::getVMatrix(Device device, bool no_sync) const
+    PartialsMatrix* Perturbations::getPartialsMatrix(Device device, bool no_sync) const
     {
-        return data->data_vmatrix.getData(device, no_sync);
+        return data->data_partials.getData(device, no_sync);
     }
 
     char* Perturbations::getBytes(Device device, bool no_sync) const
@@ -449,14 +449,14 @@ namespace OPI
         Vector3* pos = source.getDeltaPosition(DEVICE_HOST, false);
         Vector3* vel = source.getDeltaVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getDeltaAcceleration(DEVICE_HOST, false);
-        VMatrix* vmx = source.getVMatrix(DEVICE_HOST, false);
+        PartialsMatrix* pmx = source.getPartialsMatrix(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
         Orbit* thisOrbit = getDeltaOrbit();
         Vector3* thisPos = getDeltaPosition();
         Vector3* thisVel = getDeltaVelocity();
         Vector3* thisAcc = getDeltaAcceleration();
-        VMatrix* thisVmx = getVMatrix();
+        PartialsMatrix* thisPmx = getPartialsMatrix();
         char* thisBytes = getBytes();
 
         if (getByteArraySize() != source.getByteArraySize())
@@ -475,7 +475,7 @@ namespace OPI
                     thisPos[l] = pos[i];
                     thisVel[l] = vel[i];
                     thisAcc[l] = acc[i];
-                    thisVmx[l] = vmx[i];
+                    thisPmx[l] = pmx[i];
                     if (getByteArraySize() == source.getByteArraySize())
                     {
                         int b = getByteArraySize();
@@ -498,7 +498,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
-        update(DATA_VMATRIX);
+        update(DATA_PARTIALS);
         update(DATA_BYTES);
     }
 
@@ -508,7 +508,7 @@ namespace OPI
         data->data_orbit.remove(index);
         data->data_position.remove(index);
         data->data_velocity.remove(index);
-        data->data_vmatrix.remove(index);
+        data->data_partials.remove(index);
         data->data_bytes.remove(index*data->byteArraySize, data->byteArraySize);
         data->size--;
     }
@@ -530,8 +530,8 @@ namespace OPI
             case DATA_ACCELERATION:
                 data->data_acceleration.update(device);
                 break;
-            case DATA_VMATRIX:
-                data->data_vmatrix.update(device);
+            case DATA_PARTIALS:
+                data->data_partials.update(device);
                 break;
             case DATA_BYTES:
                 data->data_bytes.update(device);

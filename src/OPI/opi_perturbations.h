@@ -166,7 +166,7 @@ namespace OPI
             //! Retrieve the acceleration in cartesian coordinates on the specified device
 			OPI_API_EXPORT Vector3* getDeltaAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the V matrix on the specified device
-			OPI_API_EXPORT VMatrix* getVMatrix(Device device = DEVICE_HOST, bool no_sync = false) const;
+            OPI_API_EXPORT PartialsMatrix* getPartialsMatrix(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the arbitrary binary information on the specified device
 			OPI_API_EXPORT char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
