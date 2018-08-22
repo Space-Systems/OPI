@@ -221,7 +221,7 @@ namespace OPI
              * @return Human-readable string that can be printed to the screen or a log file. If no problems are
              * found, an empty string is returned.
              */
-			OPI_API_EXPORT std::string sanityCheck();
+            OPI_API_EXPORT std::string sanityCheck(bool removeInvalids = false);
 
         //protected:
 			OPI_API_EXPORT Host& getHostPointer() const;
