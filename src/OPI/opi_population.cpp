@@ -269,8 +269,8 @@ namespace OPI
                     data->size = number_of_objects;
                     in.read(reinterpret_cast<char*>(&propagatorNameLength), sizeof(int));
                     char* propagatorName = new char[propagatorNameLength];
-                    in.read(reinterpret_cast<char*>(&propagatorName), propagatorNameLength);
-                    data->lastPropagatorName = std::string(propagatorName);
+                    in.read(propagatorName, propagatorNameLength);
+                    data->lastPropagatorName = std::string(propagatorName, propagatorNameLength);
 					delete[] propagatorName;
                     while(in.good())
                     {
