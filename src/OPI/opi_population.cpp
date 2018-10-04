@@ -17,6 +17,7 @@
 #include "opi_population.h"
 #include "opi_host.h"
 #include "opi_gpusupport.h"
+#include "opi_indexlist.h"
 #include "internal/opi_synchronized_data.h"
 #include <iostream>
 #include <vector>
