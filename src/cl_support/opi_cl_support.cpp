@@ -59,48 +59,6 @@ void ClSupportImpl::init()
 	if (error != CL_SUCCESS) std::cerr << "Error creating context: " << error << std::endl;
 	defaultQueue = clCreateCommandQueue(context, devices[currentDevice], 0, &error);
 	if (error != CL_SUCCESS) std::cerr << "Error creating queue: " << error << std::endl;
-	
-	/*
-	int deviceCount = 0;
-	int deviceNumber = 0;
-
-	// search for devices and print some information
-	// currently, only the first device is used
-	cudaGetDeviceCount(&deviceCount);
-	if (deviceCount == 0) {
-		cout << "  No CUDA-capable devices found." << endl;
-	}
-	else {
-		CUDAProperties = new cudaDeviceProp[deviceCount];
-		cout << "  Found " << deviceCount << " CUDA capable device(s): " << endl << endl;
-		for (int i=0; i<deviceCount; i++) {
-			cudaGetDeviceProperties(&(CUDAProperties[i]), i);
-			cudaDeviceProp& deviceProp = CUDAProperties[i];
-			int tpb = deviceProp.maxThreadsPerBlock;
-			int bs[3];
-			int gs[3];
-			for (int j=0; j<3; j++) {
-				bs[j] = deviceProp.maxThreadsDim[j];
-				gs[j] = deviceProp.maxGridSize[j];
-			}
-			cout << "  Device Number:      " << i << endl;
-			cout << "  Name:               " << deviceProp.name << endl;
-			cout << "  Compute Capability: " << deviceProp.major << "." << deviceProp.minor << endl;
-			cout << "  Total Memory:       " << (deviceProp.totalGlobalMem/(1024*1024)) << "MB" << endl;
-			cout << "  Clock Speed:        " << (deviceProp.clockRate/1000) << "MHz" << endl;
-			cout << "  Threads per Block:  " << tpb << endl;
-			cout << "  Block Dimensions:   " << bs[0] << "/" << bs[1] << "/" << bs[2] << endl;
-			cout << "  Grid Dimensions:    " << gs[0] << "/" << gs[1] << "/" << gs[2] << endl;
-			cout << "  Warp Size:          " << deviceProp.warpSize << endl;
-			cout << "  MP Count:           " << deviceProp.multiProcessorCount << endl;
-			cout << endl;
-		}
-
-		deviceNumber = 0;
-
-		cudaSetDevice(deviceNumber);
-	}
-	*/
 }
 
 void ClSupportImpl::allocate(void** a, size_t size)
@@ -118,18 +76,18 @@ void ClSupportImpl::free(void *mem)
     //else cout << "Freed memory object at " << static_cast<cl_mem>(mem) << endl;
 }
 
-void ClSupportImpl::copy(void *destination, void *source, size_t size, bool host_to_device)
+void ClSupportImpl::copy(void *destination, void *source, size_t size, unsigned int num_objects, bool host_to_device)
 {
 	cl_int error = CL_SUCCESS;
 	if (host_to_device) {
 		cl_mem destinationBuffer = static_cast<cl_mem>(destination);
-        error = clEnqueueWriteBuffer(defaultQueue, destinationBuffer, CL_TRUE, 0, size, source, 0, NULL, NULL);
+        error = clEnqueueWriteBuffer(defaultQueue, destinationBuffer, CL_TRUE, 0, size*num_objects, source, 0, NULL, NULL);
 		if (error != CL_SUCCESS) std::cout << "Error copying Population data to OpenCL device: " << error << std::endl;
         //else cout << "Copied " << size << " bytes to device at " << destinationBuffer << endl;
 	}
 	else {
 		cl_mem sourceBuffer = static_cast<cl_mem>(source);
-        error = clEnqueueReadBuffer(defaultQueue, sourceBuffer, CL_TRUE, 0, size, destination, 0, NULL, NULL);
+        error = clEnqueueReadBuffer(defaultQueue, sourceBuffer, CL_TRUE, 0, size*num_objects, destination, 0, NULL, NULL);
 		if (error != CL_SUCCESS) std::cout << "Error downloading Population data from OpenCL device: " << error << std::endl;
         //else cout << "Downloaded " << size << " bytes from device (" << sourceBuffer << " to " << destination << ")" << endl;
     }

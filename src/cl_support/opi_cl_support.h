@@ -33,7 +33,7 @@ public:
 
 	virtual void init();
 
-	virtual void copy(void* a, void* b, size_t size, bool host_to_device);
+    virtual void copy(void* a, void* b, size_t size, unsigned int num_objects, bool host_to_device);
 	virtual void allocate(void** a, size_t size);
 	virtual void free(void* mem);
 	virtual void shutdown();

@@ -32,7 +32,7 @@ class CudaSupportImpl:
 
 		virtual void init();
 
-		virtual void copy(void* a, void* b, size_t size, bool host_to_device);
+        virtual void copy(void* a, void* b, size_t size, unsigned int num_objects, bool host_to_device);
 		virtual void allocate(void** a, size_t size);
 		virtual void free(void* mem);
 		virtual void shutdown();
@@ -115,9 +115,9 @@ void CudaSupportImpl::free(void *mem)
 	cudaFree(mem);
 }
 
-void CudaSupportImpl::copy(void *destination, void *source, size_t size, bool host_to_device)
+void CudaSupportImpl::copy(void *destination, void *source, size_t size, unsigned int num_objects, bool host_to_device)
 {
-	cudaMemcpy(destination, source, size, host_to_device ? cudaMemcpyHostToDevice : cudaMemcpyDeviceToHost);
+    cudaMemcpy(destination, source, size*num_objects, host_to_device ? cudaMemcpyHostToDevice : cudaMemcpyDeviceToHost);
 }
 
 void CudaSupportImpl::shutdown()
