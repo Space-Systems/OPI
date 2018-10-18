@@ -72,7 +72,7 @@ namespace OPI
              * should use the above variant of this function when resetting the propagator.
              * @param filename The name of the config file to load.
              */
-			OPI_API_EXPORT void loadConfigFile(const std::string& filename);
+            OPI_API_EXPORT void loadConfigFile(const std::string& filename);
 
             /**
              * @brief propagate Starts the propagation for the given time step.
@@ -173,7 +173,20 @@ namespace OPI
              * (k1-k6 for semi major axis, eccentricity, inclination, raan, argument of perigee and mean
              * anomaly). The options ending in _NO_DYNAMICS state that the dynamic parameters are unused.
              */
-			OPI_API_EXPORT virtual CovarianceType covarianceType();
+            OPI_API_EXPORT virtual CovarianceType covarianceType();
+
+            /**
+             * @brief Initializes a Population from a file or path.
+             *
+             * Some propagators (such as the well-known SGP4 propagator) are designed to work with
+             * very specific data formats. This function can be used by the plugin author to
+             * provide a method to load a Population from a file or directory. Additional configuration
+             * options can be provided via PropagatorProperties if required.
+             * @param population A pointer to an empty Population that will hold the data.
+             * @param filename The name of the file or path that holds the population data.
+             * @return OPI::SUCCESS if operation was successful, or other error code. Defaults to OPI::NOT_IMPLEMENTED.
+             */
+            OPI_API_EXPORT virtual ErrorCode loadPopulation(Population& population, const std::string& filename);
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules

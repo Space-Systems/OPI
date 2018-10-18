@@ -176,6 +176,11 @@ namespace OPI
         return NOT_IMPLEMENTED;
     }
 
+    ErrorCode Propagator::loadPopulation(Population& population, const std::string& filename)
+    {
+        return NOT_IMPLEMENTED;
+    }
+
     void Propagator::loadConfigFile()
     {
         loadConfigFile(configFileName);
