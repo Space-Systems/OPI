@@ -81,24 +81,9 @@ namespace OPI
         //data->lastPropagatorName = source.getLastPropagatorName();
         int s = source.getSize();
         int b = source.getByteArraySize();
-        resize(s);
-        resizeByteArray(b);
+        resize(s,b);
 
-        // TODO Use std::copy instead
-        memcpy(getDeltaOrbit(), source.getDeltaOrbit(), s*sizeof(Orbit));
-        memcpy(getDeltaPosition(), source.getDeltaPosition(), s*sizeof(Vector3));
-        memcpy(getDeltaVelocity(), source.getDeltaVelocity(), s*sizeof(Vector3));
-        memcpy(getDeltaAcceleration(), source.getDeltaAcceleration(), s*sizeof(Vector3));
-        memcpy(getPartialsMatrix(), source.getPartialsMatrix(), s*sizeof(PartialsMatrix));
-        memcpy(getBytes(), source.getBytes(), b*s*sizeof(char));
-
-        update(DATA_ORBIT);
-        update(DATA_PROPERTIES);
-        update(DATA_POSITION);
-        update(DATA_VELOCITY);
-        update(DATA_ACCELERATION);
-        update(DATA_PARTIALS);
-        update(DATA_BYTES);
+        copy(source, 0, s, 0);
     }
 
     Perturbations::Perturbations(const Perturbations& source, IndexList &list) : data(source.getHostPointer())
@@ -150,6 +135,46 @@ namespace OPI
 
     Perturbations::~Perturbations()
     {
+    }
+
+    void Perturbations::append(const Perturbations& other)
+    {
+        const int oldSize = data->size;
+        const int newSize = oldSize + other.getSize();
+
+        // use the byte array size from this population
+        // byte array data from appended population will only be copied
+        // if it has the same size.
+        resize(newSize, data->byteArraySize);
+
+        copy(other, 0, other.getSize(), oldSize);
+
+    }
+
+    void Perturbations::copy(const Perturbations& source, int firstIndex, int length, int offset)
+    {
+        if ((offset + length) <= data->size)
+        {
+            bool copyBytes =(data->byteArraySize == source.getByteArraySize());
+            if (!copyBytes) std::cout << "Warning: Copying perturbations without the byte array" << std::endl;
+
+            // TODO Use std::copy instead
+            memcpy(&getDeltaOrbit()[offset], &source.getDeltaOrbit(DEVICE_HOST, false)[firstIndex], length*sizeof(Orbit));
+            memcpy(&getDeltaPosition()[offset], &source.getDeltaPosition(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
+            memcpy(&getDeltaVelocity()[offset], &source.getDeltaVelocity(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
+            memcpy(&getDeltaAcceleration()[offset], &source.getDeltaAcceleration(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
+            memcpy(&getPartialsMatrix()[offset], &source.getPartialsMatrix(DEVICE_HOST, false)[firstIndex], length*sizeof(PartialsMatrix));
+            if (copyBytes) memcpy(&getBytes()[offset], &source.getBytes(DEVICE_HOST, false)[firstIndex], data->byteArraySize*length*sizeof(char));
+
+            update(DATA_ORBIT);
+            update(DATA_PROPERTIES);
+            update(DATA_POSITION);
+            update(DATA_VELOCITY);
+            update(DATA_ACCELERATION);
+            update(DATA_PARTIALS);
+            if (copyBytes) update(DATA_BYTES);
+        }
+        else std::cout << "Cannot copy perturbation: Trying to copy " << length << " objects with offset " << offset << " but size is " << length << std::endl;
     }
 
     /**

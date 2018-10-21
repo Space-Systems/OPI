@@ -46,7 +46,7 @@ namespace OPI
              * @param host A pointer to the OPI Host that this instance is intended for.
              * @param size The number of elements. It should match the size of the corresponding Population.
              */
-			OPI_API_EXPORT Perturbations(const Population& population);
+            OPI_API_EXPORT Perturbations(const Population& population);
 
             /**
              * @brief Population Copy constructor
@@ -79,6 +79,13 @@ namespace OPI
              * @brief Destructor. Cleans up host and device memory.
              */
 			OPI_API_EXPORT ~Perturbations();
+
+            OPI_API_EXPORT void copy(const Perturbations& source, int firstIndex, int length, int offset);
+
+            /**
+             * @brief Append a population to this one.
+             */
+            OPI_API_EXPORT void append(const Perturbations& other);
 
             /**
              * @brief resize Sets the number of elements of the Population.

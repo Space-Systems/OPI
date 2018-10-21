@@ -81,6 +81,13 @@ namespace OPI
              */
 			OPI_API_EXPORT ~Population();
 
+            OPI_API_EXPORT void copy(const Population& source, int firstIndex, int length, int offset);
+
+            /**
+             * @brief Append a population to this one.
+             */
+            OPI_API_EXPORT void append(const Population& other);
+
             /**
              * @brief resize Sets the number of elements of the Population.
              *
