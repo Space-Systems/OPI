@@ -386,7 +386,7 @@ namespace OPI
         data->lastPropagatorName = propagatorName;
     }
 
-    std::string Population::getObjectName(int index)
+    std::string Population::getObjectName(int index) const
     {
         if (index < data->size)
             return data->object_names[index];

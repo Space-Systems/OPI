@@ -127,7 +127,7 @@ namespace OPI
              * @return The object name as a string. If no name has been set or the index is out of
              * range, an empty string is returned.
              */
-			OPI_API_EXPORT std::string getObjectName(int index);
+            OPI_API_EXPORT std::string getObjectName(int index) const;
 
             /**
              * @brief setObjectName Set the name of the given object.
