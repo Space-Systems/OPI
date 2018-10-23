@@ -34,14 +34,14 @@ add_example_plugin(
 )
 
 # a simple fortran example plugin
-if(ENABLE_FORTRAN_SUPPORT)
-  add_example_plugin(
-    PropagatorFortranExample
-    FORTRAN
-    SOURCES
-      propagator_fortran_example.f90
-  )
-endif()
+#if(ENABLE_FORTRAN_SUPPORT)
+#  add_example_plugin(
+#    PropagatorFortranExample
+#    FORTRAN
+#    SOURCES
+#      propagator_fortran_example.f90
+#  )
+#endif()
 
 # cpp basic example
 add_example_plugin(
