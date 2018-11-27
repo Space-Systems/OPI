@@ -128,6 +128,26 @@ if(NOT WIN32)
   )
 endif()
 
+if (ENABLE_PYTHON)
+  # Path to SWIG interface file
+  set (OPI_INTERFACE_FILE bindings/opi.i)
+  # Include SWIG-specific CMake commands.
+  include(${SWIG_USE_FILE})
+  # Add Python headers and generated OPI headers to the include path.
+  include_directories(${PYTHON_INCLUDE_PATH} ${CMAKE_BINARY_DIR}/generated/OPI)
+  # Put SWIG in C++ mode.
+  set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES CPLUSPLUS ON)
+  # Create python module from interface definition file.
+  swig_add_library(OPI
+      TYPE MODULE
+      LANGUAGE python
+      SOURCES ${OPI_INTERFACE_FILE}
+  )
+  # Link Python module to the library we created earlier,
+  # as well as the necessary Python libraries.
+  swig_link_libraries(OPI ${PYTHON_LIBRARIES} OPI)
+endif()
+
 # install library
 install(
   TARGETS OPI
@@ -159,19 +179,14 @@ if(ENABLE_FORTRAN_SUPPORT)
   )
 endif()
 
-
 if (ENABLE_PYTHON)
-  # Path to SWIG interface file
-  set (OPI_INTERFACE_FILE bindings/opi.i)
-  # Include SWIG-specific CMake commands.
-  include(${SWIG_USE_FILE})
-  # Add Python headers and generated OPI headers to the include path.
-  include_directories(${PYTHON_INCLUDE_PATH} ${CMAKE_BINARY_DIR}/generated/OPI)
-  # Put SWIG in C++ mode.
-  set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES CPLUSPLUS ON)
-  # Create python module from interface definition file.
-  swig_add_module(OPI python ${OPI_INTERFACE_FILE})
-  # Link Python module to the library we created earlier,
-  # as well as the necessary Python libraries.
-  swig_link_libraries(OPI ${PYTHON_LIBRARIES} OPI)
+    install(
+        TARGETS ${SWIG_MODULE_OPI_REAL_NAME}
+        DESTINATION lib/python${PYTHONLIBS_VERSION_STRING}
+    )
+    install(
+        FILES ${CMAKE_BINARY_DIR}/src/OPI/OPI.py
+        DESTINATION lib/python${PYTHONLIBS_VERSION_STRING}
+    )
 endif()
+
