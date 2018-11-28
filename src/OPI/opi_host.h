@@ -73,7 +73,7 @@ namespace OPI
 			 * The parameter platformSupport states whether support for CUDA (default) or OpenCL should be loaded.
 			 * \returns an ErrorCode containing information on any errors that occurred during the operation.
 			 */
-			OPI_API_EXPORT ErrorCode loadPlugins(const std::string& plugindir, gpuPlatform platformSupport = PLATFORM_NONE);
+            OPI_API_EXPORT ErrorCode loadPlugins(const char* plugindir, gpuPlatform platformSupport = PLATFORM_NONE);
 
 			//! Sets an error callback for this host.
 			OPI_API_EXPORT void setErrorCallback(OPI_ErrorCallback callback, void* privatedata);
@@ -110,7 +110,7 @@ namespace OPI
 			 * \see Host::loadPlugins
 			 * \returns an instance of the Propagator with the given name; NULL if no such Propagator exists.
 			 */
-			OPI_API_EXPORT Propagator* getPropagator(const std::string& name) const;
+            OPI_API_EXPORT Propagator* getPropagator(const char* name) const;
 
 			//! Returns the number of propagators.
 			/** After loading the plugins, this function returns the number of valid Propagators that
@@ -134,18 +134,18 @@ namespace OPI
 			 * \see CustomPropagator, PerturbationModule, PropagatorIntegrator
 			 * \returns a new instance of a CustomPropagator.
 			 */
-			OPI_API_EXPORT CustomPropagator* createCustomPropagator(const std::string& name);
+            OPI_API_EXPORT CustomPropagator* createCustomPropagator(const char* name);
 
             /* NOT YET IMPLEMENTED
 			//! Find a propagator module by name, returns 0 (null pointer) if not found
-			PerturbationModule* getPerturbationModule(const std::string& name) const;
+            PerturbationModule* getPerturbationModule(const char* name) const;
 			//! Find a propagator module by index, returns 0 (null pointer) if not found
 			PerturbationModule* getPerturbationModule(int index) const;
 			//! Returns the number of known modules
 			int getPerturbationModuleCount() const;
 
 			//! Find a propagator integrator by name, returns 0 (null pointer) if not found
-			PropagatorIntegrator* getPropagatorIntegrator(const std::string& name) const;
+            PropagatorIntegrator* getPropagatorIntegrator(const char* name) const;
 			//! Find a propagator integrator by index, returns 0 (null pointer) if not found
 			PropagatorIntegrator* getPropagatorIntegrator(int index) const;
 
@@ -156,7 +156,7 @@ namespace OPI
 			//! Adds and registers a Distance query which is not implemented by a plugin
 			OPI_API_EXPORT void addDistanceQuery(DistanceQuery* query);
 			//! Returns an distance query module by name, returns 0 (null pointer) if not found
-			OPI_API_EXPORT DistanceQuery* getDistanceQuery(const std::string& name) const;
+            OPI_API_EXPORT DistanceQuery* getDistanceQuery(const char* name) const;
 			//! Returns an distance query module by index, returns 0 (null pointer) if not found
 			OPI_API_EXPORT DistanceQuery* getDistanceQuery(int index) const;
 			//! Returns the number of known distance queries
@@ -165,7 +165,7 @@ namespace OPI
 			//! Adds and registers a Collision Detection module
 			OPI_API_EXPORT void addCollisionDetection(CollisionDetection* module);
 			//! Find a collision detection module by name, returns 0 (null pointer) if not found
-			OPI_API_EXPORT CollisionDetection* getCollisionDetection(const std::string& name) const;
+            OPI_API_EXPORT CollisionDetection* getCollisionDetection(const char* name) const;
 			//! Find a collision detection module by index, returns 0 (null pointer) if not found
 			OPI_API_EXPORT CollisionDetection* getCollisionDetection(int index) const;
 			//! Returns the number of known collision detection modules
@@ -188,7 +188,7 @@ namespace OPI
 		private:
 			Host(const Host& other);
 			//! Load a specific plugin
-            void loadPlugin(Plugin* plugin, gpuPlatform platform, const std::string& configfile);
+            void loadPlugin(Plugin* plugin, gpuPlatform platform, const char* configfile);
             bool pluginSupported(Module *plugin, gpuPlatform platform);
             std::string getPluginTypeString(int pluginType);
 			Pimpl<HostImpl> impl;

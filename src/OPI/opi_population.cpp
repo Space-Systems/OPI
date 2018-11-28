@@ -196,13 +196,13 @@ namespace OPI
 	 *
 	 * This will not work between machines with different endianness!
 	 */
-	void Population::write(const std::string& filename)
-	{
+    void Population::write(const char* filename)
+    {
 		int temp;
         int versionNumber = 1;
         int magic = 47627;
         int nameLength = data->lastPropagatorName.length();
-		std::ofstream out(filename.c_str(), std::ofstream::binary);
+        std::ofstream out(filename, std::ofstream::binary);
 		if(out.is_open())
 		{                        
             out.write(reinterpret_cast<char*>(&magic), sizeof(int));
@@ -273,14 +273,14 @@ namespace OPI
 	 * \detail
 	 * See Population::write for more information
 	 */
-	ErrorCode Population::read(const std::string& filename)
+    ErrorCode Population::read(const char* filename)
 	{
         int number_of_objects = 0;
         int magicNumber = 0;
         int versionNumber = 0;
         int propagatorNameLength = 0;
 
-        std::ifstream in(filename.c_str(), std::ifstream::binary);
+        std::ifstream in(filename, std::ifstream::binary);
 		if(in.is_open())
         {
             in.read(reinterpret_cast<char*>(&magicNumber), sizeof(int));
@@ -401,28 +401,28 @@ namespace OPI
         data->byteArraySize = size;
     }
 
-    std::string Population::getLastPropagatorName() const
+    const char* Population::getLastPropagatorName() const
     {
-        return data->lastPropagatorName;
+        return data->lastPropagatorName.c_str();
     }
 
-    void Population::setLastPropagatorName(std::string propagatorName)
+    void Population::setLastPropagatorName(const char* propagatorName)
     {
-        data->lastPropagatorName = propagatorName;
+        data->lastPropagatorName = std::string(propagatorName);
     }
 
-    std::string Population::getObjectName(int index) const
+    const char* Population::getObjectName(int index) const
     {
         if (index < data->size)
-            return data->object_names[index];
+            return data->object_names[index].c_str();
         else return "";
     }
 
-    void Population::setObjectName(int index, std::string name)
+    void Population::setObjectName(int index, const char* name)
     {
         if (index < data->size)
         {
-            data->object_names[index] = name;
+            data->object_names[index] = std::string(name);
         }
         else std::cout << "Cannot set object name: Index (" << index << ") out of range!" << std::endl;
     }
@@ -630,9 +630,9 @@ namespace OPI
         return data->host;
     }
 
-    std::string Population::sanityCheck(bool removeInvalids)
+    const char* Population::sanityCheck(bool removeInvalids)
 	{
-		if (getSize()==0) return std::string("Population is empty.");
+        if (getSize()==0) return "Population is empty.";
 
 		std::stringstream result;
 		result.str("");
@@ -722,7 +722,7 @@ namespace OPI
                 i--;
             }
         }
-		return result.str();
+        return result.str().c_str();
 	}
 
     // adapted from SGP4 reference implementation by D. Vallado e.a.

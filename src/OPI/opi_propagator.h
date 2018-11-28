@@ -72,7 +72,7 @@ namespace OPI
              * should use the above variant of this function when resetting the propagator.
              * @param filename The name of the config file to load.
              */
-            OPI_API_EXPORT void loadConfigFile(const std::string& filename);
+            OPI_API_EXPORT void loadConfigFile(const char* filename);
 
             /**
              * @brief propagate Starts the propagation for the given time step.
@@ -132,7 +132,7 @@ namespace OPI
 			/**
 			 * It depends on the used Propagator if the assigned modules will be used
 			 */
-            //PerturbationModule* assignPerturbationModule(const std::string& name);
+            //PerturbationModule* assignPerturbationModule(const char* name);
 			//! Returns true if the propagator is able to use Perturbation Modules
 			OPI_API_EXPORT bool usesModules() const;
 
@@ -186,7 +186,7 @@ namespace OPI
              * @param filename The name of the file or path that holds the population data.
              * @return OPI::SUCCESS if operation was successful, or other error code. Defaults to OPI::NOT_IMPLEMENTED.
              */
-            OPI_API_EXPORT virtual ErrorCode loadPopulation(Population& population, const std::string& filename);
+            OPI_API_EXPORT virtual ErrorCode loadPopulation(Population& population, const char* filename);
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules

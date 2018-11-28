@@ -33,7 +33,7 @@ namespace OPI
 	{
 		public:
 			//! Creates a new custom propagator with the specified name
-			OPI_API_EXPORT CustomPropagator(const std::string& name);
+            OPI_API_EXPORT CustomPropagator(const char* name);
 			OPI_API_EXPORT ~CustomPropagator();
 			/// Adds a module to this propagator
 			OPI_API_EXPORT void addModule(PerturbationModule* module);

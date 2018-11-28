@@ -24,7 +24,7 @@ namespace OPI
 		PropagatorIntegrator* integrator;
 	};
 
-	CustomPropagator::CustomPropagator(const std::string &name)
+    CustomPropagator::CustomPropagator(const char* name)
 	{
 		setName(name);
 		impl->integrator = 0;

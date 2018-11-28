@@ -176,23 +176,24 @@ namespace OPI
         return NOT_IMPLEMENTED;
     }
 
-    ErrorCode Propagator::loadPopulation(Population& population, const std::string& filename)
+    ErrorCode Propagator::loadPopulation(Population& population, const char* filename)
     {
         return NOT_IMPLEMENTED;
     }
 
     void Propagator::loadConfigFile()
     {
-        loadConfigFile(configFileName);
+        loadConfigFile(configFileName.c_str());
     }
 
-    void Propagator::loadConfigFile(const std::string& filename)
+    void Propagator::loadConfigFile(const char* filename)
     {
-        if (filename != "" && filename.length() > 4)
+        std::string filenameStr(filename);
+        if (filenameStr != "" && filenameStr.length() > 4)
         {
-            if (filename.substr(filename.length()-4,4) == ".cfg")
+            if (filenameStr.substr(filenameStr.length()-4,4) == ".cfg")
             {
-                std::ifstream in(filename.c_str(), std::ifstream::in);
+                std::ifstream in(filename, std::ifstream::in);
                 if (in.is_open())
                 {
                     std::cout << "Applying settings for " << getName() << " from config file" << std::endl;
@@ -211,40 +212,40 @@ namespace OPI
 
                                 if (value.substr(0,1) == "\"" && value.substr(value.length()-1, value.length()) == "\"")
                                 {
-                                    if (!hasProperty(property))
+                                    if (!hasProperty(property.c_str()))
                                     {
                                         std::cout << "Registering new PropagatorProperty from config file: " << property << " (string)" << std::endl;
-                                        createProperty(property, value.substr(1,value.length()-2));
+                                        createProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
                                     }
-                                    else setProperty(property, value.substr(1,value.length()-2));
+                                    else setProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
                                 }
                                 else if (value.find_first_of(".") != std::string::npos)
                                 {
                                     if (value.substr(value.length()-1,1) == "f")
                                     {
-                                        if (!hasProperty(property))
+                                        if (!hasProperty(property.c_str()))
                                         {
                                             std::cout << "Registering new PropagatorProperty from config file: " << property << " (float)" << std::endl;
-                                            createProperty(property, (float)atof(value.substr(0,value.length()-2).c_str()));
+                                            createProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
                                         }
-                                        else setProperty(property, (float)atof(value.substr(0,value.length()-2).c_str()));
+                                        else setProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
                                     }
                                     else {
-                                        if (!hasProperty(property))
+                                        if (!hasProperty(property.c_str()))
                                         {
                                             std::cout << "Registering new PropagatorProperty from config file: " << property << " (double)" << std::endl;
-                                            createProperty(property, atof(value.c_str()));
+                                            createProperty(property.c_str(), atof(value.c_str()));
                                         }
-                                        else setProperty(property, atof(value.c_str()));
+                                        else setProperty(property.c_str(), atof(value.c_str()));
                                     }
                                 }
                                 else {
-                                    if (!hasProperty(property))
+                                    if (!hasProperty(property.c_str()))
                                     {
                                         std::cout << "Registering new PropagatorProperty from config file: " << property << " (int)" << std::endl;
-                                        createProperty(property, atoi(value.c_str()));
+                                        createProperty(property.c_str(), atoi(value.c_str()));
                                     }
-                                    else setProperty(property, atoi(value.c_str()));
+                                    else setProperty(property.c_str(), atoi(value.c_str()));
                                 }
                             }
                         }
@@ -256,10 +257,10 @@ namespace OPI
                 }
             }
             else {
-                std::cout << filename << " is not a valid config file for propagator " << getName() << std::endl;
+                std::cout << filenameStr << " is not a valid config file for propagator " << getName() << std::endl;
             }
         }
-        configFileName = filename;
+        configFileName = filenameStr;
     }
 
     std::vector<std::string> Propagator::tokenize(std::string line, std::string delimiter)
