@@ -39,7 +39,7 @@ public:
 	virtual void shutdown();
 	virtual void selectDevice(int device);
 	virtual int getCurrentDevice();
-	virtual std::string getCurrentDeviceName();
+    virtual const char* getCurrentDeviceName();
 	virtual int getCurrentDeviceCapability();
 	virtual int getDeviceCount();
 

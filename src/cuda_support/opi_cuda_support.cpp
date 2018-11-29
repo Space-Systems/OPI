@@ -38,7 +38,7 @@ class CudaSupportImpl:
 		virtual void shutdown();
 		virtual void selectDevice(int device);
 		virtual int getCurrentDevice();
-		virtual std::string getCurrentDeviceName();
+        virtual const char* getCurrentDeviceName();
 		virtual int getCurrentDeviceCapability();
 		virtual int getDeviceCount();
         virtual cudaDeviceProp* getDeviceProperties(int device);
@@ -155,7 +155,7 @@ cudaDeviceProp* CudaSupportImpl::getDeviceProperties(int device)
 	return 0;
 }
 
-std::string CudaSupportImpl::getCurrentDeviceName()
+const char* CudaSupportImpl::getCurrentDeviceName()
 {
 	int device = getCurrentDevice();
 	if((device >= 0) && (device < getDeviceCount())) {
@@ -168,10 +168,10 @@ std::string CudaSupportImpl::getCurrentDeviceName()
 		result << " @ " << (CUDAProperties[device].clockRate)/1000 << "MHz";
 		if (&CUDAProperties[device].ECCEnabled)
 			result << " (ECC enabled)";
-		return result.str();
+        return result.str().c_str();
 	}
 	else {
-		return std::string("No CUDA Device selected.");
+        return "No CUDA Device selected.";
 	}
 }
 

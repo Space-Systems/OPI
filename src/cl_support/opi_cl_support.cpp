@@ -121,7 +121,7 @@ int ClSupportImpl::getDeviceCount()
 	return nDevices;
 }
 
-std::string ClSupportImpl::getCurrentDeviceName()
+const char* ClSupportImpl::getCurrentDeviceName()
 {
 	/*
 	std::string vendor, name;

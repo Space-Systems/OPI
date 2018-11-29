@@ -52,7 +52,7 @@ namespace OPI
 			virtual void selectDevice(int device) = 0;
 			virtual int getCurrentDevice() = 0;
 			virtual int getCurrentDeviceCapability() = 0;
-			virtual std::string getCurrentDeviceName() = 0;
+            virtual const char* getCurrentDeviceName() = 0;
 
 			virtual int getDeviceCount() = 0;
 
