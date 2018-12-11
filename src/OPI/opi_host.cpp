@@ -238,13 +238,13 @@ namespace OPI
     bool Host::pluginSupported(Module *plugin, gpuPlatform platform)
     {
         bool support = false;
-        if (plugin->minimumOPIVersionRequired() < 1)
+        if (plugin->minimumOPIVersionRequired() < OPI_API_VERSION_MAJOR)
         {
             std::cout << plugin->getName() << ": Skipped because it is outdated. "
                       << "You should update this plugin, or delete it from the plugin folder." << std::endl;
             support = false;
         }
-        else if (plugin->minimumOPIVersionRequired() > 1)
+        else if (plugin->minimumOPIVersionRequired() > OPI_API_VERSION_MAJOR)
         {
             std::cout << plugin->getName() << ": Skipped because it needs at least OPI version "
                       << plugin->minimumOPIVersionRequired() << "." << std::endl;
