@@ -194,19 +194,18 @@ if (ENABLE_PYTHON)
     # Add Python headers and generated OPI headers to the include path.
     include_directories(${PYTHON_INCLUDE_PATH})
     # Create python module from interface definition file.
-	set(OPI_PY_MODULE_NAME OPI_py${PYTHON_VERSION_MAJOR})
+    set(OPI_PY_MODULE_NAME OPI_py${PYTHONLIBS_VERSION_STRING})
     swig_add_library(${OPI_PY_MODULE_NAME}
 	  TYPE MODULE
 	  LANGUAGE python
-	  OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/python${PYTHON_VERSION_MAJOR}
 	  SOURCES ${OPI_INTERFACE_FILE}
 	  )
     # Link Python module to the library we created earlier,
     # as well as the necessary Python libraries.
     swig_link_libraries(${OPI_PY_MODULE_NAME} ${PYTHON_LIBRARIES} OPI)
 
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/python${PYTHON_VERSION_MAJOR}/OPI.py DESTINATION lib/python${PYTHON_VERSION_MAJOR})
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py${PYTHON_VERSION_MAJOR}.pyd DESTINATION lib/python${PYTHON_VERSION_MAJOR}/ RENAME _OPI.pyd OPTIONAL)
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py${PYTHON_VERSION_MAJOR}.so DESTINATION lib/python${PYTHON_VERSION_MAJOR}/ RENAME _OPI.so OPTIONAL)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OPI.py DESTINATION lib/python${PYTHONLIBS_VERSION_STRING})
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py${PYTHONLIBS_VERSION_STRING}.pyd DESTINATION lib/python${PYTHONLIBS_VERSION_STRING}/ RENAME _OPI.pyd OPTIONAL)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py${PYTHONLIBS_VERSION_STRING}.so DESTINATION lib/python${PYTHONLIBS_VERSION_STRING}/ RENAME _OPI.so OPTIONAL)
   endif()
 endif()
