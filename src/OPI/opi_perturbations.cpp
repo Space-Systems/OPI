@@ -186,13 +186,13 @@ namespace OPI
      *
      * This will not work between machines with different endianness!
      */
-    void Perturbations::write(const std::string& filename)
+    void Perturbations::write(const char* filename)
     {
         int temp;
         int versionNumber = 1;
         int magic = 45323;
         int nameLength = data->lastPropagatorName.length();
-        std::ofstream out(filename.c_str(), std::ofstream::binary);
+        std::ofstream out(filename, std::ofstream::binary);
         if(out.is_open())
         {
             out.write(reinterpret_cast<char*>(&magic), sizeof(int));
@@ -255,7 +255,7 @@ namespace OPI
      * \detail
      * See Perturbations::write for more information
      */
-    ErrorCode Perturbations::read(const std::string& filename)
+    ErrorCode Perturbations::read(const char* filename)
     {
         int number_of_objects = 0;
         int magicNumber = 0;
@@ -263,7 +263,7 @@ namespace OPI
         int propagatorNameLength = 0;
         char* propagatorName;
 
-        std::ifstream in(filename.c_str(), std::ifstream::binary);
+        std::ifstream in(filename, std::ifstream::binary);
         if(in.is_open())
         {
             in.read(reinterpret_cast<char*>(&magicNumber), sizeof(int));
@@ -346,7 +346,7 @@ namespace OPI
                 }
                 else std::cout << "Unknown file version" << std::endl;
             }
-            else std::cout << filename << " does not appear to be an OPI perturbations file." << std::endl;
+            else std::cout << std::string(filename) << " does not appear to be an OPI perturbations file." << std::endl;
         }
         return SUCCESS;
     }
@@ -389,14 +389,14 @@ namespace OPI
         data->byteArraySize = size;
     }
 
-    std::string Perturbations::getLastPropagatorName() const
+    const char* Perturbations::getLastPropagatorName() const
     {
-        return data->lastPropagatorName;
+        return (data->lastPropagatorName).c_str();
     }
 
-    void Perturbations::setLastPropagatorName(std::string propagatorName)
+    void Perturbations::setLastPropagatorName(const char* propagatorName)
     {
-        data->lastPropagatorName = propagatorName;
+        data->lastPropagatorName = std::string(propagatorName);
     }
 
     /**

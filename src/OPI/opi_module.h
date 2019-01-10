@@ -44,17 +44,17 @@ namespace OPI
 			//! Disable this propagator (frees up internal memory)
 			OPI_API_EXPORT ErrorCode disable();
 			//! Sets the name of this module
-			OPI_API_EXPORT void setName(const std::string& name);
+            OPI_API_EXPORT void setName(const char* name);
 			//! Returns the name of this module
-			OPI_API_EXPORT const std::string& getName() const;
+            OPI_API_EXPORT const char* getName() const;
 			//! Sets the author of this module
-			OPI_API_EXPORT void setAuthor(const std::string& name);
+            OPI_API_EXPORT void setAuthor(const char* name);
 			//! Returns the author of this module
-			OPI_API_EXPORT const std::string& getAuthor() const;
+            OPI_API_EXPORT const char* getAuthor() const;
 			//! Sets the description of this module
-			OPI_API_EXPORT void setDescription(const std::string& name);
+            OPI_API_EXPORT void setDescription(const char* name);
 			//! Returns the description of this module
-			OPI_API_EXPORT const std::string& getDescription() const;
+            OPI_API_EXPORT const char* getDescription() const;
 
             /* NOT YET IMPLEMENTED
 			//! Sets the version number of this module
@@ -69,82 +69,82 @@ namespace OPI
 
 			// property access functions
 			//! registers a property
-			OPI_API_EXPORT void registerProperty(const std::string& name, int* location);
+            OPI_API_EXPORT void registerProperty(const char* name, int* location);
 			//! registers a property
-			OPI_API_EXPORT void registerProperty(const std::string& name, float* location);
+            OPI_API_EXPORT void registerProperty(const char* name, float* location);
 			//! registers a property
-			OPI_API_EXPORT void registerProperty(const std::string& name, double* location);
+            OPI_API_EXPORT void registerProperty(const char* name, double* location);
 			//! registers a property
-			OPI_API_EXPORT void registerProperty(const std::string& name, int* location, int size);
+            OPI_API_EXPORT void registerProperty(const char* name, int* location, int size);
 			//! registers a property
-			OPI_API_EXPORT void registerProperty(const std::string& name, float* location, int size);
+            OPI_API_EXPORT void registerProperty(const char* name, float* location, int size);
 			//! registers a property
-			OPI_API_EXPORT void registerProperty(const std::string& name, double* location, int size);
+            OPI_API_EXPORT void registerProperty(const char* name, double* location, int size);
 			//! registers a property
-			OPI_API_EXPORT void registerProperty(const std::string& name, std::string* location);
+            OPI_API_EXPORT void registerProperty(const char* name, std::string* location);
 
 			//! creates a new property of type int, the memory will be managed by OPI
-			OPI_API_EXPORT void createProperty(const std::string& name, int value);
+            OPI_API_EXPORT void createProperty(const char* name, int value);
 			//! creates a new property of type float, the memory will be managed by OPI
-			OPI_API_EXPORT void createProperty(const std::string& name, float value);
+            OPI_API_EXPORT void createProperty(const char* name, float value);
 			//! creates a new property of type double, the memory will be managed by OPI
-			OPI_API_EXPORT void createProperty(const std::string& name, double value);
+            OPI_API_EXPORT void createProperty(const char* name, double value);
 			//! creates a new property of type string, the memory will be managed by OPI
-			OPI_API_EXPORT void createProperty(const std::string &name, const std::string& value);
+            OPI_API_EXPORT void createProperty(const char* name, const char* value);
 
             /* NOT YET IMPLEMENTED
 			//! creates a new property array of type int, the memory will be managed by OPI
-			void createProperty(const std::string& name, int* value, int size);
+            void createProperty(const char* name, int* value, int size);
 			//! creates a new property array of type float, the memory will be managed by OPI
-			void createProperty(const std::string& name, float* value, int size);
+            void createProperty(const char* name, float* value, int size);
 			//! creates a new property array of type double, the memory will be managed by OPI
-			void createProperty(const std::string& name, double* value, int size);
+            void createProperty(const char* name, double* value, int size);
             */
 
 			//! Sets a property
-			OPI_API_EXPORT ErrorCode setProperty(const std::string& name, int value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, int value);
 			//! Sets a property
-			OPI_API_EXPORT ErrorCode setProperty(const std::string& name, float value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, float value);
 			//! Sets a property
-			OPI_API_EXPORT ErrorCode setProperty(const std::string& name, double value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, double value);
 			//! Sets a property
-			OPI_API_EXPORT ErrorCode setProperty(const std::string& name, const std::string& value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, const char* value);
 			//! Sets a property
-			OPI_API_EXPORT ErrorCode setProperty(const std::string& name, int* value, int n);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, int* value, int n);
 			//! Sets a property
-			OPI_API_EXPORT ErrorCode setProperty(const std::string& name, float* value, int n);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, float* value, int n);
 			//! Sets a property
-			OPI_API_EXPORT ErrorCode setProperty(const std::string& name, double* value, int n);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, double* value, int n);
 			//! Gets the value of a given property
-			OPI_API_EXPORT int getPropertyInt(const std::string& name, int element = 0);
+            OPI_API_EXPORT int getPropertyInt(const char* name, int element = 0);
 			//! Gets the value of a given property
 			OPI_API_EXPORT int getPropertyInt(int index, int element = 0);
 			//! Gets the value of a given property
-			OPI_API_EXPORT float getPropertyFloat(const std::string& name, int element = 0);
+            OPI_API_EXPORT float getPropertyFloat(const char* name, int element = 0);
 			//! Gets the value of a given property
 			OPI_API_EXPORT float getPropertyFloat(int index, int element = 0);
 			//! Gets the value of a given property
-			OPI_API_EXPORT double getPropertyDouble(const std::string& name, int element = 0);
+            OPI_API_EXPORT double getPropertyDouble(const char* name, int element = 0);
 			//! Gets the value of a given property
 			OPI_API_EXPORT double getPropertyDouble(int index, int element = 0);
 			//! Gets the value of a given property
-			OPI_API_EXPORT const std::string& getPropertyString(const std::string& name, int element = 0);
+            OPI_API_EXPORT const char* getPropertyString(const char* name, int element = 0);
 			//! Gets the value of a given property
-			OPI_API_EXPORT const std::string& getPropertyString(int index, int element = 0);
+            OPI_API_EXPORT const char* getPropertyString(int index, int element = 0);
 
 			// property information functions
 			//! Returns the amount of registered properties
 			OPI_API_EXPORT int getPropertyCount() const;
 			//! Returns the name of the property identified by the given index
-			OPI_API_EXPORT const std::string& getPropertyName(int index) const;
+            OPI_API_EXPORT const char* getPropertyName(int index) const;
 			//! Checks if a property is registered
-			OPI_API_EXPORT bool hasProperty(const std::string& name) const;
+            OPI_API_EXPORT bool hasProperty(const char* name) const;
 			//! Returns the type of a property
-			OPI_API_EXPORT PropertyType getPropertyType(const std::string& name) const;
+            OPI_API_EXPORT PropertyType getPropertyType(const char* name) const;
 			//! Returns the type of the property identified by the given index
 			OPI_API_EXPORT PropertyType getPropertyType(int index) const;
 			//! Returns the size of the property
-			OPI_API_EXPORT int getPropertySize(const std::string& name) const;
+            OPI_API_EXPORT int getPropertySize(const char* name) const;
 			//! Returns the size of the property
 			OPI_API_EXPORT int getPropertySize(int index) const;
 

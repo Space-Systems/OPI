@@ -24,6 +24,7 @@
 #include "opi_collisiondetection.h"
 #include "internal/dynlib.h"
 #include <iostream>
+#include <cstring>
 #ifdef _MSC_VER
 #include "internal/msdirent.h"
 #else
@@ -113,7 +114,7 @@ namespace OPI
 		return impl->lastError;
 	}
 
-	ErrorCode Host::loadPlugins(const std::string& plugindir, gpuPlatform platformSupport)
+    ErrorCode Host::loadPlugins(const char* plugindir, gpuPlatform platformSupport)
 	{
 		ErrorCode status = SUCCESS;
 		std::cout << "Loading plugins from " << plugindir << std::endl;
@@ -125,7 +126,7 @@ namespace OPI
 			// try to load cuda plugin
 			std::string pluginName = (platformSupport == PLATFORM_OPENCL ? "OPI-cl" : "OPI-cuda");
 			std::string gpuFrameworkName = (platformSupport == PLATFORM_OPENCL ? "OpenCL" : "CUDA");
-			std::string libraryFileName = std::string(plugindir + "/support/" + pluginName + suffix);
+            std::string libraryFileName = std::string(plugindir) + "/support/" + pluginName + suffix;
 			std::cout << "Loading support library " << libraryFileName << std::endl;
 
 			impl->gpuSupportPluginHandle = new DynLib(libraryFileName, true);
@@ -161,7 +162,7 @@ namespace OPI
 		}
 
 		// now load all plugins from plugindir
-		DIR* dir = opendir(plugindir.c_str());
+        DIR* dir = opendir(plugindir);
 		// check if plugindir is a directory
 		if(dir != 0)
 		{
@@ -176,7 +177,7 @@ namespace OPI
                   )
 				{
 					// try to load the plugin
-                    std::string pluginpath = plugindir + "/" + entry_name;
+                    std::string pluginpath = std::string(plugindir) + "/" + entry_name;
                     DynLib* lib = new DynLib(pluginpath);
 					if(lib->isValid()) {
 						// if it is valid load the plugin
@@ -185,11 +186,11 @@ namespace OPI
                         std::string configFileName = "";
                         if (entry_name.find_last_of(".") != std::string::npos)
                         {
-                            configFileName = plugindir + "/" + entry_name.substr(0,entry_name.find_last_of(".")) + ".cfg";
+                            configFileName = std::string(plugindir) + "/" + entry_name.substr(0,entry_name.find_last_of(".")) + ".cfg";
                         }
 
                         std::cout << "Found " << getPluginTypeString(plugin->getInfo().type) << " " << plugin->getInfo().name << " (" << pluginpath << ")" << std::endl;
-                        loadPlugin(plugin,platformSupport,configFileName);
+                        loadPlugin(plugin,platformSupport,configFileName.c_str());
 					}
 					else
 						delete lib;
@@ -292,7 +293,7 @@ namespace OPI
         return support;
     }
 
-    void Host::loadPlugin(Plugin *plugin, gpuPlatform platform, const std::string& configfile)
+    void Host::loadPlugin(Plugin *plugin, gpuPlatform platform, const char* configfile)
 	{
         // we have a functional plugin loaded
         // now create the correct type for it
@@ -356,11 +357,11 @@ namespace OPI
 
     }
 
-	Propagator* Host::getPropagator(const std::string& name) const
-	{
+    Propagator* Host::getPropagator(const char* name) const
+	{        
 		for(size_t i = 0; i < impl->propagagorlist.size(); ++i)
 		{
-			if(impl->propagagorlist[i]->getName() == name)
+            if(strcmp(impl->propagagorlist[i]->getName(),name) == 0)
 				return impl->propagagorlist[i];
 		}
 		return 0;
@@ -438,11 +439,11 @@ namespace OPI
 		impl->detectionlist.push_back(module);
 	}
 
-	CollisionDetection* Host::getCollisionDetection(const std::string& name) const
+    CollisionDetection* Host::getCollisionDetection(const char* name) const
 	{
 		for(size_t i = 0; i < impl->detectionlist.size(); ++i)
 		{
-			if(impl->detectionlist[i]->getName() == name)
+            if(strcmp(impl->detectionlist[i]->getName(), name) == 0)
 				return impl->detectionlist[i];
 		}
 		return 0;
@@ -470,11 +471,11 @@ namespace OPI
 		return false;
 	}
 
-	DistanceQuery* Host::getDistanceQuery(const std::string& name) const
+    DistanceQuery* Host::getDistanceQuery(const char* name) const
 	{
 		for(size_t i = 0; i < impl->querylist.size(); ++i)
 		{
-			if(impl->querylist[i]->getName() == name)
+            if(strcmp(impl->querylist[i]->getName(),name) == 0)
 				return impl->querylist[i];
 		}
 		return 0;
@@ -490,7 +491,7 @@ namespace OPI
 		return impl->querylist[index];
 	}
 
-	CustomPropagator* Host::createCustomPropagator(const std::string& name)
+    CustomPropagator* Host::createCustomPropagator(const char* name)
 	{
 		CustomPropagator* prop = new CustomPropagator(name);
 		addPropagator(prop);

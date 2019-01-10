@@ -125,7 +125,7 @@ namespace OPI
              * was propagated with.
              * @return The Propagator name as defined by the plugin last used on this Population.
              */
-			OPI_API_EXPORT std::string getLastPropagatorName() const;
+            OPI_API_EXPORT const char* getLastPropagatorName() const;
 
             /**
              * @brief setLastPropagatorName Set the name of the last Propagator the population was
@@ -135,7 +135,7 @@ namespace OPI
              * and should not require any extra effort from the plugin author.
              * @param propagatorName The name of the Propagator as returned by its getName() function.
              */
-			OPI_API_EXPORT void setLastPropagatorName(std::string propagatorName);
+            OPI_API_EXPORT void setLastPropagatorName(const char* propagatorName);
 
             /**
              * @brief insert Insert all elements from another population into this one.
@@ -157,9 +157,9 @@ namespace OPI
 			OPI_API_EXPORT void remove(IndexList& list);
 
             //! Stores the Object Data to disk
-			OPI_API_EXPORT void write(const std::string& filename);
+            OPI_API_EXPORT void write(const char* filename);
             //! Loads the Object Data from disk
-			OPI_API_EXPORT ErrorCode read(const std::string& filename);
+            OPI_API_EXPORT ErrorCode read(const char* filename);
 
             //! Notify about updates on the specified device
 			OPI_API_EXPORT ErrorCode update(int type, Device device = DEVICE_HOST);
