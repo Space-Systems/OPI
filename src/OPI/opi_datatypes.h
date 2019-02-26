@@ -206,6 +206,18 @@ namespace OPI
 		return sqrt(lengthSquare(v));
 	}
 
+    //! Calculates the square distance between two vectors
+    OPI_CUDA_PREFIX inline double distanceSquared(const Vector3& a, const Vector3& b)
+    {
+        return (pow(a.x-b.x,2) + pow(a.y-b.y,2) + pow(a.z-b.z,2));
+    }
+
+    //! Calculates the distance between two vectors
+    OPI_CUDA_PREFIX inline double distance(const Vector3& a, const Vector3& b)
+    {
+        return sqrt(distanceSquared(a,b));
+    }
+
 	//! Returns the smallest element
     OPI_CUDA_PREFIX inline double smallest(const Vector3& v)
 	{
