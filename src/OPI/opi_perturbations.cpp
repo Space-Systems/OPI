@@ -283,7 +283,7 @@ namespace OPI
         {
             infile.seekg(0, std::ios::end);
             // Last eight bytes are for the uncompressed data size
-            size_t fileSize = infile.tellg() - sizeof(unsigned long);
+            size_t fileSize = (size_t)infile.tellg() - (size_t)sizeof(unsigned long);
             char* fileContents = (char*)malloc(fileSize);
             infile.seekg(0, std::ios::beg);
             infile.read(fileContents, fileSize);
