@@ -19,6 +19,7 @@
 #include "opi_indexlist.h"
 #include "opi_gpusupport.h"
 #include "internal/opi_synchronized_data.h"
+#include "internal/miniz.h"
 #include <iostream>
 #include <vector>
 #include <cassert>
@@ -192,63 +193,83 @@ namespace OPI
         int versionNumber = 1;
         int magic = 45323;
         int nameLength = data->lastPropagatorName.length();
-        std::ofstream out(filename, std::ofstream::binary);
-        if(out.is_open())
+        std::stringstream out;
+        out.write(reinterpret_cast<char*>(&magic), sizeof(int));
+        out.write(reinterpret_cast<char*>(&versionNumber), sizeof(int));
+        out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
+        out.write(reinterpret_cast<char*>(&nameLength), sizeof(int));
+        out.write(reinterpret_cast<char*>(&data->lastPropagatorName), data->lastPropagatorName.length());
+        if(data->data_orbit.hasData())
         {
-            out.write(reinterpret_cast<char*>(&magic), sizeof(int));
-            out.write(reinterpret_cast<char*>(&versionNumber), sizeof(int));
-            out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
-            out.write(reinterpret_cast<char*>(&nameLength), sizeof(int));
-            out.write(reinterpret_cast<char*>(&data->lastPropagatorName), data->lastPropagatorName.length());
-            if(data->data_orbit.hasData())
-            {
-                temp = DATA_ORBIT;
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                temp = sizeof(Orbit);
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getDeltaOrbit()), sizeof(Orbit) * data->size);
-            }
-            if(data->data_position.hasData())
-            {
-                temp = DATA_POSITION;
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                temp = sizeof(Vector3);
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getDeltaPosition()), sizeof(Vector3) * data->size);
-            }
-            if(data->data_velocity.hasData())
-            {
-                temp = DATA_VELOCITY;
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                temp = sizeof(Vector3);
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getDeltaVelocity()), sizeof(Vector3) * data->size);
-            }
-            if(data->data_acceleration.hasData())
-            {
-                temp = DATA_ACCELERATION;
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                temp = sizeof(Vector3);
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getDeltaAcceleration()), sizeof(Vector3) * data->size);
-            }
-            if(data->data_partials.hasData())
-            {
-                temp = DATA_PARTIALS;
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                temp = sizeof(PartialsMatrix);
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getPartialsMatrix()), sizeof(PartialsMatrix) * data->size);
-            }
-            if(data->data_bytes.hasData())
-            {
-                temp = DATA_BYTES;
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                temp = data->byteArraySize;
-                out.write(reinterpret_cast<char*>(&temp), sizeof(int));
-                out.write(reinterpret_cast<char*>(getBytes()), data->byteArraySize * data->size);
-            }
+            temp = DATA_ORBIT;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            temp = sizeof(Orbit);
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            out.write(reinterpret_cast<char*>(getDeltaOrbit()), sizeof(Orbit) * data->size);
         }
+        if(data->data_position.hasData())
+        {
+            temp = DATA_POSITION;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            temp = sizeof(Vector3);
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            out.write(reinterpret_cast<char*>(getDeltaPosition()), sizeof(Vector3) * data->size);
+        }
+        if(data->data_velocity.hasData())
+        {
+            temp = DATA_VELOCITY;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            temp = sizeof(Vector3);
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            out.write(reinterpret_cast<char*>(getDeltaVelocity()), sizeof(Vector3) * data->size);
+        }
+        if(data->data_acceleration.hasData())
+        {
+            temp = DATA_ACCELERATION;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            temp = sizeof(Vector3);
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            out.write(reinterpret_cast<char*>(getDeltaAcceleration()), sizeof(Vector3) * data->size);
+        }
+        if(data->data_partials.hasData())
+        {
+            temp = DATA_PARTIALS;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            temp = sizeof(PartialsMatrix);
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            out.write(reinterpret_cast<char*>(getPartialsMatrix()), sizeof(PartialsMatrix) * data->size);
+        }
+        if(data->data_bytes.hasData())
+        {
+            temp = DATA_BYTES;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            temp = data->byteArraySize;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            out.write(reinterpret_cast<char*>(getBytes()), data->byteArraySize * data->size);
+        }
+
+        // Convert stringstream to byte array. Do not use .str() because it will terminate at \0.
+        unsigned long uncompressedSize = out.tellp();
+        char* bytes = (char*)malloc((size_t)uncompressedSize);
+        out.get(bytes, uncompressedSize);
+
+        // Compress char array using miniz and write to file.
+        unsigned long compressedSize = compressBound(uncompressedSize);
+        mz_uint8* compressedData = (mz_uint8 *)malloc((size_t)compressedSize);
+        int status = compress(compressedData, &compressedSize, (const unsigned char *)bytes, uncompressedSize);
+        if (status == Z_OK)
+        {
+            std::ofstream outfile(filename, std::ofstream::binary);
+            outfile.write((const char*)compressedData, compressedSize);
+            // Append uncompressed data size
+            outfile.write(reinterpret_cast<char*>(&uncompressedSize), sizeof(unsigned long));
+            outfile.close();
+        }
+        else {
+            std::cout << "Failed to compress perturbation data!" << std::endl;
+        }
+        free(compressedData);
+        free(bytes);
     }
 
     /**
@@ -257,97 +278,125 @@ namespace OPI
      */
     ErrorCode Perturbations::read(const char* filename)
     {
-        int number_of_objects = 0;
-        int magicNumber = 0;
-        int versionNumber = 0;
-        int propagatorNameLength = 0;
-        char* propagatorName;
-
-        std::ifstream in(filename, std::ifstream::binary);
-        if(in.is_open())
+        std::ifstream infile(filename, std::ifstream::binary);
+        if(infile.is_open())
         {
-            in.read(reinterpret_cast<char*>(&magicNumber), sizeof(int));
-            if (magicNumber == 45323)
+            infile.seekg(0, std::ios::end);
+            // Last eight bytes are for the uncompressed data size
+            size_t fileSize = infile.tellg() - sizeof(unsigned long);
+            char* fileContents = (char*)malloc(fileSize);
+            infile.seekg(0, std::ios::beg);
+            infile.read(fileContents, fileSize);
+            unsigned long uncompressedSize = 0;
+            infile.read(reinterpret_cast<char*>(&uncompressedSize), sizeof(unsigned long));
+            infile.close();
+
+            mz_uint8* uncompressedData = (mz_uint8*)malloc((size_t)uncompressedSize);
+
+            int status = uncompress(uncompressedData, &uncompressedSize, (const unsigned char*)fileContents, fileSize);
+            free(fileContents);
+
+            if (status == Z_OK)
             {
-                in.read(reinterpret_cast<char*>(&versionNumber), sizeof(int));
-                if (versionNumber == 1)
+                std::stringstream in;
+                in.write((char*)uncompressedData, (size_t)uncompressedSize);
+                free(uncompressedData);
+
+                int number_of_objects = 0;
+                int magicNumber = 0;
+                int versionNumber = 0;
+                int propagatorNameLength = 0;
+                char* propagatorName;
+
+
+                in.read(reinterpret_cast<char*>(&magicNumber), sizeof(int));
+                if (magicNumber == 45323)
                 {
-                    in.read(reinterpret_cast<char*>(&number_of_objects), sizeof(int));
-                    resize(number_of_objects);
-                    data->size = number_of_objects;
-                    in.read(reinterpret_cast<char*>(&propagatorNameLength), sizeof(int));
-                    in.read(reinterpret_cast<char*>(&propagatorName), propagatorNameLength*sizeof(char));
-                    data->lastPropagatorName = std::string(propagatorName);
-                    while(in.good())
+                    in.read(reinterpret_cast<char*>(&versionNumber), sizeof(int));
+                    if (versionNumber == 1)
                     {
-                        int type;
-                        int size;
-                        in.read(reinterpret_cast<char*>(&type), sizeof(int));
-                        if(!in.eof())
+                        in.read(reinterpret_cast<char*>(&number_of_objects), sizeof(int));
+                        resize(number_of_objects);
+                        data->size = number_of_objects;
+                        in.read(reinterpret_cast<char*>(&propagatorNameLength), sizeof(int));
+                        in.read(reinterpret_cast<char*>(&propagatorName), propagatorNameLength*sizeof(char));
+                        data->lastPropagatorName = std::string(propagatorName);
+                        while(in.good())
                         {
-                            in.read(reinterpret_cast<char*>(&size), sizeof(int));
-                            switch(type)
+                            int type;
+                            int size;
+                            in.read(reinterpret_cast<char*>(&type), sizeof(int));
+                            if(!in.eof())
                             {
-                            case DATA_ORBIT:
-                                if(size == sizeof(Orbit))
+                                in.read(reinterpret_cast<char*>(&size), sizeof(int));
+                                switch(type)
                                 {
-                                    Orbit* orbit = getDeltaOrbit(DEVICE_HOST, true);
-                                    in.read(reinterpret_cast<char*>(orbit), sizeof(Orbit) * number_of_objects);
-                                    data->data_orbit.update(DEVICE_HOST);
-                                    break;
+                                case DATA_ORBIT:
+                                    if(size == sizeof(Orbit))
+                                    {
+                                        Orbit* orbit = getDeltaOrbit(DEVICE_HOST, true);
+                                        in.read(reinterpret_cast<char*>(orbit), sizeof(Orbit) * number_of_objects);
+                                        data->data_orbit.update(DEVICE_HOST);
+                                        break;
+                                    }
+                                case DATA_POSITION:
+                                    if(size == sizeof(Vector3))
+                                    {
+                                        Vector3* pos = getDeltaPosition(DEVICE_HOST, true);
+                                        in.read(reinterpret_cast<char*>(pos), sizeof(Vector3) * number_of_objects);
+                                        data->data_position.update(DEVICE_HOST);
+                                        break;
+                                    }
+                                case DATA_VELOCITY:
+                                    if(size == sizeof(Vector3))
+                                    {
+                                        Vector3* vel = getDeltaVelocity(DEVICE_HOST, true);
+                                        in.read(reinterpret_cast<char*>(vel), sizeof(Vector3) * number_of_objects);
+                                        data->data_velocity.update(DEVICE_HOST);
+                                        break;
+                                    }
+                                case DATA_ACCELERATION:
+                                    if(size == sizeof(Vector3))
+                                    {
+                                        Vector3* acc = getDeltaAcceleration(DEVICE_HOST, true);
+                                        in.read(reinterpret_cast<char*>(acc), sizeof(Vector3) * number_of_objects);
+                                        data->data_acceleration.update(DEVICE_HOST);
+                                        break;
+                                    }
+                                case DATA_PARTIALS:
+                                    if(size == sizeof(PartialsMatrix))
+                                    {
+                                        PartialsMatrix* pmx = getPartialsMatrix(DEVICE_HOST, true);
+                                        in.read(reinterpret_cast<char*>(pmx), sizeof(PartialsMatrix) * number_of_objects);
+                                        data->data_partials.update(DEVICE_HOST);
+                                        break;
+                                    }
+                                case DATA_BYTES:
+                                    if(size == size) //TODO
+                                    {
+                                        resizeByteArray(size);
+                                        char* bytes = getBytes(DEVICE_HOST, true);
+                                        in.read(bytes, size * number_of_objects * sizeof(char));
+                                        data->data_bytes.update(DEVICE_HOST);
+                                        break;
+                                    }
+                                default:
+                                    std::cout << "Found unknown block id " << type << std::endl;
+                                    in.seekg(number_of_objects * size);
                                 }
-                            case DATA_POSITION:
-                                if(size == sizeof(Vector3))
-                                {
-                                    Vector3* pos = getDeltaPosition(DEVICE_HOST, true);
-                                    in.read(reinterpret_cast<char*>(pos), sizeof(Vector3) * number_of_objects);
-                                    data->data_position.update(DEVICE_HOST);
-                                    break;
-                                }
-                            case DATA_VELOCITY:
-                                if(size == sizeof(Vector3))
-                                {
-                                    Vector3* vel = getDeltaVelocity(DEVICE_HOST, true);
-                                    in.read(reinterpret_cast<char*>(vel), sizeof(Vector3) * number_of_objects);
-                                    data->data_velocity.update(DEVICE_HOST);
-                                    break;
-                                }
-                            case DATA_ACCELERATION:
-                                if(size == sizeof(Vector3))
-                                {
-                                    Vector3* acc = getDeltaAcceleration(DEVICE_HOST, true);
-                                    in.read(reinterpret_cast<char*>(acc), sizeof(Vector3) * number_of_objects);
-                                    data->data_acceleration.update(DEVICE_HOST);
-                                    break;
-                                }
-                            case DATA_PARTIALS:
-                                if(size == sizeof(PartialsMatrix))
-                                {
-                                    PartialsMatrix* pmx = getPartialsMatrix(DEVICE_HOST, true);
-                                    in.read(reinterpret_cast<char*>(pmx), sizeof(PartialsMatrix) * number_of_objects);
-                                    data->data_partials.update(DEVICE_HOST);
-                                    break;
-                                }
-                            case DATA_BYTES:
-                                if(size == size) //TODO
-                                {
-                                    resizeByteArray(size);
-                                    char* bytes = getBytes(DEVICE_HOST, true);
-                                    in.read(bytes, size * number_of_objects * sizeof(char));
-                                    data->data_bytes.update(DEVICE_HOST);
-                                    break;
-                                }
-                            default:
-                                std::cout << "Found unknown block id " << type << std::endl;
-                                in.seekg(number_of_objects * size);
                             }
                         }
                     }
+                    else std::cout << "Unknown file version" << std::endl;
                 }
-                else std::cout << "Unknown file version" << std::endl;
+                else std::cout << std::string(filename) << " does not appear to be an OPI perturbations file." << std::endl;
             }
-            else std::cout << std::string(filename) << " does not appear to be an OPI perturbations file." << std::endl;
+            else {
+                std::cout << "Failed to decompress perturbation data! " << std::endl;
+                free(uncompressedData);
+            }
         }
+        else std::cout << "Unable to open file " << filename << "!" << std::endl;
         return SUCCESS;
     }
 

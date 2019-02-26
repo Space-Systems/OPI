@@ -27,6 +27,7 @@ set( OPI_SOURCE_FILES
   internal/opi_query_plugin.cpp
   internal/opi_plugin.cpp
   internal/dynlib.cpp
+  internal/miniz.c
   ${CMAKE_BINARY_DIR}/generated/OPI/opi_c_bindings.cpp
 )
 
