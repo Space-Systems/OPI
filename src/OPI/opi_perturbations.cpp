@@ -250,12 +250,12 @@ namespace OPI
 
         // Convert stringstream to byte array. Do not use .str() because it will terminate at \0.
         unsigned long uncompressedSize = out.tellp();
-        char* bytes = (char*)malloc((size_t)uncompressedSize);
-        out.get(bytes, uncompressedSize);
+        char* bytes = new char[uncompressedSize];
+        out.read(bytes, uncompressedSize);
 
         // Compress char array using miniz and write to file.
         unsigned long compressedSize = compressBound(uncompressedSize);
-        mz_uint8* compressedData = (mz_uint8 *)malloc((size_t)compressedSize);
+        unsigned char* compressedData = new unsigned char[compressedSize];
         int status = compress(compressedData, &compressedSize, (const unsigned char *)bytes, uncompressedSize);
         if (status == Z_OK)
         {
@@ -268,8 +268,8 @@ namespace OPI
         else {
             std::cout << "Failed to compress perturbation data!" << std::endl;
         }
-        free(compressedData);
-        free(bytes);
+        delete[] compressedData;
+        delete[] bytes;
     }
 
     /**
@@ -284,23 +284,23 @@ namespace OPI
             infile.seekg(0, std::ios::end);
             // Last eight bytes are for the uncompressed data size
             size_t fileSize = (size_t)infile.tellg() - (size_t)sizeof(unsigned long);
-            char* fileContents = (char*)malloc(fileSize);
+            char* fileContents = new char[fileSize];
             infile.seekg(0, std::ios::beg);
             infile.read(fileContents, fileSize);
             unsigned long uncompressedSize = 0;
             infile.read(reinterpret_cast<char*>(&uncompressedSize), sizeof(unsigned long));
             infile.close();
 
-            mz_uint8* uncompressedData = (mz_uint8*)malloc((size_t)uncompressedSize);
+            unsigned char* uncompressedData = new unsigned char[uncompressedSize];
 
             int status = uncompress(uncompressedData, &uncompressedSize, (const unsigned char*)fileContents, fileSize);
-            free(fileContents);
+            delete[] fileContents;
 
             if (status == Z_OK)
             {
                 std::stringstream in;
                 in.write((char*)uncompressedData, (size_t)uncompressedSize);
-                free(uncompressedData);
+                delete[] uncompressedData;
 
                 int number_of_objects = 0;
                 int magicNumber = 0;
@@ -393,7 +393,7 @@ namespace OPI
             }
             else {
                 std::cout << "Failed to decompress perturbation data! " << std::endl;
-                free(uncompressedData);
+                delete[] uncompressedData;
             }
         }
         else std::cout << "Unable to open file " << filename << "!" << std::endl;
