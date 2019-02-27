@@ -209,6 +209,15 @@ namespace OPI
         out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
         out.write(reinterpret_cast<char*>(&nameLength), sizeof(int));
         out.write(reinterpret_cast<const char*>(data->lastPropagatorName.c_str()), data->lastPropagatorName.length());
+        for (int i=0; i<data->size; i++)
+        {
+            int objectNameLength = data->object_names[i].length();
+            out.write(reinterpret_cast<char*>(&objectNameLength), sizeof(int));
+            if (objectNameLength > 0)
+            {
+                out.write(reinterpret_cast<const char*>(data->object_names[i].c_str()), objectNameLength);
+            }
+        }
         if(data->data_orbit.hasData())
         {
             temp = DATA_ORBIT;
@@ -338,6 +347,18 @@ namespace OPI
                         char* propagatorName = new char[propagatorNameLength];
                         in.read(propagatorName, propagatorNameLength);
                         data->lastPropagatorName = std::string(propagatorName, propagatorNameLength);
+                        for (int i=0; i<data->size; i++)
+                        {
+                            int objectNameLength = 0;
+                            in.read(reinterpret_cast<char*>(&objectNameLength),sizeof(int));
+                            if (objectNameLength > 0)
+                            {
+                                char* objectName = new char[objectNameLength];
+                                in.read(objectName, objectNameLength);
+                                data->object_names[i] = std::string(objectName, objectNameLength);
+                                delete[] objectName;
+                            }
+                        }
                         delete[] propagatorName;
                         while(in.good())
                         {
