@@ -154,13 +154,6 @@ namespace OPI
 			//! Returns the module-internal data pointer
 			OPI_API_EXPORT void* getPrivateData();
 
-		protected:
-			//! Returns the Host of this propagator
-			Host* getHost() const;
-			//! Override this if you want to change the enable behaviour
-			virtual ErrorCode runEnable();
-			//! Override this if you want to change the disable behaviour
-			virtual ErrorCode runDisable();
             /**
              * @brief requiresCUDA Check whether this module requires CUDA to function.
              * @return 0 if CUDA is not required, or the major number of
@@ -182,6 +175,14 @@ namespace OPI
              * @return An integer representing the minimum API level required.
              */
             virtual int minimumOPIVersionRequired();
+
+		protected:
+			//! Returns the Host of this propagator
+			Host* getHost() const;
+			//! Override this if you want to change the enable behaviour
+			virtual ErrorCode runEnable();
+			//! Override this if you want to change the disable behaviour
+			virtual ErrorCode runDisable();
 
 		private:
 			//! \cond INTERNAL_DOCUMENTATION
