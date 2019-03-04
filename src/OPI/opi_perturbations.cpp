@@ -166,6 +166,7 @@ namespace OPI
             memcpy(&getDeltaAcceleration()[offset], &source.getDeltaAcceleration(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
             memcpy(&getPartialsMatrix()[offset], &source.getPartialsMatrix(DEVICE_HOST, false)[firstIndex], length*sizeof(PartialsMatrix));
             if (copyBytes) memcpy(&getBytes()[offset], &source.getBytes(DEVICE_HOST, false)[firstIndex], data->byteArraySize*length*sizeof(char));
+            else memset(&getBytes()[offset], 0, data->byteArraySize*length*sizeof(char));
 
             update(DATA_ORBIT);
             update(DATA_PROPERTIES);

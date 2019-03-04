@@ -176,6 +176,7 @@ namespace OPI
             memcpy(&getAcceleration()[offset], &source.getAcceleration(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
             memcpy(&getCovariance()[offset], &source.getCovariance(DEVICE_HOST, false)[firstIndex], length*sizeof(Covariance));
             if (copyBytes) memcpy(&getBytes()[offset], &source.getBytes(DEVICE_HOST, false)[firstIndex], data->byteArraySize*length*sizeof(char));
+            else memset(&getBytes()[offset], 0, data->byteArraySize*length*sizeof(char));
 
             update(DATA_ORBIT);
             update(DATA_PROPERTIES);
