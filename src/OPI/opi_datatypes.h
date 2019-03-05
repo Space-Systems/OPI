@@ -281,6 +281,61 @@ namespace OPI
         else return std::numeric_limits<double>::quiet_NaN();
     }
 
+    OPI_CUDA_PREFIX inline bool isZero(const Orbit& o)
+    {
+        return (o.semi_major_axis == 0.0
+                && o.eccentricity == 0.0
+                && o.inclination == 0.0
+                && o.raan == 0.0
+                && o.arg_of_perigee == 0.0
+                && o.mean_anomaly == 0.0
+                && o.bol == 0.0
+                && o.eol == 0.0);
+    }
+
+    OPI_CUDA_PREFIX inline bool isZero(const Vector3& v)
+    {
+        return (v.x == 0.0 && v.y == 0.0 && v.z == 0.0);
+    }
+
+    OPI_CUDA_PREFIX inline bool isZero(const ObjectProperties& p)
+    {
+        // ID can be zero
+        return (p.mass == 0.0
+                && p.diameter == 0.0
+                && p.area_to_mass == 0.0
+                && p.drag_coefficient == 0.0
+                && p.reflectivity == 0.0
+                );
+    }
+
+    OPI_CUDA_PREFIX inline bool hasNaN(const Orbit& o)
+    {
+        return (std::isnan(o.semi_major_axis)
+                || std::isnan(o.eccentricity)
+                || std::isnan(o.inclination)
+                || std::isnan(o.raan)
+                || std::isnan(o.arg_of_perigee)
+                || std::isnan(o.mean_anomaly)
+                || std::isnan(o.bol)
+                || std::isnan(o.eol));
+    }
+
+    OPI_CUDA_PREFIX inline bool hasNaN(const Vector3& v)
+    {
+        return (std::isnan(v.x) || std::isnan(v.y) || std::isnan(v.z));
+    }
+
+    OPI_CUDA_PREFIX inline bool hasNaN(const ObjectProperties& p)
+    {
+        return (std::isnan(p.id)
+                || std::isnan(p.mass)
+                || std::isnan(p.diameter)
+                || std::isnan(p.area_to_mass)
+                || std::isnan(p.drag_coefficient)
+                || std::isnan(p.reflectivity));
+    }
+
     //! Addition assignment operator for VMatrix
     OPI_CUDA_PREFIX inline PartialsMatrix& operator+=(PartialsMatrix& a, const PartialsMatrix& b)
     {
