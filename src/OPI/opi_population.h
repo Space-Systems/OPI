@@ -216,7 +216,7 @@ namespace OPI
 			OPI_API_EXPORT char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
             /**
-             * @brief sanityCheck Performs various checks on the Population data and generate a debug string.
+             * @brief validate Performs various checks on the Population data and generate a debug string.
              *
              * Call on this Population to perform some validity checks of all orbits and properties. Checks
              * include orbit height (must be larger than Earth radius or end-of-life date must be set),
@@ -225,10 +225,11 @@ namespace OPI
              * This is a host function so the data will be synched to the host when calling this function. It is
              * comparatively slow and should be used for debugging or once after Population data is read from
              * input files.
+             * @param invalidObjects an IndexList to which indices of invalid objects will be added.
              * @return Human-readable string that can be printed to the screen or a log file. If no problems are
              * found, an empty string is returned.
              */
-            OPI_API_EXPORT const char* sanityCheck(bool removeInvalids = false);
+            OPI_API_EXPORT std::string validate(IndexList& invalidObjects) const;
 
         //protected:
 			OPI_API_EXPORT Host& getHostPointer() const;

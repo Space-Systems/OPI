@@ -700,100 +700,121 @@ namespace OPI
         return data->host;
     }
 
-    const char* Population::sanityCheck(bool removeInvalids)
-	{
-        if (getSize()==0) return "Population is empty.";
-
-		std::stringstream result;
-		result.str("");
-        const double twopi = 6.2831853;
-
-        for (int i=0; i<getSize(); i++)
+    std::string Population::validate(IndexList& invalidObjects) const
+    {
+        std::stringstream report;
+        for (int i=0; i<data->size; i++)
         {
-            bool invalid = false;
+            bool valid = true;
 
-            if (data->data_orbit.hasData())
+            // get ID, or -1 if object has no properties set
+            int id = -1;
+
+            // check properties
+            ObjectProperties props = getObjectProperties(DEVICE_HOST)[i];
+            if (data->data_properties.hasData() && !isZero(props))
             {
-                Orbit orbit = getOrbit(DEVICE_HOST)[i];
-                ObjectProperties props = getObjectProperties(DEVICE_HOST)[i];
-
-                // SMA is smaller than Earth's radius but object has not been marked as decayed
-                if (orbit.semi_major_axis < 6378.0f && orbit.eol <= 0.0f) {
-                    result << "Object " << i << " (ID " << props.id << "): Unmarked deorbit: ";
-                    result << "SMA: " << orbit.semi_major_axis << ", EOL: " << orbit.eol << "\n";
-                    invalid = true;
-                }
-                // Eccentricity is zero or smaller than zero
-                if (orbit.eccentricity <= 0.0f) {
-                    result << "Object " << i << "(" << props.id << "): Eccentricity below zero: ";
-                    result << orbit.eccentricity << "\n";
-                    invalid = true;
-                }
-                // Eccentricity is larger than one. This might occur when decayed objects are propagated
-                // further so only issue a warning if the object has not been marked as decayed.
-                // For some use cases hyperbolic orbits might actually be valid so this value might have
-                // to be adjusted. One possibility would be to calculate the delta-V required to achieve
-                // the given eccentricity and issue a warning when unrealistic speeds occur.
-                if (orbit.eccentricity > 1.0f && orbit.eol <= 0.0f) {
-                    result << "Object " << i << "(" << props.id << "): Eccentricity larger than one: ";
-                    result << orbit.eccentricity << "\n";
-                    invalid = true;
-                }
-                // Angles are outside of radian range (possibly given in degrees)
-                if (orbit.inclination < -twopi || orbit.inclination > twopi) {
-                    result << "Object " << i << "(" << props.id << "): Inclination not in radian range: ";
-                    result << orbit.inclination << "\n";
-                    invalid = true;
-                }
-                if (orbit.raan < -twopi || orbit.raan > twopi) {
-                    result << "Object " << i << "(" << props.id << "): RAAN not in radian range: ";
-                    result << orbit.raan << "\n";
-                    invalid = true;
-                }
-                if (orbit.arg_of_perigee < -twopi || orbit.arg_of_perigee > twopi) {
-                    result << "Object " << i << "(" << props.id << "): Arg. of perigee not in radian range: ";
-                    result << orbit.arg_of_perigee << "\n";
-                    invalid = true;
-                }
-                if (orbit.mean_anomaly < -twopi || orbit.mean_anomaly > twopi) {
-                    result << "Object " << i << "(" << props.id << "): Mean anomaly not in radian range: ";
-                    result << orbit.mean_anomaly << "\n";
-                    invalid = true;
-                }
-                // Drag and reflectivity coefficients are not set (which may lead to early decays or division by zero)
-                if (props.drag_coefficient <= 0.0f) {
-                    result << "Object " << i << "(" << props.id << "): Invalid drag coefficient: ";
-                    result << props.drag_coefficient << "\n";
-                    invalid = true;
-                }
-                if (props.reflectivity <= 0.0f) {
-                    result << "Object " << i << "(" << props.id << "): Invalid reflectivity coefficient: ";
-                    result << props.reflectivity << "\n";
-                    invalid = true;
-                }
-                //any number is NaN
-                //unrealistic A2m ratio (possible mixup with m2a)
-            }
-
-            if (data->data_position.hasData())
-            {
-                Vector3 position = getPosition(DEVICE_HOST)[i];
-                if (length(position) <= 0)
+                id = props.id;
+                if (hasNaN(props))
                 {
-                    //result << "Object " << i << "(" << props.id << "): Invalid position: ";
-                    result << position.x << "/" << position.y << "/" << position.z << "\n";
-                    invalid = true;
+                    report << i << "/" << id << "/Properties: NaN detected" << std::endl;
+                    valid = false;
+                }
+                if (props.drag_coefficient < 1e-32)
+                {
+                    report << i << "/" << id << "/Properties: Invalid drag coefficient" << std::endl;
+                    valid = false;
+                }
+                if (props.mass < 1e-12)
+                {
+                    report << i << "/" << id << "/Properties: Invalid mass" << std::endl;
+                    valid = false;
+                }
+                if (props.diameter < 1e-12)
+                {
+                    report << i << "/" << id << "/Properties: Invalid diameter" << std::endl;
+                    valid = false;
+                }
+                if (props.area_to_mass <= 0.0)
+                {
+                    report << i << "/" << id << "/Properties: Invalid area to mass ratio" << std::endl;
+                    valid = false;
+                }
+                if (props.reflectivity < 0.0 || props.reflectivity > 2.0)
+                {
+                    report << i << "/" << id << "/Properties: Invalid reflectivity coefficient" << std::endl;
+                    valid = false;
                 }
             }
 
-            if (invalid && removeInvalids)
+            // check orbit
+            Orbit orbit = getOrbit(DEVICE_HOST)[i];
+            if (data->data_orbit.hasData() && !isZero(orbit))
             {
-                remove(i);
-                i--;
+                if (hasNaN(orbit))
+                {
+                    report << i << "/" << id << "/Orbit: NaN detected" << std::endl;
+                    valid = false;
+                }
+                if (orbit.semi_major_axis < 6378.0 && orbit.eol <= 0.0) {
+                    report << i << "/" << id << "/Orbit: SMA too small, and object has not been marked as decayed (EOL = 0)" << std::endl;
+                    valid = false;
+                }
+                if (orbit.eccentricity <= 0.0 || orbit.eccentricity >= 1.0)
+                {
+                    report << i << "/" << id << "/Orbit: Eccentricity not within valid range" << std::endl;
+                    valid = false;
+                }
+                if (orbit.inclination < -2*M_PI || orbit.inclination > 2*M_PI
+                    || orbit.raan < -2*M_PI || orbit.raan > 2*M_PI
+                    || orbit.arg_of_perigee < -2*M_PI || orbit.arg_of_perigee > 2*M_PI
+                    || orbit.mean_anomaly < -2*M_PI || orbit.mean_anomaly > 2*M_PI)
+                {
+                    report << i << "/" << id << "/Orbit: One or more angles outside radian range" << std::endl;
+                    valid = false;
+                }
+                if (orbit.eol > 0.0 && orbit.bol > 0.0 && orbit.eol < orbit.bol)
+                {
+                    report << i << "/" << id << "/Orbit: EOL date precedes BOL date" << std::endl;
+                    valid = false;
+                }
             }
+
+            // check state vector
+            Vector3 pos = getPosition(DEVICE_HOST)[i];
+            Vector3 vel = getVelocity(DEVICE_HOST)[i];
+            if (data->data_position.hasData() && !isZero(pos))
+            {
+                if (data->data_velocity.hasData() && !isZero(vel))
+                {
+                    if (length(pos) <= 6378.0 && orbit.eol <= 0.0)
+                    {
+                        report << i << "/" << id << "/StateVector: Object is inside Earth and has not been marked as decayed (EOL = 0)" << std::endl;
+                        valid = false;
+                    }
+                    if (length(pos) <= 0.0)
+                    {
+                        report << i << "/" << id << "/StateVector: Invalid velocity" << std::endl;
+                        valid = false;
+                    }
+                }
+                else {
+                    report << i << "/" << id << "/StateVector: Object has position but no velocity set" << std::endl;
+                    valid = false;
+                }
+            }
+
+            if (isZero(orbit) && isZero(pos) && isZero(vel))
+            {
+                report << i << "/" << id << "/StateVector: Object has neither state vector nor orbit set" << std::endl;
+                valid = false;
+            }
+
+            if (!valid) invalidObjects.add(i);
         }
-        return result.str().c_str();
-	}
+
+        return report.str();
+    }
 
     // adapted from SGP4 reference implementation by D. Vallado e.a.
     // https://celestrak.com/publications/AIAA/2006-6753/
