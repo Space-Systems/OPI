@@ -277,14 +277,14 @@ namespace OPI
         }
 
         // Convert stringstream to byte array. Do not use .str() because it will terminate at \0.
-        unsigned long uncompressedSize = out.tellp();
+        unsigned long long uncompressedSize = out.tellp();
         char* bytes = new char[uncompressedSize];
         out.read(bytes, uncompressedSize);
 
         // Compress char array using miniz and write to file.
-        unsigned long long compressedSize = compressBound(uncompressedSize);
+        unsigned long compressedSize = compressBound(uncompressedSize);
         unsigned char* compressedData = new unsigned char[compressedSize];
-        int status = compress(compressedData, (mz_ulong*)&compressedSize, (const unsigned char *)bytes, uncompressedSize);
+        int status = compress(compressedData, (mz_ulong*)&compressedSize, (const unsigned char *)bytes, (mz_ulong)uncompressedSize);
         if (status == Z_OK)
         {
             std::ofstream outfile(filename, std::ofstream::binary);
@@ -311,6 +311,8 @@ namespace OPI
         {
             infile.seekg(0, std::ios::end);
             // Last eight bytes are for the uncompressed data size
+            // Use unsigned long long because it has the same size on all platforms
+            // Uncompressed file size is still limited to 4GB by mz_ulong
             size_t fileSize = (size_t)infile.tellg() - (size_t)sizeof(unsigned long long);
             char* fileContents = new char[fileSize];
             infile.seekg(0, std::ios::beg);
