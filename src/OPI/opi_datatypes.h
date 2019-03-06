@@ -22,7 +22,8 @@
 #endif
 
 #include "OPI/opi_types.h"
-#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <limits>
 
 namespace OPI
@@ -328,8 +329,7 @@ namespace OPI
 
     OPI_CUDA_PREFIX inline bool hasNaN(const ObjectProperties& p)
     {
-        return (std::isnan(p.id)
-                || std::isnan(p.mass)
+        return (std::isnan(p.mass)
                 || std::isnan(p.diameter)
                 || std::isnan(p.area_to_mass)
                 || std::isnan(p.drag_coefficient)
