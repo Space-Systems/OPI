@@ -282,15 +282,15 @@ namespace OPI
         out.read(bytes, uncompressedSize);
 
         // Compress char array using miniz and write to file.
-        unsigned long compressedSize = compressBound(uncompressedSize);
+        unsigned long long compressedSize = compressBound(uncompressedSize);
         unsigned char* compressedData = new unsigned char[compressedSize];
-        int status = compress(compressedData, &compressedSize, (const unsigned char *)bytes, uncompressedSize);
+        int status = compress(compressedData, (mz_ulong*)&compressedSize, (const unsigned char *)bytes, uncompressedSize);
         if (status == Z_OK)
         {
             std::ofstream outfile(filename, std::ofstream::binary);
             outfile.write((const char*)compressedData, compressedSize);
             // Append uncompressed data size
-            outfile.write(reinterpret_cast<char*>(&uncompressedSize), sizeof(unsigned long));
+            outfile.write(reinterpret_cast<char*>(&uncompressedSize), sizeof(unsigned long long));
             outfile.close();
         }
         else {
@@ -311,17 +311,17 @@ namespace OPI
         {
             infile.seekg(0, std::ios::end);
             // Last eight bytes are for the uncompressed data size
-            size_t fileSize = (size_t)infile.tellg() - (size_t)sizeof(unsigned long);
+            size_t fileSize = (size_t)infile.tellg() - (size_t)sizeof(unsigned long long);
             char* fileContents = new char[fileSize];
             infile.seekg(0, std::ios::beg);
             infile.read(fileContents, fileSize);
-            unsigned long uncompressedSize = 0;
-            infile.read(reinterpret_cast<char*>(&uncompressedSize), sizeof(unsigned long));
+            unsigned long long uncompressedSize = 0;
+            infile.read(reinterpret_cast<char*>(&uncompressedSize), sizeof(unsigned long long));
             infile.close();
 
             unsigned char* uncompressedData = new unsigned char[uncompressedSize];
 
-            int status = uncompress(uncompressedData, &uncompressedSize, (const unsigned char*)fileContents, fileSize);
+            int status = uncompress(uncompressedData, (mz_ulong*)&uncompressedSize, (const unsigned char*)fileContents, fileSize);
             delete[] fileContents;
 
             if (status == Z_OK)
