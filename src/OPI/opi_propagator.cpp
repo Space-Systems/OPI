@@ -69,78 +69,21 @@ namespace OPI
 		return data->perturbationModules.size();
 	}
 
-    ErrorCode Propagator::propagate(Population& objectdata, double julian_day, double dt)
+    ErrorCode Propagator::propagate(Population& population, double julian_day, double dt, PropagationMode mode, IndexList* indices)
 	{
 		ErrorCode status = SUCCESS;
 		// ensure this propagator is enabled
 		status = enable();
 		// an error occured?
 		if(status == SUCCESS)
-			status = runPropagation(objectdata, julian_day, dt);
+            status = runPropagation(population, julian_day, dt, mode, indices);
 		getHost()->sendError(status);
-        if (status == SUCCESS && objectdata.getLastPropagatorName() != getName())
+        if (status == SUCCESS && population.getLastPropagatorName() != getName())
         {
-            objectdata.setLastPropagatorName(getName());
+            population.setLastPropagatorName(getName());
         }
 		return status;
 	}
-
-	/**
-	 * If the runPropagation method for index-based propagation is not overloaded (returning OPI_NOT_IMPLEMENTED)
-	 * this function will perform a normal propagation instead.
-	 */
-    ErrorCode Propagator::propagate(Population& objectdata, IndexList& indices, double julian_day, double dt)
-	{
-		ErrorCode status = SUCCESS;
-		status = runIndexedPropagation(objectdata, indices, julian_day, dt);
-		if(status == NOT_IMPLEMENTED)
-        {
-            Population indexedData = Population(objectdata, indices);
-            propagate(indexedData, julian_day, dt);
-            objectdata.insert(indexedData, indices);
-        }
-		getHost()->sendError(status);
-        if (status == SUCCESS && objectdata.getLastPropagatorName() != getName())
-        {
-            objectdata.setLastPropagatorName(getName());
-        }
-		return status;
-	}
-
-    ErrorCode Propagator::propagate(Population& objectdata, double* julian_days, int length, double dt)
-    {
-        ErrorCode status = SUCCESS;
-        if (length < 1 || length < objectdata.getSize())
-        {
-            status = INDEX_RANGE;
-        }
-        else if (length == 1)
-        {
-            status = runPropagation(objectdata, julian_days[0], dt);
-        }
-        else if (length >= objectdata.getSize())
-        {
-            status = runMultiTimePropagation(objectdata, julian_days, length, dt);
-            if (status == NOT_IMPLEMENTED)
-            {
-                ErrorCode innerStatus = SUCCESS;
-                for (int i=0; i<objectdata.getSize(); i++)
-                {
-                    IndexList indices(*getHost());
-                    indices.add(i);
-                    innerStatus = propagate(objectdata, indices, julian_days[i], dt);
-                }
-                if (innerStatus != SUCCESS) status = innerStatus;
-            }
-        }
-        else status = INDEX_RANGE;                
-        getHost()->sendError(status);
-        if (status == SUCCESS && objectdata.getLastPropagatorName() != getName())
-        {
-            objectdata.setLastPropagatorName(getName());
-        }
-        return status;
-    }
 
 	bool Propagator::backwardPropagation()
 	{
@@ -164,16 +107,6 @@ namespace OPI
     CovarianceType Propagator::covarianceType()
     {
         return CV_NONE;
-    }
-
-    ErrorCode Propagator::runIndexedPropagation(Population& objectdata, IndexList& indices, double julian_day, double dt)
-	{
-		return NOT_IMPLEMENTED;
-	}
-
-    ErrorCode Propagator::runMultiTimePropagation(Population& objectdata, double* julian_days, int length, double dt)
-    {
-        return NOT_IMPLEMENTED;
     }
 
     ErrorCode Propagator::loadPopulation(Population& population, const char* filename)

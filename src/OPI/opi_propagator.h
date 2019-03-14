@@ -82,51 +82,23 @@ namespace OPI
              * orbit and position/velocity vectors (if supported) are written back to the
              * given Population. The propagation result shall reflect the state of the
              * Population at the point in time defined by julian_day + dt seconds.
-             * @param data The Population to be propagated.
-             * @param julian_day The base date in Julian date format.
+             * @param population The Population to be propagated.
+             * @param julian_day The base date in Julian date format. Ignored when mode is set to
+             * individual epochs.
              * @param dt The time step, in seconds, from last propagation.
+             * @param mode Sets the propagation mode to single epoch (default) or individual epochs.
+             * In single epoch mode, the propagator assumes that all objects are at the same epoch
+             * given with the julian_day parameter. In individual epoch mode, that parameter is
+             * ignored and the objects' individual current_epoch parameter is used instead.
+             * The plugin shall return NOT_IMPLEMENTED if propagation with individual epochs
+             * is unsupported.
+             * @param indices An IndexList containing the indices of the Population elements that
+             * should be propagated. Defaults to null in which case all objects are propagated.
+             * The plugin shall return NOT_IMPLEMENTED if an index list is set and indexed propagation
+             * is unsupported.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
-			OPI_API_EXPORT ErrorCode propagate(Population& population, double julian_day, double dt);
-
-            /**
-             * @brief propagate Starts the index-based propagation for the given time step.
-             *
-             * Like the propagate() function above, but
-             * only those Population elements that appear in the given IndexList will be
-             * propagated. This function will call the runIndexedPropagation() function that
-             * should be implemented by the plugin. If the plugin returns NOT_IMPLEMENTED, the
-             * operation will still be performed by calling the runPropagation() function on
-             * individual elements which is likely to be very inefficient.
-             * @param data The Population to be propagated.
-             * @param indices An IndexList containing the indices of the Population elements that
-             * should be propagated.
-             * @param julian_day The base date in Julian date format.
-             * @param dt The time step, in seconds, from last propagation.
-             * @return OPI::SUCCESS if propagation was successful; OPI::NOT_IMPLEMENTED if propagation
-             * was performed with OPI's inherent method (which should still give you valid results); or
-             * any other error code returned by the plugin.
-             */
-			OPI_API_EXPORT ErrorCode propagate(Population& population, IndexList& indices, double julian_day, double dt);
-
-            /**
-             * @brief propagate Starts propagation with individual times for each object.
-             *
-             * Like the propagate) function above, but every object receives an individual base date.
-             * This is useful e.g. when doing fine-grained conjunction analysis between two
-             * regular time steps. This function will call runMultiTimePropagation() which should be
-             * implemented by the plugin. If the plugin returns NOT_IMPLEMENTED, the operation will
-             * be performed by instead calling runPropagation() on individual objects with individual
-             * times. While this should yield valid results, it is likely to be very inefficient.
-             * @param data The Population to be propagated.
-             * @param julian_days An array of Julian dates, one for each element in the Population.
-             * @param length The length of the julian_days array. Must be the same size as the Population's.
-             * @param dt The time step, in seconds, from last propagation.
-             * @return OPI::SUCCESS if propagation was successful; OPI::NOT_IMPLEMENTED if propagation
-             * was performed with OPI's inherent method (which should still give you valid results); or
-             * any other ErrorCode returned by the plugin.
-             */
-			OPI_API_EXPORT ErrorCode propagate(Population& population, double* julian_days, int length, double dt);
+            OPI_API_EXPORT ErrorCode propagate(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
             //! Assigns a module to this propagator (not yet implemented)
 			/**
@@ -193,13 +165,7 @@ namespace OPI
 			void useModules();
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
-            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt) = 0;
-			//! Override this to implement an index-based propagation
-			//! The C Namespace equivalent for this function is OPI_Plugin_propagateIndexed
-            virtual ErrorCode runIndexedPropagation(Population& population, IndexList& indices, double julian_day, double dt);
-            //! Override this to implement propagation with individual times.
-            //! OPI will make sure that the julian_days vector length matches that of the Population.
-            virtual ErrorCode runMultiTimePropagation(Population& population, double* julian_days, int length, double dt);
+            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr) = 0;
             //! Variable to hold the appropriate name for the config file.
             std::string configFileName;
 
