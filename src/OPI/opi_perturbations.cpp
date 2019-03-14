@@ -416,7 +416,7 @@ namespace OPI
             {
                 for (int i=data->size; i<size; i++)
                 {
-                    data->data_orbit.set(Orbit(0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0),i);
+                    data->data_orbit.set(Orbit(0.0,0.0,0.0,0.0,0.0,0.0),i);
                     data->data_position.set(Vector3(0.0,0.0,0.0),i);
                     data->data_velocity.set(Vector3(0.0,0.0,0.0),i);
                     data->data_acceleration.set(Vector3(0.0,0.0,0.0),i);

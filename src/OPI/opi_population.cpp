@@ -44,6 +44,7 @@ namespace OPI
 				data_position(host),
 				data_velocity(host),
                 data_acceleration(host),
+                data_epoch(host),
                 data_covariance(host),
                 data_bytes(host)
 			{
@@ -57,6 +58,7 @@ namespace OPI
 			SynchronizedData<Vector3> data_position;
 			SynchronizedData<Vector3> data_velocity;
             SynchronizedData<Vector3> data_acceleration;
+            SynchronizedData<Epoch> data_epoch;
             SynchronizedData<Covariance> data_covariance;
             SynchronizedData<char> data_bytes;
 
@@ -109,6 +111,7 @@ namespace OPI
         Vector3* pos = source.getPosition(DEVICE_HOST, false);
         Vector3* vel = source.getVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
+        Epoch* ep = source.getEpoch(DEVICE_HOST, false);
         Covariance* cov = source.getCovariance(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
@@ -117,6 +120,7 @@ namespace OPI
         Vector3* thisPos = getPosition();
         Vector3* thisVel = getVelocity();
         Vector3* thisAcc = getAcceleration();
+        Epoch* thisEp = getEpoch();
         Covariance* thisCov = getCovariance();
         char* thisBytes = getBytes();
 
@@ -127,6 +131,7 @@ namespace OPI
             thisPos[i] = pos[listdata[i]];
             thisVel[i] = vel[listdata[i]];
             thisAcc[i] = acc[listdata[i]];
+            thisEp[i] = ep[listdata[i]];
             thisCov[i] = cov[listdata[i]];
             for (int j=0; j<b; j++)
             {
@@ -139,6 +144,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
+        update(DATA_EPOCH);
         update(DATA_COVARIANCE);
         update(DATA_BYTES);
     }
@@ -174,6 +180,7 @@ namespace OPI
             memcpy(&getPosition()[offset], &source.getPosition(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
             memcpy(&getVelocity()[offset], &source.getVelocity(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
             memcpy(&getAcceleration()[offset], &source.getAcceleration(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
+            memcpy(&getEpoch()[offset], &source.getEpoch(DEVICE_HOST, false)[firstIndex], length*sizeof(Epoch));
             memcpy(&getCovariance()[offset], &source.getCovariance(DEVICE_HOST, false)[firstIndex], length*sizeof(Covariance));
             if (copyBytes) memcpy(&getBytes()[offset], &source.getBytes(DEVICE_HOST, false)[firstIndex], data->byteArraySize*length*sizeof(char));
             else memset(&getBytes()[offset], 0, data->byteArraySize*length*sizeof(char));
@@ -183,6 +190,7 @@ namespace OPI
             update(DATA_POSITION);
             update(DATA_VELOCITY);
             update(DATA_ACCELERATION);
+            update(DATA_EPOCH);
             update(DATA_COVARIANCE);
             if (copyBytes) update(DATA_BYTES);
         }
@@ -258,6 +266,14 @@ namespace OPI
             temp = sizeof(Vector3);
             out.write(reinterpret_cast<char*>(&temp), sizeof(int));
             out.write(reinterpret_cast<char*>(getAcceleration()), sizeof(Vector3) * data->size);
+        }
+        if(data->data_epoch.hasData())
+        {
+            temp = DATA_EPOCH;
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            temp = sizeof(Epoch);
+            out.write(reinterpret_cast<char*>(&temp), sizeof(int));
+            out.write(reinterpret_cast<char*>(getEpoch()), sizeof(Epoch) * data->size);
         }
         if(data->data_covariance.hasData())
         {
@@ -413,6 +429,14 @@ namespace OPI
                                         data->data_acceleration.update(DEVICE_HOST);
                                         break;
                                     }
+                                case DATA_EPOCH:
+                                    if(size == sizeof(Epoch))
+                                    {
+                                        Epoch* ep = getEpoch(DEVICE_HOST, true);
+                                        in.read(reinterpret_cast<char*>(ep), sizeof(Epoch) * number_of_objects);
+                                        data->data_epoch.update(DEVICE_HOST);
+                                        break;
+                                    }
                                 case DATA_COVARIANCE:
                                     if(size == sizeof(Covariance))
                                     {
@@ -459,6 +483,7 @@ namespace OPI
 			data->data_position.resize(size);
 			data->data_velocity.resize(size);
             data->data_acceleration.resize(size);
+            data->data_epoch.resize(size);
             data->data_covariance.resize(size);
             data->data_bytes.resize(size*byteArraySize);
             data->object_names.resize(size);
@@ -555,6 +580,16 @@ namespace OPI
      * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
      * requested device.
      */
+    Epoch* Population::getEpoch(Device device, bool no_sync) const
+    {
+        return data->data_epoch.getData(device, no_sync);
+    }
+
+    /**
+     * @details
+     * If no_sync is set to false, a synchronization is performed to ensure the latest up-to-date data on the
+     * requested device.
+     */
     Covariance* Population::getCovariance(Device device, bool no_sync) const
     {
         return data->data_covariance.getData(device, no_sync);
@@ -586,6 +621,7 @@ namespace OPI
         Vector3* pos = source.getPosition(DEVICE_HOST, false);
         Vector3* vel = source.getVelocity(DEVICE_HOST, false);
         Vector3* acc = source.getAcceleration(DEVICE_HOST, false);
+        Epoch* ep = source.getEpoch(DEVICE_HOST, false);
         Covariance* cov = source.getCovariance(DEVICE_HOST, false);
         char* bytes = source.getBytes(DEVICE_HOST, false);
 
@@ -594,6 +630,7 @@ namespace OPI
         Vector3* thisPos = getPosition();
         Vector3* thisVel = getVelocity();
         Vector3* thisAcc = getAcceleration();
+        Epoch* thisEp = getEpoch();
         Covariance* thisCov = getCovariance();
         char* thisBytes = getBytes();
 
@@ -614,6 +651,7 @@ namespace OPI
                     thisPos[l] = pos[i];
                     thisVel[l] = vel[i];
                     thisAcc[l] = acc[i];
+                    thisEp[l] = ep[i];
                     thisCov[l] = cov[i];
                     if (getByteArraySize() == source.getByteArraySize())
                     {
@@ -638,6 +676,7 @@ namespace OPI
         update(DATA_POSITION);
         update(DATA_VELOCITY);
         update(DATA_ACCELERATION);
+        update(DATA_EPOCH);
         update(DATA_COVARIANCE);
         update(DATA_BYTES);
     }
@@ -649,6 +688,7 @@ namespace OPI
 		data->data_position.remove(index);
 		data->data_properties.remove(index);
         data->data_velocity.remove(index);
+        data->data_epoch.remove(index);
         data->data_covariance.remove(index);
         data->data_bytes.remove(index*data->byteArraySize, data->byteArraySize);
 		data->size--;
@@ -673,6 +713,9 @@ namespace OPI
 				break;
 			case DATA_ACCELERATION:
 				data->data_acceleration.update(device);
+                break;
+            case DATA_EPOCH:
+                data->data_epoch.update(device);
                 break;
             case DATA_COVARIANCE:
                 data->data_covariance.update(device);
@@ -749,8 +792,9 @@ namespace OPI
                 }
             }
 
-            // check orbit
+            // check orbit and epoch
             Orbit orbit = getOrbit(DEVICE_HOST)[i];
+            Epoch epoch = getEpoch(DEVICE_HOST)[i];
             if (data->data_orbit.hasData() && !isZero(orbit))
             {
                 if (hasNaN(orbit))
@@ -758,7 +802,7 @@ namespace OPI
                     report << i << "/" << id << "/Orbit: NaN detected" << std::endl;
                     valid = false;
                 }
-                if (orbit.semi_major_axis < 6378.0 && orbit.eol <= 0.0) {
+                if (orbit.semi_major_axis < 6378.0 && epoch.end_of_life <= 0.0) {
                     report << i << "/" << id << "/Orbit: SMA too small, and object has not been marked as decayed (EOL = 0)" << std::endl;
                     valid = false;
                 }
@@ -775,7 +819,7 @@ namespace OPI
                     report << i << "/" << id << "/Orbit: One or more angles outside radian range" << std::endl;
                     valid = false;
                 }
-                if (orbit.eol > 0.0 && orbit.bol > 0.0 && orbit.eol < orbit.bol)
+                if (epoch.end_of_life > 0.0 && epoch.beginning_of_life > 0.0 && epoch.end_of_life < epoch.beginning_of_life)
                 {
                     report << i << "/" << id << "/Orbit: EOL date precedes BOL date" << std::endl;
                     valid = false;
@@ -789,7 +833,7 @@ namespace OPI
             {
                 if (data->data_velocity.hasData() && !isZero(vel))
                 {
-                    if (length(pos) <= 6378.0 && orbit.eol <= 0.0)
+                    if (length(pos) <= 6378.0 && epoch.end_of_life <= 0.0)
                     {
                         report << i << "/" << id << "/StateVector: Object is inside Earth and has not been marked as decayed (EOL = 0)" << std::endl;
                         valid = false;
@@ -1097,8 +1141,6 @@ namespace OPI
                     o.mean_anomaly = nan;
                     e = INVALID_DATA;
                 }
-                o.bol = 0.0;
-                o.eol = 0.0;
                 getOrbit()[i] = o;
             }
             update(DATA_ORBIT);

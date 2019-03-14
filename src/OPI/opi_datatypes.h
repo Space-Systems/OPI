@@ -289,9 +289,7 @@ namespace OPI
                 && o.inclination == 0.0
                 && o.raan == 0.0
                 && o.arg_of_perigee == 0.0
-                && o.mean_anomaly == 0.0
-                && o.bol == 0.0
-                && o.eol == 0.0);
+                && o.mean_anomaly == 0.0);
     }
 
     OPI_CUDA_PREFIX inline bool isZero(const Vector3& v)
@@ -317,9 +315,7 @@ namespace OPI
                 || std::isnan(o.inclination)
                 || std::isnan(o.raan)
                 || std::isnan(o.arg_of_perigee)
-                || std::isnan(o.mean_anomaly)
-                || std::isnan(o.bol)
-                || std::isnan(o.eol));
+                || std::isnan(o.mean_anomaly));
     }
 
     OPI_CUDA_PREFIX inline bool hasNaN(const Vector3& v)

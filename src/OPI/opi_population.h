@@ -210,6 +210,8 @@ namespace OPI
 			OPI_API_EXPORT Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
 			//! Retrieve the acceleration in cartesian coordinates on the specified device
 			OPI_API_EXPORT Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Retrieve epoch information on the specified device
+            OPI_API_EXPORT Epoch* getEpoch(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the covariance information on the specified device
 			OPI_API_EXPORT Covariance* getCovariance(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the arbitrary binary information on the specified device
