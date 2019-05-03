@@ -114,7 +114,7 @@ namespace OPI
 		return impl->lastError;
 	}
 
-    ErrorCode Host::loadPlugins(const char* plugindir, gpuPlatform platformSupport)
+    ErrorCode Host::loadPlugins(const char* plugindir, gpuPlatform platformSupport, int platformNumber, int deviceNumber)
 	{
 		ErrorCode status = SUCCESS;
 		std::cout << "Loading plugins from " << plugindir << std::endl;
@@ -137,7 +137,7 @@ namespace OPI
 				{
 					// plugin successfully loaded
 					impl->gpuSupport = proc_create_support();
-					impl->gpuSupport->init();
+                    impl->gpuSupport->init(platformNumber, deviceNumber);
 				}
 				else {
 					platformSupport = PLATFORM_NONE;

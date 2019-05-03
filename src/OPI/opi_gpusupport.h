@@ -41,7 +41,7 @@ namespace OPI
 	{
 		public:
 			virtual ~GpuSupport() {}
-			virtual void init() = 0;
+            virtual void init(int platformNumber = 0, int deviceNumber = 0) = 0;
 
 			virtual void allocate(void** a, size_t size) = 0;
 			virtual void free(void* mem) = 0;

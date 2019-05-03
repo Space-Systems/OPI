@@ -30,7 +30,7 @@ class CudaSupportImpl:
 		CudaSupportImpl();
 		~CudaSupportImpl();
 
-		virtual void init();
+        virtual void init(int platformNumber = 0, int deviceNumber = 0);
 
         virtual void copy(void* a, void* b, size_t size, unsigned int num_objects, bool host_to_device);
 		virtual void allocate(void** a, size_t size);
@@ -62,10 +62,10 @@ CudaSupportImpl::~CudaSupportImpl()
 	delete[] CUDAProperties;
 }
 
-void CudaSupportImpl::init()
+void CudaSupportImpl::init(int platformNumber, int deviceNumber)
 {
+    //platformNumber is not required for CUDA
 	int deviceCount = 0;
-	int deviceNumber = 0;
 
 	// search for devices and print some information
 	// currently, only the first device is used

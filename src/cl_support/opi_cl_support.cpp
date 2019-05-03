@@ -26,39 +26,46 @@ ClSupportImpl::~ClSupportImpl()
 	
 }
 
-void ClSupportImpl::init()
+void ClSupportImpl::init(int platformNumber, int deviceNumber)
 {
 	std::cout << "Calling CL init function" << std::endl;
 	cl_platform_id platforms[8];
 	cl_uint nPlatforms;
 	cl_int error;
 	error = clGetPlatformIDs(8, platforms, &nPlatforms);
-    for (unsigned int i = 0; i < nPlatforms; i++) {
-		size_t actualLength;
-		char vendor[32], name[64];
-		clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 32, &vendor, &actualLength);
-		clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME,   64, &name,   &actualLength);
-		std::cout << "Platform " << i << ": " << string(vendor) << " " << string(name) << std::endl;
+    if (error == CL_SUCCESS)
+    {
+        for (unsigned int i = 0; i < nPlatforms; i++) {
+            size_t actualLength;
+            char vendor[32], name[64];
+            clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 32, &vendor, &actualLength);
+            clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME,   64, &name,   &actualLength);
+            std::cout << "Platform " << i << ": " << string(vendor) << " " << string(name) << std::endl;
 
-		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &nDevices);
-		devices = new cl_device_id[nDevices];
-		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, nDevices, devices, &nDevices);
-        for (unsigned int j = 0; j < nDevices; j++) {
-			char devName[64];
-			clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 64, devName, &actualLength);
-			std::cout << "Device " << j << ": " << string(devName) << std::endl;
-		}
-	}
+            clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &nDevices);
+            devices = new cl_device_id[nDevices];
+            clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, nDevices, devices, &nDevices);
+            for (unsigned int j = 0; j < nDevices; j++) {
+                char devName[64];
+                clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 64, devName, &actualLength);
+                std::cout << "Device " << j << ": " << string(devName) << std::endl;
+            }
+        }
 
-	//Just select the first platform and device for now
-	int currentPlatform = 0;
-	currentDevice = 0;
-	clGetDeviceIDs(platforms[currentPlatform], CL_DEVICE_TYPE_ALL, nDevices, devices, &nDevices);
-	cl_context_properties props[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[currentPlatform]), 0 };
-	context = clCreateContext(props, 1, devices, NULL, NULL, &error);
-	if (error != CL_SUCCESS) std::cerr << "Error creating context: " << error << std::endl;
-	defaultQueue = clCreateCommandQueue(context, devices[currentDevice], 0, &error);
-	if (error != CL_SUCCESS) std::cerr << "Error creating queue: " << error << std::endl;
+        //FIXME Check availability
+        int currentPlatform = platformNumber;
+        currentDevice = deviceNumber;
+
+        clGetDeviceIDs(platforms[currentPlatform], CL_DEVICE_TYPE_ALL, nDevices, devices, &nDevices);
+        cl_context_properties props[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)(platforms[currentPlatform]), 0 };
+        context = clCreateContext(props, 1, devices, NULL, NULL, &error);
+        if (error != CL_SUCCESS) std::cerr << "Error creating context: " << error << std::endl;
+        defaultQueue = clCreateCommandQueue(context, devices[currentDevice], 0, &error);
+        if (error != CL_SUCCESS) std::cerr << "Error creating queue: " << error << std::endl;
+    }
+    else {
+        std::cerr << "Unable to get OpenCL platform IDs: " << error << std::endl;
+    }
 }
 
 void ClSupportImpl::allocate(void** a, size_t size)

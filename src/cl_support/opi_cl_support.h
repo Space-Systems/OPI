@@ -31,7 +31,7 @@ public:
 	ClSupportImpl();
 	~ClSupportImpl();
 
-	virtual void init();
+    virtual void init(int platformNumber = 0, int deviceNumber = 0);
 
     virtual void copy(void* a, void* b, size_t size, unsigned int num_objects, bool host_to_device);
 	virtual void allocate(void** a, size_t size);
