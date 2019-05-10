@@ -74,8 +74,7 @@ namespace OPI
 	 * \endcond
 	 */
 
-	Population::Population(Host& host, int size):
-		data(host)
+    Population::Population(Host& host, int size): data(host)
 	{
 		data->size = 0;
         data->byteArraySize = 1;
@@ -83,7 +82,7 @@ namespace OPI
 		resize(size);        
 	}
 
-    Population::Population(const Population& source) : data(source.getHostPointer())
+    Population::Population(const Population& source): data(source.getHostPointer())
     {
         data->size = 0;
         data->byteArraySize = 1;
@@ -133,6 +132,7 @@ namespace OPI
             thisAcc[i] = acc[listdata[i]];
             thisEp[i] = ep[listdata[i]];
             thisCov[i] = cov[listdata[i]];
+            data->object_names[i] = source.getObjectName(i);
             for (int j=0; j<b; j++)
             {
                 thisBytes[i*b+j] = bytes[listdata[i]*b+j];
@@ -164,14 +164,13 @@ namespace OPI
         resize(newSize, data->byteArraySize);
 
         copy(other, 0, other.getSize(), oldSize);
-
     }
 
     void Population::copy(const Population& source, int firstIndex, int length, int offset)
     {
         if ((offset + length) <= data->size)
         {
-            bool copyBytes =(data->byteArraySize == source.getByteArraySize());
+            bool copyBytes = (data->byteArraySize == source.getByteArraySize());
             if (!copyBytes) std::cout << "Warning: Copying population without the byte array" << std::endl;
 
             // TODO Use std::copy instead
@@ -182,6 +181,7 @@ namespace OPI
             memcpy(&getAcceleration()[offset], &source.getAcceleration(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
             memcpy(&getEpoch()[offset], &source.getEpoch(DEVICE_HOST, false)[firstIndex], length*sizeof(Epoch));
             memcpy(&getCovariance()[offset], &source.getCovariance(DEVICE_HOST, false)[firstIndex], length*sizeof(Covariance));
+            for (int i=0; i<length; i++) data->object_names[offset+i] = source.getObjectName(firstIndex+i);
             if (copyBytes) memcpy(&getBytes()[offset], &source.getBytes(DEVICE_HOST, false)[firstIndex], data->byteArraySize*length*sizeof(char));
             else memset(&getBytes()[offset], 0, data->byteArraySize*length*sizeof(char));
 
