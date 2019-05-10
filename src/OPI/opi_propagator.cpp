@@ -21,6 +21,8 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <iomanip>
+
 namespace OPI
 {
 	/**
@@ -194,6 +196,66 @@ namespace OPI
             }
         }
         configFileName = filenameStr;
+    }
+
+    OPI::ErrorCode Propagator::align(OPI::Population& population, double dt)
+    {
+        // Find the target epoch to align the population to
+        double latestEpoch = 0.0;
+        for (int i=0; i<population.getSize(); i++)
+        {
+            double currentEpoch = population.getEpoch()[i].current_epoch;
+            if (currentEpoch == 0.0)
+            {
+                std::cout << "Cannot align: Current epoch must be set for all objects." << std::endl;
+                return OPI::INVALID_DATA;
+            }
+            latestEpoch = std::max(latestEpoch, currentEpoch);
+        }
+        std::cout << "Aligning to epoch " << std::setprecision(15) << latestEpoch << std::endl;
+
+        OPI::ErrorCode error;
+        int objectsAligned = 0;
+        while (objectsAligned < population.getSize())
+        {
+            objectsAligned = 0;
+            OPI::IndexList trailingObjects(population.getHostPointer());
+            for (int i=0; i<population.getSize(); i++)
+            {                
+                const double currentEpoch = population.getEpoch()[i].current_epoch;
+                const double deltaSeconds = (latestEpoch - currentEpoch) * 86400.0;
+                if (deltaSeconds < 1)
+                {
+                    objectsAligned++;
+                }
+                else if (deltaSeconds >= dt)
+                {
+                    trailingObjects.add(i);
+                }
+                else if (deltaSeconds < dt)
+                {
+                    // Object is close to the target epoch. Propagate individually.
+                    OPI::IndexList thisObject(population.getHostPointer());
+                    thisObject.add(i);
+                    //std::cout << "Object " << i << " closing in. Propagating for " << deltaSeconds << " seconds." << std::endl;
+                    error = runPropagation(population, 0.0, deltaSeconds, OPI::MODE_INDIVIDUAL_EPOCHS, &thisObject);
+                }
+            }
+            if (trailingObjects.getSize() > 0) error = runPropagation(population, 0.0, dt, OPI::MODE_INDIVIDUAL_EPOCHS, &trailingObjects);
+            if (error == OPI::NOT_IMPLEMENTED)
+            {
+                std::cout << "Cannot align: Propagator does not support the required functions." << std::endl;
+                return error;
+            }
+            else if (error != OPI::SUCCESS)
+            {
+                std::cout << "Propagator returned an error during object alignment." << std::endl;
+                return error;
+            }
+            //std::cout << objectsAligned << " objects aligned." << std::endl;
+        }
+        //std::cout << "Alignment complete." << std::endl;
+        return OPI::SUCCESS;
     }
 
     std::vector<std::string> Propagator::tokenize(std::string line, std::string delimiter)

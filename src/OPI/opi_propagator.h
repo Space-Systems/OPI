@@ -160,6 +160,23 @@ namespace OPI
              */
             OPI_API_EXPORT virtual ErrorCode loadPopulation(Population& population, const char* filename);
 
+            /**
+             * @brief Align a population to a common epoch.
+             *
+             * This function allows a population to be aligned to a common epoch. The epoch is chosen automatically
+             * by analyzing the population and finding the object whose epoch is furthest ahead. All other objects
+             * will then be propagated to that epoch.
+             * All propagators that correctly implement both indexed propagation and individual epoch mode should be
+             * capable of supporting object alignment. All objects in the population will need their current epoch
+             * set to a value larger than zero for this to work.
+             * @param population The population to be aligned.
+             * @param dt The step size, in seconds, used for alignment.
+             * @return OPI::NOT_IMPLEMENTED if the propagator does not support the required functions, OPI::INVALID_VALUE
+             * if the population does not have all required fields filled out, OPI::SUCCESS if the propagator returns
+             * no errors.
+             */
+            OPI_API_EXPORT virtual OPI::ErrorCode align(OPI::Population& population, double dt);
+
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
 			void useModules();
