@@ -22,7 +22,7 @@
 #include "opi_module.h"
 #include "opi_pimpl_helper.h"
 #include <string>
-#include <vector>
+
 namespace OPI
 {
 	class Population;
@@ -50,29 +50,6 @@ namespace OPI
 		public:
 			OPI_API_EXPORT Propagator();
 			OPI_API_EXPORT virtual ~Propagator();
-
-            /**
-             * @brief loadConfigFile Attempts to load the standard configuration file.
-             *
-             * The standard configuration file resides in the same directory as the plugin
-             * with a .cfg suffix instead of the platform's library extension (.dll, .so,
-             * .dynlib). This file is automatically loaded by the host on initialization using
-             * the second variant of this function below.
-             * It is recommended for plugin authors to call this function on runDisable()
-             * as part of resetting the propagator to its default state.
-             */
-			OPI_API_EXPORT void loadConfigFile();
-
-            /**
-             * @brief loadConfigFile Attempts to load a config file. Called by the host upon initialization.
-             *
-             * This function will automatically be called by OPI (and, in most cases, should
-             * only ever be called by OPI) when the plugin is first loaded.
-             * The given config file name will be stored in the propagator. Plugin authors
-             * should use the above variant of this function when resetting the propagator.
-             * @param filename The name of the config file to load.
-             */
-            OPI_API_EXPORT void loadConfigFile(const char* filename);
 
             /**
              * @brief propagate Starts the propagation for the given time step.
@@ -183,14 +160,8 @@ namespace OPI
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
             virtual ErrorCode runPropagation(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr) = 0;
-            //! Variable to hold the appropriate name for the config file.
-            std::string configFileName;
 
 		private:
-            //! Auxiliary functions for loadConfig
-            std::vector<std::string> tokenize(std::string line, std::string delimiter);
-            std::string trim(const std::string &s);
-
 			Pimpl<PropagatorImpl> data;
 
 	};
