@@ -796,7 +796,7 @@ namespace OPI
                                 {
                                     if (!hasProperty(property.c_str()))
                                     {
-                                        std::cout << "Registering new PropagatorProperty from config file: " << property << " (string)" << std::endl;
+                                        //std::cout << "Registering new PropagatorProperty from config file: " << property << " (string)" << std::endl;
                                         createProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
                                     }
                                     else setProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
@@ -807,7 +807,7 @@ namespace OPI
                                     {
                                         if (!hasProperty(property.c_str()))
                                         {
-                                            std::cout << "Registering new PropagatorProperty from config file: " << property << " (float)" << std::endl;
+                                            //std::cout << "Registering new PropagatorProperty from config file: " << property << " (float)" << std::endl;
                                             createProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
                                         }
                                         else setProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
@@ -815,7 +815,7 @@ namespace OPI
                                     else {
                                         if (!hasProperty(property.c_str()))
                                         {
-                                            std::cout << "Registering new PropagatorProperty from config file: " << property << " (double)" << std::endl;
+                                            //std::cout << "Registering new PropagatorProperty from config file: " << property << " (double)" << std::endl;
                                             createProperty(property.c_str(), atof(value.c_str()));
                                         }
                                         else setProperty(property.c_str(), atof(value.c_str()));
@@ -824,7 +824,7 @@ namespace OPI
                                 else {
                                     if (!hasProperty(property.c_str()))
                                     {
-                                        std::cout << "Registering new PropagatorProperty from config file: " << property << " (int)" << std::endl;
+                                        //std::cout << "Registering new PropagatorProperty from config file: " << property << " (int)" << std::endl;
                                         createProperty(property.c_str(), atoi(value.c_str()));
                                     }
                                     else setProperty(property.c_str(), atoi(value.c_str()));
