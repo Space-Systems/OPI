@@ -62,12 +62,14 @@ endif()
 
 # opencl basic example (C++ API)
 if (ENABLE_CL_SUPPORT)
-  add_example_plugin(
-    PropagatorCL2Basic
-    OPENCL
-    SOURCES
-      propagator_basic_cl2.cpp
-  )
+  if (${OpenCL_VERSION_STRING} VERSION_GREATER "1")
+    add_example_plugin(
+      PropagatorCL2Basic
+      OPENCL
+      SOURCES
+        propagator_basic_cl2.cpp
+    )
+  endif()
 endif()
 
 # cuda example
@@ -92,10 +94,12 @@ endif()
 
 # a simple OpenCL example plugin (C++ API)
 if (ENABLE_CL_SUPPORT)
-  add_example_plugin(
-    PropagatorCL2Example
-    OPENCL
-    SOURCES
-     propagator_cl2_example.cpp
-  )
+  if (${OpenCL_VERSION_STRING} VERSION_GREATER "1")
+    add_example_plugin(
+      PropagatorCL2Example
+      OPENCL
+      SOURCES
+       propagator_cl2_example.cpp
+    )
+  endif()
 endif()

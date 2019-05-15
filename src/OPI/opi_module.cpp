@@ -19,6 +19,10 @@
 #include "opi_host.h"
 #include <map>
 #include <sstream>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
+
 namespace OPI
 {
 	/**
@@ -319,6 +323,7 @@ namespace OPI
 			std::string author;
 			std::string description;
 			std::map<std::string, Property> properties;
+            std::string configFileName;
 			void* privateData;
 			template<class T> ErrorCode setValue(const std::string& name, const T& value);
 	};
@@ -333,6 +338,7 @@ namespace OPI
 	{
 		data->host = 0;
 		data->enabled = false;
+        data->configFileName = "";
 	}
 
 	Module::~Module()
@@ -379,34 +385,34 @@ namespace OPI
 		return data->enabled;
 	}
 
-	void Module::setName(const std::string &newname)
+    void Module::setName(const char* newname)
 	{
-		data->name = newname;
+        data->name = std::string(newname);
 	}
 
-	const std::string& Module::getName() const
+    const char* Module::getName() const
 	{
-		return data->name;
+        return data->name.c_str();
 	}
 
-	void Module::setAuthor(const std::string& author)
+    void Module::setAuthor(const char* author)
 	{
-		data->author = author;
+        data->author = std::string(author);
 	}
 
-	const std::string& Module::getAuthor() const
+    const char* Module::getAuthor() const
 	{
-		return data->author;
+        return data->author.c_str();
 	}
 
-	void Module::setDescription(const std::string& description)
+    void Module::setDescription(const char* description)
 	{
-		data->description = description;
+        data->description = std::string(description);
 	}
 
-	const std::string& Module::getDescription() const
+    const char* Module::getDescription() const
 	{
-		return data->description;
+        return data->description.c_str();
 	}
 
 	Host* Module::getHost() const
@@ -414,110 +420,110 @@ namespace OPI
 		return data->host;
 	}
 
-	void Module::registerProperty(const std::string &name, int *location)
+    void Module::registerProperty(const char* name, int *location)
 	{
-		data->properties.insert(std::make_pair(name, Property(location, false)));
+        data->properties.insert(std::make_pair(std::string(name), Property(location, false)));
 	}
 
-	void Module::registerProperty(const std::string &name, float *location)
+    void Module::registerProperty(const char* name, float *location)
 	{
-		data->properties.insert(std::make_pair(name, Property(location, false)));
+        data->properties.insert(std::make_pair(std::string(name), Property(location, false)));
 	}
 
-	void Module::registerProperty(const std::string &name, double *location)
+    void Module::registerProperty(const char* name, double *location)
 	{
-		data->properties.insert(std::make_pair(name, Property(location, false)));
+        data->properties.insert(std::make_pair(std::string(name), Property(location, false)));
 	}
 
-	void Module::registerProperty(const std::string &name, std::string *location)
+    void Module::registerProperty(const char* name, std::string *location)
 	{
-		data->properties.insert(std::make_pair(name, Property(location)));
+        data->properties.insert(std::make_pair(std::string(name), Property(location)));
 	}
 
-	void Module::registerProperty(const std::string &name, int *location, int size)
+    void Module::registerProperty(const char* name, int *location, int size)
 	{
-		data->properties.insert(std::make_pair(name, Property(location, false, size)));
+        data->properties.insert(std::make_pair(std::string(name), Property(location, false, size)));
 	}
 
-	void Module::registerProperty(const std::string &name, float *location, int size)
+    void Module::registerProperty(const char* name, float *location, int size)
 	{
-		data->properties.insert(std::make_pair(name, Property(location, false, size)));
+        data->properties.insert(std::make_pair(std::string(name), Property(location, false, size)));
 	}
 
-	void Module::registerProperty(const std::string &name, double *location, int size)
+    void Module::registerProperty(const char* name, double *location, int size)
 	{
-		data->properties.insert(std::make_pair(name, Property(location, false, size)));
+        data->properties.insert(std::make_pair(std::string(name), Property(location, false, size)));
 	}
 
 
-	void Module::createProperty(const std::string &name, int value)
+    void Module::createProperty(const char* name, int value)
 	{
-		data->properties.insert(std::make_pair(name, Property(&value, true)));
+        data->properties.insert(std::make_pair(std::string(name), Property(&value, true)));
 	}
 
-	void Module::createProperty(const std::string &name, float value)
+    void Module::createProperty(const char* name, float value)
 	{
-		data->properties.insert(std::make_pair(name, Property(&value, true)));
+        data->properties.insert(std::make_pair(std::string(name), Property(&value, true)));
 	}
 
-	void Module::createProperty(const std::string &name, double value)
+    void Module::createProperty(const char* name, double value)
 	{
-		data->properties.insert(std::make_pair(name, Property(&value, true)));
+        data->properties.insert(std::make_pair(std::string(name), Property(&value, true)));
 	}
 
-	void Module::createProperty(const std::string &name, const std::string& value)
+    void Module::createProperty(const char* name, const char* value)
 	{
-		data->properties.insert(std::make_pair(name, Property(value)));
+        data->properties.insert(std::make_pair(std::string(name), Property(std::string(value))));
 	}
 
 	template<class T>
-	ErrorCode ModuleImpl::setValue(const std::string& name, const T& value)
+    ErrorCode ModuleImpl::setValue(const std::string& name, const T& value)
 	{
 		ErrorCode result = INVALID_PROPERTY;
 		// find property
 		if(properties.count(name) > 0)
 		{
-			result = properties[name].setValue(value);
+            result = properties[name].setValue(value);
 		}
 		host->sendError(result);
 		return SUCCESS;
 	}
 
-	ErrorCode Module::setProperty(const std::string &name, int value)
+    ErrorCode Module::setProperty(const char* name, int value)
 	{
-		return data->setValue(name, value);
+        return data->setValue(std::string(name), value);
 	}
-	ErrorCode Module::setProperty(const std::string &name, float value)
+    ErrorCode Module::setProperty(const char* name, float value)
 	{
-		return data->setValue(name, value);
+        return data->setValue(std::string(name), value);
 	}
-	ErrorCode Module::setProperty(const std::string &name, double value)
+    ErrorCode Module::setProperty(const char* name, double value)
 	{
-		return data->setValue(name, value);
+        return data->setValue(std::string(name), value);
 	}
 
-	ErrorCode Module::setProperty(const std::string &name, const std::string& value)
+    ErrorCode Module::setProperty(const char* name, const char* value)
 	{
 		ErrorCode result = INVALID_PROPERTY;
 		// find property
-		if(data->properties.count(name) > 0)
+        if(data->properties.count(std::string(name)) > 0)
 		{
 			result = SUCCESS;
-			Property& property = data->properties[name];
+            Property& property = data->properties[std::string(name)];
 			// check the type
 			switch(property.type)
 			{
 				case TYPE_INTEGER:
-					std::istringstream(value) >> *(property.ptr.v_int);
+                    std::istringstream(std::string(value)) >> *(property.ptr.v_int);
 					break;
 				case TYPE_FLOAT:
-					std::istringstream(value) >> *(property.ptr.v_float);
+                    std::istringstream(std::string(value)) >> *(property.ptr.v_float);
 					break;
 				case TYPE_DOUBLE:
-					std::istringstream(value) >> *(property.ptr.v_double);
+                    std::istringstream(std::string(value)) >> *(property.ptr.v_double);
 					break;
 				case TYPE_STRING:
-					*(property.ptr.v_string) = value;
+                    *(property.ptr.v_string) = std::string(value);
 					break;
 				case TYPE_INTEGER_ARRAY:
 				case TYPE_FLOAT_ARRAY:
@@ -531,33 +537,33 @@ namespace OPI
 		return result;
 	}
 
-	ErrorCode Module::setProperty(const std::string &name, int *value, int n)
+    ErrorCode Module::setProperty(const char* name, int *value, int n)
 	{
 		ErrorCode result = INVALID_PROPERTY;
 		data->host->sendError(result);
 		return result;
 	}
 
-	ErrorCode Module::setProperty(const std::string &name, float *value, int n)
+    ErrorCode Module::setProperty(const char* name, float *value, int n)
 	{
 		ErrorCode result = INVALID_PROPERTY;
 		data->host->sendError(result);
 		return result;
 	}
 
-	ErrorCode Module::setProperty(const std::string &name, double *value, int n)
+    ErrorCode Module::setProperty(const char* name, double *value, int n)
 	{
 		ErrorCode result = INVALID_PROPERTY;
 		data->host->sendError(result);
 		return result;
 	}
 
-	int Module::getPropertyInt(const std::string &name, int element)
+    int Module::getPropertyInt(const char* name, int element)
 	{
-		if(data->properties.count(name) > 0)
+        if(data->properties.count(std::string(name)) > 0)
 		{
 			int value;
-			ErrorCode error_status = data->properties[name].getValue(value, element);
+            ErrorCode error_status = data->properties[std::string(name)].getValue(value, element);
 			data->host->sendError(error_status);
 			return value;
 		}
@@ -570,12 +576,12 @@ namespace OPI
 		return getPropertyInt(getPropertyName(index), element);
 	}
 
-	float Module::getPropertyFloat(const std::string &name, int element)
+    float Module::getPropertyFloat(const char* name, int element)
 	{
-		if(data->properties.count(name) > 0)
+        if(data->properties.count(std::string(name)) > 0)
 		{
 			float value;
-			ErrorCode error_status = data->properties[name].getValue(value, element);
+            ErrorCode error_status = data->properties[std::string(name)].getValue(value, element);
 			data->host->sendError(error_status);
 			return value;
 		}
@@ -588,12 +594,12 @@ namespace OPI
 		return getPropertyFloat(getPropertyName(index), element);
 	}
 
-	double Module::getPropertyDouble(const std::string &name, int element)
+    double Module::getPropertyDouble(const char* name, int element)
 	{
-		if(data->properties.count(name) > 0)
+        if(data->properties.count(std::string(name)) > 0)
 		{
 			double value;
-			ErrorCode error_status = data->properties[name].getValue(value, element);
+            ErrorCode error_status = data->properties[std::string(name)].getValue(value, element);
 			data->host->sendError(error_status);
 			return value;
 		}
@@ -606,13 +612,13 @@ namespace OPI
 		return getPropertyDouble(getPropertyName(index), element);
 	}
 
-	const std::string& Module::getPropertyString(const std::string &name, int element)
+    const char* Module::getPropertyString(const char* name, int element)
 	{
 		static std::string internal_bufferstring;
 		internal_bufferstring = "";
-		if(data->properties.count(name) > 0)
+        if(data->properties.count(std::string(name)) > 0)
 		{
-			Property& property = data->properties[name];
+            Property& property = data->properties[std::string(name)];
 			// check the type
 			switch(property.type)
 			{
@@ -679,12 +685,12 @@ namespace OPI
 					data->host->sendError(INCOMPATIBLE_TYPES);
 			}
 		}		
-		return internal_bufferstring;
+        return internal_bufferstring.c_str();
 	}
 
-	const std::string& Module::getPropertyString(int index, int element)
+    const char* Module::getPropertyString(int index, int element)
 	{
-		return getPropertyString(getPropertyName(index), element);
+        return getPropertyString(getPropertyName(index), element);
 	}
 
 
@@ -703,23 +709,23 @@ namespace OPI
 		return data->properties.size();
 	}
 
-	bool Module::hasProperty(const std::string &name) const
+    bool Module::hasProperty(const char* name) const
 	{
-		return data->properties.count(name) > 0;
+        return data->properties.count(std::string(name)) > 0;
 	}
 
-	const std::string& Module::getPropertyName(int index) const
+    const char* Module::getPropertyName(int index) const
 	{
 		static std::string dummystring = "";
 		if((index < 0)||(index >= (int)(data->properties.size())))
 		{
 			data->host->sendError(INDEX_RANGE);
-			return dummystring;
+            return dummystring.c_str();
 		}
 		std::map<std::string, Property>::iterator itr = data->properties.begin();
 		for(int i=0; i < index; i++)
 			itr++;
-		return itr->first;
+        return (itr->first).c_str();
 	}
 
 	PropertyType Module::getPropertyType(int index) const
@@ -736,18 +742,18 @@ namespace OPI
 		return itr->second.type;
 	}
 
-	PropertyType Module::getPropertyType(const std::string &name) const
+    PropertyType Module::getPropertyType(const char* name) const
 	{
-		if(data->properties.count(name) > 0)
-			return data->properties[name].type;
+        if(data->properties.count(std::string(name)) > 0)
+            return data->properties[std::string(name)].type;
 		data->host->sendError(INVALID_PROPERTY);
 		return TYPE_UNKNOWN;
 	}
 
-	int Module::getPropertySize(const std::string &name) const
+    int Module::getPropertySize(const char* name) const
 	{
-		if(data->properties.count(name) > 0)
-			return data->properties[name].size;
+        if(data->properties.count(std::string(name)) > 0)
+            return data->properties[std::string(name)].size;
 		data->host->sendError(INVALID_PROPERTY);
 		return 0;
 	}
@@ -756,6 +762,111 @@ namespace OPI
 	{
 		return getPropertySize(getPropertyName(index));
 	}
+
+    void Module::loadConfigFile()
+    {
+        loadConfigFile(data->configFileName.c_str());
+    }
+
+    void Module::loadConfigFile(const char* filename)
+    {
+        std::string filenameStr(filename);
+        if (filenameStr != "" && filenameStr.length() > 4)
+        {
+            if (filenameStr.substr(filenameStr.length()-4,4) == ".cfg")
+            {
+                std::ifstream in(filename, std::ifstream::in);
+                if (in.is_open())
+                {
+                    std::cout << "Applying settings for " << getName() << " from config file" << std::endl;
+                    while (in.good())
+                    {
+                        std::string line;
+                        std::getline(in, line);
+                        line = trim(line);
+                        if (line[0] != '#')
+                        {
+                            std::vector<std::string> setting = tokenize(line, "=");
+                            if (setting.size() >= 2)
+                            {
+                                std::string property = trim(setting[0]);
+                                std::string value = trim(setting[1]);
+
+                                if (value.substr(0,1) == "\"" && value.substr(value.length()-1, value.length()) == "\"")
+                                {
+                                    if (!hasProperty(property.c_str()))
+                                    {
+                                        //std::cout << "Registering new PropagatorProperty from config file: " << property << " (string)" << std::endl;
+                                        createProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
+                                    }
+                                    else setProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
+                                }
+                                else if (value.find_first_of(".") != std::string::npos)
+                                {
+                                    if (value.substr(value.length()-1,1) == "f")
+                                    {
+                                        if (!hasProperty(property.c_str()))
+                                        {
+                                            //std::cout << "Registering new PropagatorProperty from config file: " << property << " (float)" << std::endl;
+                                            createProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
+                                        }
+                                        else setProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
+                                    }
+                                    else {
+                                        if (!hasProperty(property.c_str()))
+                                        {
+                                            //std::cout << "Registering new PropagatorProperty from config file: " << property << " (double)" << std::endl;
+                                            createProperty(property.c_str(), atof(value.c_str()));
+                                        }
+                                        else setProperty(property.c_str(), atof(value.c_str()));
+                                    }
+                                }
+                                else {
+                                    if (!hasProperty(property.c_str()))
+                                    {
+                                        //std::cout << "Registering new PropagatorProperty from config file: " << property << " (int)" << std::endl;
+                                        createProperty(property.c_str(), atoi(value.c_str()));
+                                    }
+                                    else setProperty(property.c_str(), atoi(value.c_str()));
+                                }
+                            }
+                        }
+                    }
+                    in.close();
+                }
+                else {
+                    //std::cout << "No config file found for propagator " << getName() << std::endl;
+                }
+            }
+            else {
+                std::cout << filenameStr << " is not a valid config file for propagator " << getName() << std::endl;
+            }
+        }
+        data->configFileName = filenameStr;
+    }
+
+    std::vector<std::string> Module::tokenize(std::string line, std::string delimiter)
+    {
+        std::vector<std::string> elements;
+
+        std::string::size_type lastPos = line.find_first_not_of(delimiter, 0);
+        std::string::size_type pos     = line.find_first_of(delimiter, lastPos);
+
+        while (std::string::npos != pos || std::string::npos != lastPos)
+        {
+            elements.push_back(line.substr(lastPos, pos - lastPos));
+            lastPos = line.find_first_not_of(delimiter, pos);
+            pos = line.find_first_of(delimiter, lastPos);
+        }
+        return elements;
+    }
+
+    std::string Module::trim(const std::string &s)
+    {
+        auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c){return isspace(c); });
+        auto wsback = std::find_if_not(s.rbegin(), s.rend(), [](int c){return isspace(c); }).base();
+        return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
+    }
 
     int Module::requiresCUDA()
     {

@@ -78,7 +78,7 @@ class BasicCL: public OPI::Propagator
 		}
 
         // This is the main function every plugin needs to implement to do the actual propagation.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
 		{
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
             // look at the seconds that have elapsed since the first call of the propagator. The first
@@ -100,8 +100,8 @@ class BasicCL: public OPI::Propagator
             // cl_mem instances in the OpenCL implementation. They must be explicitly cast to
             // cl_mem before they can be used as kernel arguments. This step will also trigger
             // the memory transfer from host to OpenCL device if required.
-            cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
-            cl_mem position = reinterpret_cast<cl_mem>(data.getPosition(OPI::DEVICE_CUDA));
+            cl_mem orbit = reinterpret_cast<cl_mem>(population.getOrbit(OPI::DEVICE_CUDA));
+            cl_mem position = reinterpret_cast<cl_mem>(population.getPosition(OPI::DEVICE_CUDA));
 
             // To use the OpenCL C++ API, we also need to create a cl::Buffer object from
             // the cl_mem instance. Again, the retainObject flag of the cl::Buffer constructor
@@ -118,12 +118,12 @@ class BasicCL: public OPI::Propagator
 
             // set remaining arguments (julian_day and dt)
             propagator.setArg(2, seconds);
-            propagator.setArg(3, data.getSize());
+            propagator.setArg(3, population.getSize());
 
             // Get the command queue (retainOwnership = true, you get the idea...)
             cl::CommandQueue queue = cl::CommandQueue(*clSupport->getOpenCLQueue(), true);
             // Enqueue the kernel with a 1-dimensional NDRange matching the size of the population.
-            err = queue.enqueueNDRangeKernel(propagator, cl::NullRange, cl::NDRange(data.getSize()), cl::NullRange);
+            err = queue.enqueueNDRangeKernel(propagator, cl::NullRange, cl::NDRange(population.getSize()), cl::NullRange);
             if (err != CL_SUCCESS) std::cout << "Error running kernel: " << err << std::endl;
 
             // Wait for the kernel to finish.
@@ -131,8 +131,8 @@ class BasicCL: public OPI::Propagator
 
             // The kernel writes to the Population's position and orbit vectors, so
             // these two have to be marked for updated values on the OpenCL ("CUDA") device.
-            data.update(OPI::DATA_POSITION, OPI::DEVICE_CUDA);
-            data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
+			population.update(OPI::DATA_POSITION, OPI::DEVICE_CUDA);
+			population.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
 
             return OPI::SUCCESS;
 		}
@@ -148,12 +148,12 @@ class BasicCL: public OPI::Propagator
         // is helpful to know that the IndexList synchronizes with the GPU just like the
         // Population - the functions IndexList::getData() and IndexList::update() work
         // just like their Population counterparts.
-        OPI::ErrorCode runIndexedPropagation(OPI::Population& data, OPI::IndexList& indices, double julian_day, double dt)
+        OPI::ErrorCode runIndexedPropagation(OPI::Population& population, OPI::IndexList& indices, double julian_day, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }
 
-        OPI::ErrorCode runMultiTimePropagation(OPI::Population& data, double* julian_days, int length, double dt)
+        OPI::ErrorCode runMultiTimePropagation(OPI::Population& population, double* julian_days, int length, double dt)
         {
             return OPI::NOT_IMPLEMENTED;
         }

@@ -1,5 +1,5 @@
-# No idea which version is actually required
-cmake_minimum_required (VERSION 2.8)
+# Minimum version required is 3.1 for CMAKE_CXX_STANDARD
+cmake_minimum_required (VERSION 3.1)
 
 # disable in source builds (these must be placed before project)
 if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
@@ -53,12 +53,26 @@ endif()
 option(ENABLE_PYTHON "Generate Python bindings using SWIG" ON)
 if (ENABLE_PYTHON)
   find_package(SWIG)
-  find_package(PythonLibs)
-  if (${SWIG_FOUND} AND ${PYTHONLIBS_FOUND})
-    message("Python support enabled")
+  if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
+    set (ENABLE_PYTHON OFF)
+    find_package(Python3 COMPONENTS Development)
+	if (${SWIG_FOUND} AND ${Python3_FOUND})
+	  message("Building interface for Python 3")
+	  set (ENABLE_PYTHON ON)
+	endif()
+	find_package(Python2 COMPONENTS Development)
+    if (${SWIG_FOUND} AND ${Python2_FOUND})
+	  message("Building interface for Python 2")
+	  set (ENABLE_PYTHON ON)
+	endif()
   else()
-    message("SWIG and/or python libraries missing. Python interface will not be built.")
-    set(ENABLE_PYTHON OFF)
+    find_package(PythonLibs)
+    if (${SWIG_FOUND} AND ${PYTHONLIBS_FOUND})
+      message("Python support enabled")
+    else()
+      message("SWIG and/or python libraries missing. Python interface will not be built.")
+      set(ENABLE_PYTHON OFF)
+    endif()
   endif()
 endif()
 
@@ -73,10 +87,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # add option to enable c++11 compiler features
-option(ENABLE_CXX11 "Enable c++11" OFF)
+option(ENABLE_CXX11 "Enable C++11" ON)
 if(ENABLE_CXX11)
-  #add_definitions( --std=c++11)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11")
+  set(CMAKE_CXX_STANDARD 11)
   message( "C++11 enabled")
 endif()
 
@@ -98,7 +111,11 @@ endif()
 include_directories( ${CMAKE_BINARY_DIR}/generated)
 
 add_subdirectory(src)
+
+option(ENABLE_EXAMPLES "Build examples" ON)
+if(ENABLE_EXAMPLES)
 add_subdirectory(examples)
+endif()
 
 install(
   EXPORT OPI-libs

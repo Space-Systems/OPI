@@ -35,16 +35,12 @@ namespace OPI
 
 			virtual ErrorCode enable();
 			virtual ErrorCode disable();
-            virtual ErrorCode runPropagation(Population& data, double julian_day, double dt);
-            virtual ErrorCode runIndexedPropagation(Population& data, int* indices, int index_size, double julian_day, double dt);
-            virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, int length, double dt);
+            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt, PropagationMode mode, IndexList* indices);
 			virtual int requiresCUDA();
 		private:
 			Plugin* plugin;
 			// propagate proc
 			pluginPropagateFunction proc_propagate;
-			pluginPropagateFunctionIndexed proc_propagate_indexed;
-            pluginPropagateFunctionMultiTime proc_propagate_multitime;
 			pluginInitFunction proc_init;
 
 	};

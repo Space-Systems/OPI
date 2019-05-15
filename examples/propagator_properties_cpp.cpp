@@ -92,7 +92,7 @@ class PropertiesCPP: public OPI::Propagator
         // It is important to remember that the host can set new property values at any
         // time. If you are using properties that affect the propagation you need to
         // make sure to check for updated values at every propagation step.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
 		{
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;

@@ -51,11 +51,11 @@ namespace OPI
 	 * for orbital propagation. The Host keeps a list of available propagators (usually loaded from
 	 * shared objects) and provides access to them.
 	 */
-	class OPI_API_EXPORT Host
+	class Host
 	{
 		public:
-			Host();
-			~Host();
+			OPI_API_EXPORT Host();
+			OPI_API_EXPORT ~Host();
 	
 			enum gpuPlatform {
 				PLATFORM_NONE,
@@ -64,7 +64,7 @@ namespace OPI
 			};
 
 			//! Check whether CUDA is supported on the current hardware.
-			bool hasCUDASupport() const;
+			OPI_API_EXPORT bool hasCUDASupport() const;
 
 			//! Load all plugins found in the given directory.
 			/** A plugin can be a Propagator, CustomPropagator, PerturbationModule, PropagatorIntegrator,
@@ -73,25 +73,25 @@ namespace OPI
 			 * The parameter platformSupport states whether support for CUDA (default) or OpenCL should be loaded.
 			 * \returns an ErrorCode containing information on any errors that occurred during the operation.
 			 */
-			ErrorCode loadPlugins(const std::string& plugindir, gpuPlatform platformSupport = PLATFORM_OPENCL);
+            OPI_API_EXPORT ErrorCode loadPlugins(const char* plugindir, gpuPlatform platformSupport = PLATFORM_NONE, int platformNumber = 0, int deviceNumber = 0);
 
 			//! Sets an error callback for this host.
-			void setErrorCallback(OPI_ErrorCallback callback, void* privatedata);
+			OPI_API_EXPORT void setErrorCallback(OPI_ErrorCallback callback, void* privatedata);
 
 			//! Returns the number of available CUDA devices
-			int getCudaDeviceCount() const;
+			OPI_API_EXPORT int getCudaDeviceCount() const;
 
 			//! Selects the CUDA device to be used by the plugin.
 			/** The default device is zero.
 			 * \returns -1 if no CUDA devices are present, zero otherwise.
 			 */	
-			int selectCudaDevice(int deviceNumber) const;
+			OPI_API_EXPORT int selectCudaDevice(int deviceNumber) const;
 
 			//! Returns the name of the currently selected CUDA device.
-			std::string getCurrentCudaDeviceName() const;
+			OPI_API_EXPORT std::string getCurrentCudaDeviceName() const;
 
 			//! Returns the major capability number of the currently selected CUDA device.
-			int getCurrentCudaDeviceCapability() const;
+			OPI_API_EXPORT int getCurrentCudaDeviceCapability() const;
 
 			//! Get a Propagator by index.
 			/** After loading the available plugins this function can
@@ -102,7 +102,7 @@ namespace OPI
 			 * \see Host::loadPlugins
 			 * \returns an instance of the Propagator with the given name; NULL if no such Propagator exists.
 			 */
-			Propagator* getPropagator(int index) const;
+			OPI_API_EXPORT Propagator* getPropagator(int index) const;
 
 			//! Get a specific propagator by name.
 			/** After loading the available plugins use this function
@@ -110,7 +110,7 @@ namespace OPI
 			 * \see Host::loadPlugins
 			 * \returns an instance of the Propagator with the given name; NULL if no such Propagator exists.
 			 */
-			Propagator* getPropagator(const std::string& name) const;
+            OPI_API_EXPORT Propagator* getPropagator(const char* name) const;
 
 			//! Returns the number of propagators.
 			/** After loading the plugins, this function returns the number of valid Propagators that
@@ -118,7 +118,7 @@ namespace OPI
 			 * \see Host::loadPlugins
 			 * \returns the number of Propagator plugins available; zero if none were found.
 			 */
-			int getPropagatorCount() const;
+			OPI_API_EXPORT int getPropagatorCount() const;
 
 			//! Adds and registers a Propagator which is not implemented by a plugin (C++-API only).
 			/** If both Propagator and Host are written in C++, this function can be used to
@@ -126,7 +126,7 @@ namespace OPI
 			 * Useful if Host and Propagator should be the same application (which would partly
 			 * defeat the purpose of this API, but hey - it's your work :-P).
 			 */
-			void addPropagator(Propagator* propagator);
+			OPI_API_EXPORT void addPropagator(Propagator* propagator);
 
 			//! Adds an empty CustomPropagator with the given name to the list of available Propagators.
 			/** A CustomPropagator works exactly like a Propagator, but is put together from
@@ -134,59 +134,61 @@ namespace OPI
 			 * \see CustomPropagator, PerturbationModule, PropagatorIntegrator
 			 * \returns a new instance of a CustomPropagator.
 			 */
-			CustomPropagator* createCustomPropagator(const std::string& name);
+            OPI_API_EXPORT CustomPropagator* createCustomPropagator(const char* name);
 
+            /* NOT YET IMPLEMENTED
 			//! Find a propagator module by name, returns 0 (null pointer) if not found
-			PerturbationModule* getPerturbationModule(const std::string& name) const;
+            PerturbationModule* getPerturbationModule(const char* name) const;
 			//! Find a propagator module by index, returns 0 (null pointer) if not found
 			PerturbationModule* getPerturbationModule(int index) const;
 			//! Returns the number of known modules
 			int getPerturbationModuleCount() const;
 
 			//! Find a propagator integrator by name, returns 0 (null pointer) if not found
-			PropagatorIntegrator* getPropagatorIntegrator(const std::string& name) const;
+            PropagatorIntegrator* getPropagatorIntegrator(const char* name) const;
 			//! Find a propagator integrator by index, returns 0 (null pointer) if not found
 			PropagatorIntegrator* getPropagatorIntegrator(int index) const;
 
 			//! Returns the number of known Intergrators
 			int getPropagatorIntegratorCount() const;
+            */
 
 			//! Adds and registers a Distance query which is not implemented by a plugin
-			void addDistanceQuery(DistanceQuery* query);
+			OPI_API_EXPORT void addDistanceQuery(DistanceQuery* query);
 			//! Returns an distance query module by name, returns 0 (null pointer) if not found
-			DistanceQuery* getDistanceQuery(const std::string& name) const;
+            OPI_API_EXPORT DistanceQuery* getDistanceQuery(const char* name) const;
 			//! Returns an distance query module by index, returns 0 (null pointer) if not found
-			DistanceQuery* getDistanceQuery(int index) const;
+			OPI_API_EXPORT DistanceQuery* getDistanceQuery(int index) const;
 			//! Returns the number of known distance queries
-			int getDistanceQueryCount() const;
+			OPI_API_EXPORT int getDistanceQueryCount() const;
 
 			//! Adds and registers a Collision Detection module
-			void addCollisionDetection(CollisionDetection* module);
+			OPI_API_EXPORT void addCollisionDetection(CollisionDetection* module);
 			//! Find a collision detection module by name, returns 0 (null pointer) if not found
-			CollisionDetection* getCollisionDetection(const std::string& name) const;
+            OPI_API_EXPORT CollisionDetection* getCollisionDetection(const char* name) const;
 			//! Find a collision detection module by index, returns 0 (null pointer) if not found
-			CollisionDetection* getCollisionDetection(int index) const;
+			OPI_API_EXPORT CollisionDetection* getCollisionDetection(int index) const;
 			//! Returns the number of known collision detection modules
-			int getCollisionDetectionCount() const;
+			OPI_API_EXPORT int getCollisionDetectionCount() const;
 
 
 			//! Returns the code of the last occured Error of this host or its plugins
-			ErrorCode getLastError() const;
+			OPI_API_EXPORT ErrorCode getLastError() const;
 
 			//! \cond INTERNAL_DOCUMENTATION
 
 			//! Returns the CUDA Support object
-			GpuSupport* getGPUSupport() const;
+			OPI_API_EXPORT GpuSupport* getGPUSupport() const;
 			//! Returns cuda device properties
-			cudaDeviceProp* getCUDAProperties(int device = 0) const;
+			OPI_API_EXPORT cudaDeviceProp* getCUDAProperties(int device = 0) const;
 
 			//! Sends an error through the registered callback
-			void sendError(ErrorCode code) const;
+			OPI_API_EXPORT void sendError(ErrorCode code) const;
 			//! \endcond
 		private:
 			Host(const Host& other);
 			//! Load a specific plugin
-            void loadPlugin(Plugin* plugin, gpuPlatform platform, const std::string& configfile);
+            void loadPlugin(Plugin* plugin, gpuPlatform platform, const char* configfile);
             bool pluginSupported(Module *plugin, gpuPlatform platform);
             std::string getPluginTypeString(int pluginType);
 			Pimpl<HostImpl> impl;

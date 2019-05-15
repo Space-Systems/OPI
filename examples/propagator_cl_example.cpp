@@ -82,7 +82,7 @@ class TestPropagator:
 			return kernel;
 		}
 
-        virtual OPI::ErrorCode runPropagation(OPI::Population& data, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
 		{
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;
@@ -104,8 +104,8 @@ class TestPropagator:
 				// cl_mem objects in the OpenCL implementation. They must be explicitly cast to
 				// cl_mem before they can be used as kernel arguments. This step will also trigger
 				// the memory transfer from host to OpenCL device.
-                std::cout << data.getSize() << std::endl;
-				cl_mem orbit = reinterpret_cast<cl_mem>(data.getOrbit(OPI::DEVICE_CUDA));
+                std::cout << population.getSize() << std::endl;
+				cl_mem orbit = reinterpret_cast<cl_mem>(population.getOrbit(OPI::DEVICE_CUDA));
 				err = clSetKernelArg(propagator, 0, sizeof(cl_mem), &orbit);
                 if (err != CL_SUCCESS) std::cout << "Error setting population data: " << err << std::endl;
 
@@ -116,7 +116,7 @@ class TestPropagator:
                 if (err != CL_SUCCESS) std::cout << "Error setting dt data: " << err << std::endl;
 
 				// run the kernel
-				const size_t s = data.getSize();
+				const size_t s = population.getSize();
                 err = clEnqueueNDRangeKernel(*clSupport->getOpenCLQueue(), propagator, 1, NULL, &s, NULL, 0, NULL, NULL);
                 if (err != CL_SUCCESS) std::cout << "Error running kernel: " << err << std::endl;
 
@@ -124,7 +124,7 @@ class TestPropagator:
                 clFinish(*clSupport->getOpenCLQueue());
 
 				// Don't forget to notify OPI of the updated data on the device!
-				data.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
+				population.update(OPI::DATA_ORBIT, OPI::DEVICE_CUDA);
 
 				return OPI::SUCCESS;
 			}

@@ -30,15 +30,15 @@ class CudaSupportImpl:
 		CudaSupportImpl();
 		~CudaSupportImpl();
 
-		virtual void init();
+        virtual void init(int platformNumber = 0, int deviceNumber = 0);
 
-		virtual void copy(void* a, void* b, size_t size, bool host_to_device);
+        virtual void copy(void* a, void* b, size_t size, unsigned int num_objects, bool host_to_device);
 		virtual void allocate(void** a, size_t size);
 		virtual void free(void* mem);
 		virtual void shutdown();
 		virtual void selectDevice(int device);
 		virtual int getCurrentDevice();
-		virtual std::string getCurrentDeviceName();
+        virtual const char* getCurrentDeviceName();
 		virtual int getCurrentDeviceCapability();
 		virtual int getDeviceCount();
         virtual cudaDeviceProp* getDeviceProperties(int device);
@@ -62,10 +62,10 @@ CudaSupportImpl::~CudaSupportImpl()
 	delete[] CUDAProperties;
 }
 
-void CudaSupportImpl::init()
+void CudaSupportImpl::init(int platformNumber, int deviceNumber)
 {
+    //platformNumber is not required for CUDA
 	int deviceCount = 0;
-	int deviceNumber = 0;
 
 	// search for devices and print some information
 	// currently, only the first device is used
@@ -115,9 +115,9 @@ void CudaSupportImpl::free(void *mem)
 	cudaFree(mem);
 }
 
-void CudaSupportImpl::copy(void *destination, void *source, size_t size, bool host_to_device)
+void CudaSupportImpl::copy(void *destination, void *source, size_t size, unsigned int num_objects, bool host_to_device)
 {
-	cudaMemcpy(destination, source, size, host_to_device ? cudaMemcpyHostToDevice : cudaMemcpyDeviceToHost);
+    cudaMemcpy(destination, source, size*num_objects, host_to_device ? cudaMemcpyHostToDevice : cudaMemcpyDeviceToHost);
 }
 
 void CudaSupportImpl::shutdown()
@@ -155,7 +155,7 @@ cudaDeviceProp* CudaSupportImpl::getDeviceProperties(int device)
 	return 0;
 }
 
-std::string CudaSupportImpl::getCurrentDeviceName()
+const char* CudaSupportImpl::getCurrentDeviceName()
 {
 	int device = getCurrentDevice();
 	if((device >= 0) && (device < getDeviceCount())) {
@@ -168,10 +168,10 @@ std::string CudaSupportImpl::getCurrentDeviceName()
 		result << " @ " << (CUDAProperties[device].clockRate)/1000 << "MHz";
 		if (&CUDAProperties[device].ECCEnabled)
 			result << " (ECC enabled)";
-		return result.str();
+        return result.str().c_str();
 	}
 	else {
-		return std::string("No CUDA Device selected.");
+        return "No CUDA Device selected.";
 	}
 }
 

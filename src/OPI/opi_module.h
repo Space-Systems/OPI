@@ -21,6 +21,8 @@
 #include "opi_error.h"
 #include "opi_pimpl_helper.h"
 #include <string>
+#include <vector>
+
 namespace OPI
 {
 	class Population;
@@ -31,31 +33,55 @@ namespace OPI
 
 	//! \brief This interface class defines the common module shared functions
 	//! \ingroup CPP_API_GROUP
-	class OPI_API_EXPORT Module
+	class Module
 	{
 		public:
-			Module();
-			virtual ~Module();
+			OPI_API_EXPORT Module();
+			OPI_API_EXPORT virtual ~Module();
 
 			//! Checks if this propagator is enabled
-			bool isEnabled() const;
+			OPI_API_EXPORT bool isEnabled() const;
 			//! Enable this propagator (reserves internal memory)
-			ErrorCode enable();
+			OPI_API_EXPORT ErrorCode enable();
 			//! Disable this propagator (frees up internal memory)
-			ErrorCode disable();
+			OPI_API_EXPORT ErrorCode disable();
 			//! Sets the name of this module
-			void setName(const std::string& name);
+            OPI_API_EXPORT void setName(const char* name);
 			//! Returns the name of this module
-			const std::string& getName() const;
+            OPI_API_EXPORT const char* getName() const;
 			//! Sets the author of this module
-			void setAuthor(const std::string& name);
+            OPI_API_EXPORT void setAuthor(const char* name);
 			//! Returns the author of this module
-			const std::string& getAuthor() const;
+            OPI_API_EXPORT const char* getAuthor() const;
 			//! Sets the description of this module
-			void setDescription(const std::string& name);
+            OPI_API_EXPORT void setDescription(const char* name);
 			//! Returns the description of this module
-			const std::string& getDescription() const;
+            OPI_API_EXPORT const char* getDescription() const;
 
+            /**
+             * @brief loadConfigFile Attempts to load the standard configuration file.
+             *
+             * The standard configuration file resides in the same directory as the plugin
+             * with a .cfg suffix instead of the platform's library extension (.dll, .so,
+             * .dynlib). This file is automatically loaded by the host on initialization using
+             * the second variant of this function below.
+             * It is recommended for plugin authors to call this function on runDisable()
+             * as part of resetting the propagator to its default state.
+             */
+            OPI_API_EXPORT void loadConfigFile();
+
+            /**
+             * @brief loadConfigFile Attempts to load a config file. Called by the host upon initialization.
+             *
+             * This function will automatically be called by OPI (and, in most cases, should
+             * only ever be called by OPI) when the plugin is first loaded.
+             * The given config file name will be stored in the propagator. Plugin authors
+             * should use the above variant of this function when resetting the propagator.
+             * @param filename The name of the config file to load.
+             */
+            OPI_API_EXPORT void loadConfigFile(const char* filename);
+
+            /* NOT YET IMPLEMENTED
 			//! Sets the version number of this module
 			void setVersion(int major, int minor, int patch);
 			//! Gets the major version of this module
@@ -64,98 +90,95 @@ namespace OPI
 			int getVersionMinor() const;
 			//! Gets the patch version of this module
 			int getVersionPatch() const;
+            */
 
 			// property access functions
 			//! registers a property
-			void registerProperty(const std::string& name, int* location);
+            OPI_API_EXPORT void registerProperty(const char* name, int* location);
 			//! registers a property
-			void registerProperty(const std::string& name, float* location);
+            OPI_API_EXPORT void registerProperty(const char* name, float* location);
 			//! registers a property
-			void registerProperty(const std::string& name, double* location);
+            OPI_API_EXPORT void registerProperty(const char* name, double* location);
 			//! registers a property
-			void registerProperty(const std::string& name, int* location, int size);
+            OPI_API_EXPORT void registerProperty(const char* name, int* location, int size);
 			//! registers a property
-			void registerProperty(const std::string& name, float* location, int size);
+            OPI_API_EXPORT void registerProperty(const char* name, float* location, int size);
 			//! registers a property
-			void registerProperty(const std::string& name, double* location, int size);
+            OPI_API_EXPORT void registerProperty(const char* name, double* location, int size);
 			//! registers a property
-			void registerProperty(const std::string& name, std::string* location);
+            OPI_API_EXPORT void registerProperty(const char* name, std::string* location);
 
 			//! creates a new property of type int, the memory will be managed by OPI
-			void createProperty(const std::string& name, int value);
+            OPI_API_EXPORT void createProperty(const char* name, int value);
 			//! creates a new property of type float, the memory will be managed by OPI
-			void createProperty(const std::string& name, float value);
+            OPI_API_EXPORT void createProperty(const char* name, float value);
 			//! creates a new property of type double, the memory will be managed by OPI
-			void createProperty(const std::string& name, double value);
+            OPI_API_EXPORT void createProperty(const char* name, double value);
 			//! creates a new property of type string, the memory will be managed by OPI
-			void createProperty(const std::string &name, const std::string& value);
+            OPI_API_EXPORT void createProperty(const char* name, const char* value);
+
+            /* NOT YET IMPLEMENTED
 			//! creates a new property array of type int, the memory will be managed by OPI
-			void createProperty(const std::string& name, int* value, int size);
+            void createProperty(const char* name, int* value, int size);
 			//! creates a new property array of type float, the memory will be managed by OPI
-			void createProperty(const std::string& name, float* value, int size);
+            void createProperty(const char* name, float* value, int size);
 			//! creates a new property array of type double, the memory will be managed by OPI
-			void createProperty(const std::string& name, double* value, int size);
+            void createProperty(const char* name, double* value, int size);
+            */
 
 			//! Sets a property
-			ErrorCode setProperty(const std::string& name, int value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, int value);
 			//! Sets a property
-			ErrorCode setProperty(const std::string& name, float value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, float value);
 			//! Sets a property
-			ErrorCode setProperty(const std::string& name, double value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, double value);
 			//! Sets a property
-			ErrorCode setProperty(const std::string& name, const std::string& value);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, const char* value);
 			//! Sets a property
-			ErrorCode setProperty(const std::string& name, int* value, int n);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, int* value, int n);
 			//! Sets a property
-			ErrorCode setProperty(const std::string& name, float* value, int n);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, float* value, int n);
 			//! Sets a property
-			ErrorCode setProperty(const std::string& name, double* value, int n);
+            OPI_API_EXPORT ErrorCode setProperty(const char* name, double* value, int n);
 			//! Gets the value of a given property
-			int getPropertyInt(const std::string& name, int element = 0);
+            OPI_API_EXPORT int getPropertyInt(const char* name, int element = 0);
 			//! Gets the value of a given property
-			int getPropertyInt(int index, int element = 0);
+			OPI_API_EXPORT int getPropertyInt(int index, int element = 0);
 			//! Gets the value of a given property
-			float getPropertyFloat(const std::string& name, int element = 0);
+            OPI_API_EXPORT float getPropertyFloat(const char* name, int element = 0);
 			//! Gets the value of a given property
-			float getPropertyFloat(int index, int element = 0);
+			OPI_API_EXPORT float getPropertyFloat(int index, int element = 0);
 			//! Gets the value of a given property
-			double getPropertyDouble(const std::string& name, int element = 0);
+            OPI_API_EXPORT double getPropertyDouble(const char* name, int element = 0);
 			//! Gets the value of a given property
-			double getPropertyDouble(int index, int element = 0);
+			OPI_API_EXPORT double getPropertyDouble(int index, int element = 0);
 			//! Gets the value of a given property
-			const std::string& getPropertyString(const std::string& name, int element = 0);
+            OPI_API_EXPORT const char* getPropertyString(const char* name, int element = 0);
 			//! Gets the value of a given property
-			const std::string& getPropertyString(int index, int element = 0);
+            OPI_API_EXPORT const char* getPropertyString(int index, int element = 0);
 
 			// property information functions
 			//! Returns the amount of registered properties
-			int getPropertyCount() const;
+			OPI_API_EXPORT int getPropertyCount() const;
 			//! Returns the name of the property identified by the given index
-			const std::string& getPropertyName(int index) const;
+            OPI_API_EXPORT const char* getPropertyName(int index) const;
 			//! Checks if a property is registered
-			bool hasProperty(const std::string& name) const;
+            OPI_API_EXPORT bool hasProperty(const char* name) const;
 			//! Returns the type of a property
-			PropertyType getPropertyType(const std::string& name) const;
+            OPI_API_EXPORT PropertyType getPropertyType(const char* name) const;
 			//! Returns the type of the property identified by the given index
-			PropertyType getPropertyType(int index) const;
+			OPI_API_EXPORT PropertyType getPropertyType(int index) const;
 			//! Returns the size of the property
-			int getPropertySize(const std::string& name) const;
+            OPI_API_EXPORT int getPropertySize(const char* name) const;
 			//! Returns the size of the property
-			int getPropertySize(int index) const;
+			OPI_API_EXPORT int getPropertySize(int index) const;
 
 
 			//! Sets a private module-internal data pointer
-			void setPrivateData(void* private_data);
+			OPI_API_EXPORT void setPrivateData(void* private_data);
 			//! Returns the module-internal data pointer
-			void* getPrivateData();
+			OPI_API_EXPORT void* getPrivateData();
 
-		protected:
-			//! Returns the Host of this propagator
-			Host* getHost() const;
-			//! Override this if you want to change the enable behaviour
-			virtual ErrorCode runEnable();
-			//! Override this if you want to change the disable behaviour
-			virtual ErrorCode runDisable();
             /**
              * @brief requiresCUDA Check whether this module requires CUDA to function.
              * @return 0 if CUDA is not required, or the major number of
@@ -178,12 +201,24 @@ namespace OPI
              */
             virtual int minimumOPIVersionRequired();
 
+		protected:
+			//! Returns the Host of this propagator
+			Host* getHost() const;
+			//! Override this if you want to change the enable behaviour
+			virtual ErrorCode runEnable();
+			//! Override this if you want to change the disable behaviour
+			virtual ErrorCode runDisable();
+
 		private:
 			//! \cond INTERNAL_DOCUMENTATION
 			void setHost(OPI::Host* newhost);
 			friend class Host;
 			//! \endcond
 			Pimpl<ModuleImpl> data;
+
+            //! Auxiliary functions for loadConfig
+            std::vector<std::string> tokenize(std::string line, std::string delimiter);
+            std::string trim(const std::string &s);
 	};
 }
 

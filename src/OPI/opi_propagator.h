@@ -22,7 +22,7 @@
 #include "opi_module.h"
 #include "opi_pimpl_helper.h"
 #include <string>
-#include <vector>
+
 namespace OPI
 {
 	class Population;
@@ -45,35 +45,11 @@ namespace OPI
 	 * implementation for runIndexPropagation
 	 * \see Module, Host
 	 */
-	class OPI_API_EXPORT Propagator:
-			public Module
+	class Propagator: public Module
 	{
 		public:
-			Propagator();
-			virtual ~Propagator();
-
-            /**
-             * @brief loadConfigFile Attempts to load the standard configuration file.
-             *
-             * The standard configuration file resides in the same directory as the plugin
-             * with a .cfg suffix instead of the platform's library extension (.dll, .so,
-             * .dynlib). This file is automatically loaded by the host on initialization using
-             * the second variant of this function below.
-             * It is recommended for plugin authors to call this function on runDisable()
-             * as part of resetting the propagator to its default state.
-             */
-            void loadConfigFile();
-
-            /**
-             * @brief loadConfigFile Attempts to load a config file. Called by the host upon initialization.
-             *
-             * This function will automatically be called by OPI (and, in most cases, should
-             * only ever be called by OPI) when the plugin is first loaded.
-             * The given config file name will be stored in the propagator. Plugin authors
-             * should use the above variant of this function when resetting the propagator.
-             * @param filename The name of the config file to load.
-             */
-            void loadConfigFile(const std::string& filename);
+			OPI_API_EXPORT Propagator();
+			OPI_API_EXPORT virtual ~Propagator();
 
             /**
              * @brief propagate Starts the propagation for the given time step.
@@ -83,71 +59,43 @@ namespace OPI
              * orbit and position/velocity vectors (if supported) are written back to the
              * given Population. The propagation result shall reflect the state of the
              * Population at the point in time defined by julian_day + dt seconds.
-             * @param data The Population to be propagated.
-             * @param julian_day The base date in Julian date format.
+             * @param population The Population to be propagated.
+             * @param julian_day The base date in Julian date format. Ignored when mode is set to
+             * individual epochs.
              * @param dt The time step, in seconds, from last propagation.
+             * @param mode Sets the propagation mode to single epoch (default) or individual epochs.
+             * In single epoch mode, the propagator assumes that all objects are at the same epoch
+             * given with the julian_day parameter. In individual epoch mode, that parameter is
+             * ignored and the objects' individual current_epoch parameter is used instead.
+             * The plugin shall return NOT_IMPLEMENTED if propagation with individual epochs
+             * is unsupported.
+             * @param indices An IndexList containing the indices of the Population elements that
+             * should be propagated. Defaults to null in which case all objects are propagated.
+             * The plugin shall return NOT_IMPLEMENTED if an index list is set and indexed propagation
+             * is unsupported.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
-            ErrorCode propagate(Population& data, double julian_day, double dt);
+            OPI_API_EXPORT ErrorCode propagate(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
-            /**
-             * @brief propagate Starts the index-based propagation for the given time step.
-             *
-             * Like the propagate() function above, but
-             * only those Population elements that appear in the given IndexList will be
-             * propagated. This function will call the runIndexedPropagation() function that
-             * should be implemented by the plugin. If the plugin returns NOT_IMPLEMENTED, the
-             * operation will still be performed by calling the runPropagation() function on
-             * individual elements which is likely to be very inefficient.
-             * @param data The Population to be propagated.
-             * @param indices An IndexList containing the indices of the Population elements that
-             * should be propagated.
-             * @param julian_day The base date in Julian date format.
-             * @param dt The time step, in seconds, from last propagation.
-             * @return OPI::SUCCESS if propagation was successful; OPI::NOT_IMPLEMENTED if propagation
-             * was performed with OPI's inherent method (which should still give you valid results); or
-             * any other error code returned by the plugin.
-             */
-            ErrorCode propagate(Population& data, IndexList& indices, double julian_day, double dt);
-
-            /**
-             * @brief propagate Starts propagation with individual times for each object.
-             *
-             * Like the propagate) function above, but every object receives an individual base date.
-             * This is useful e.g. when doing fine-grained conjunction analysis between two
-             * regular time steps. This function will call runMultiTimePropagation() which should be
-             * implemented by the plugin. If the plugin returns NOT_IMPLEMENTED, the operation will
-             * be performed by instead calling runPropagation() on individual objects with individual
-             * times. While this should yield valid results, it is likely to be very inefficient.
-             * @param data The Population to be propagated.
-             * @param julian_days An array of Julian dates, one for each element in the Population.
-             * @param length The length of the julian_days array. Must be the same size as the Population's.
-             * @param dt The time step, in seconds, from last propagation.
-             * @return OPI::SUCCESS if propagation was successful; OPI::NOT_IMPLEMENTED if propagation
-             * was performed with OPI's inherent method (which should still give you valid results); or
-             * any other ErrorCode returned by the plugin.
-             */
-            ErrorCode propagate(Population& data, double* julian_days, int length, double dt);
-
-			//! Assigns a module to this propagator
+            //! Assigns a module to this propagator (not yet implemented)
 			/**
 			 * It depends on the used Propagator if the assigned modules will be used
 			 */
-			PerturbationModule* assignPerturbationModule(const std::string& name);
+            //PerturbationModule* assignPerturbationModule(const char* name);
 			//! Returns true if the propagator is able to use Perturbation Modules
-			bool usesModules() const;
+			OPI_API_EXPORT bool usesModules() const;
 
 			//! Returns the assigned Perturbation modules
-			PerturbationModule* getPerturbationModule(int index);
+			OPI_API_EXPORT PerturbationModule* getPerturbationModule(int index);
 
 			//! Returns the number of assigned Perturbation modules
-			int getPerturbationModuleCount() const;
+			OPI_API_EXPORT int getPerturbationModuleCount() const;
 
 			//! Check if this propagator is able to propagate backwards
-			virtual bool backwardPropagation();
+			OPI_API_EXPORT virtual bool backwardPropagation();
 	
 			//! Check if this propagator supports generation of cartesian state vectors
-			virtual bool cartesianCoordinates();
+			OPI_API_EXPORT virtual bool cartesianCoordinates();
 
             /**
              * @brief referenceFrame Return the reference frame for the cartesian state vectors.
@@ -161,7 +109,7 @@ namespace OPI
              * in many different flavours always consult the plugin's documentation for specifics.
              * @return A value of the ReferenceFrame enum matching the propagator's output.
              */
-            virtual ReferenceFrame referenceFrame();
+			OPI_API_EXPORT virtual ReferenceFrame referenceFrame();
 
             /**
              * @brief covarianceType Return the setup of the covariance matrix.
@@ -174,28 +122,46 @@ namespace OPI
              * (k1-k6 for semi major axis, eccentricity, inclination, raan, argument of perigee and mean
              * anomaly). The options ending in _NO_DYNAMICS state that the dynamic parameters are unused.
              */
-            virtual CovarianceType covarianceType();
+            OPI_API_EXPORT virtual CovarianceType covarianceType();
+
+            /**
+             * @brief Initializes a Population from a file or path.
+             *
+             * Some propagators (such as the well-known SGP4 propagator) are designed to work with
+             * very specific data formats. This function can be used by the plugin author to
+             * provide a method to load a Population from a file or directory. Additional configuration
+             * options can be provided via PropagatorProperties if required.
+             * @param population A pointer to an empty Population that will hold the data.
+             * @param filename The name of the file or path that holds the population data.
+             * @return OPI::SUCCESS if operation was successful, or other error code. Defaults to OPI::NOT_IMPLEMENTED.
+             */
+            OPI_API_EXPORT virtual ErrorCode loadPopulation(Population& population, const char* filename);
+
+            /**
+             * @brief Align a population to a common epoch.
+             *
+             * This function allows a population to be aligned to a common epoch. The epoch is chosen automatically
+             * by analyzing the population and finding the object whose epoch is furthest ahead. All other objects
+             * will then be propagated to that epoch.
+             * All propagators that correctly implement both indexed propagation and individual epoch mode should be
+             * capable of supporting object alignment. All objects in the population will need their current epoch
+             * set to a value larger than zero for this to work.
+             * @param population The population to be aligned.
+             * @param dt The step size, in seconds, used for alignment.
+             * @return OPI::NOT_IMPLEMENTED if the propagator does not support the required functions, OPI::INVALID_VALUE
+             * if the population does not have all required fields filled out, OPI::SUCCESS if the propagator returns
+             * no errors.
+             */
+            OPI_API_EXPORT virtual OPI::ErrorCode align(OPI::Population& population, double dt);
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
 			void useModules();
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
-            virtual ErrorCode runPropagation(Population& data, double julian_day, double dt) = 0;
-			//! Override this to implement an index-based propagation
-			//! The C Namespace equivalent for this function is OPI_Plugin_propagateIndexed
-            virtual ErrorCode runIndexedPropagation(Population& data, IndexList& indices, double julian_day, double dt);
-            //! Override this to implement propagation with individual times.
-            //! OPI will make sure that the julian_days vector length matches that of the Population.
-            virtual ErrorCode runMultiTimePropagation(Population& data, double* julian_days, int length, double dt);
-            //! Variable to hold the appropriate name for the config file.
-            std::string configFileName;
+            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr) = 0;
 
 		private:
-            //! Auxiliary functions for loadConfig
-            std::vector<std::string> tokenize(std::string line, std::string delimiter);
-            std::string trim(const std::string &s);
-
 			Pimpl<PropagatorImpl> data;
 
 	};

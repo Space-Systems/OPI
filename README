@@ -26,6 +26,23 @@ functions are subject to change. Your feedback is appreciated.
 
 
 
+FAQ
+---
+
+Q: Does OPI's open source license affect my host and propagator applications?
+
+A: No. OPI is explicitly designed to be independent from hosts and propagators
+so using OPI does not require you to adopt open source licenses for your
+applications or plugins. While we always welcome all kinds of source code
+contributions we only ask you to submit fixes and improvements that you
+make to the OPI library itself. One major goal of OPI is to be able to exchange,
+compare and collaborate on orbital propagators with other researchers. If you are
+unable to share your propagator or force model implementation in source code form
+then OPI may provide an easy way for you to distribute it as a pre-compiled plugin
+instead.
+
+
+
 BUILD INSTRUCTIONS
 ------------------
 

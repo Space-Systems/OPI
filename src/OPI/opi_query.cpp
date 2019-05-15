@@ -33,31 +33,31 @@ namespace OPI
 	{
 	}
 
-	ErrorCode DistanceQuery::rebuild(Population &data)
+	ErrorCode DistanceQuery::rebuild(Population &population)
 	{
-		if(data.getSize() == 0)
+		if(population.getSize() == 0)
 			return SUCCESS;
 		ErrorCode status;
 		// ensure this DistanceQuery is enabled
 		status = enable();
 		// an error occured?
 		if(status == SUCCESS)
-			status = runRebuild(data);
+			status = runRebuild(population);
 		// forward propagation call
 		getHost()->sendError(status);
 		return status;
 	}
 
-	ErrorCode DistanceQuery::queryCubicPairs(Population &data, IndexPairList& pairs, float cube_size)
+	ErrorCode DistanceQuery::queryCubicPairs(Population &population, IndexPairList& pairs, float cube_size)
 	{
-		if(data.getSize() == 0)
+		if(population.getSize() == 0)
 			return SUCCESS;
 		ErrorCode status;
 		// ensure this DistanceQuery is enabled
 		status = enable();
 		// an error occured?
 		if(status == SUCCESS)
-			status = runCubicPairQuery(data, pairs, cube_size);
+			status = runCubicPairQuery(population, pairs, cube_size);
 		getHost()->sendError(status);
 		// forward propagation call
 		return status;

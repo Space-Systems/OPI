@@ -378,7 +378,7 @@ namespace OPI
 							cuda->selectDevice(latestDevice - DEVICE_CUDA);
 							// copy data from device to host
 							hostData.resize(numObjects);
-                            cuda->copy(hostData.data(), deviceData[latestDevice].ptr, sizeof(DataType) * numObjects, false);
+                            cuda->copy(hostData.data(), deviceData[latestDevice].ptr, sizeof(DataType), numObjects, false);
 							// set update flag to false, since we just updated the values
 							hostNeedsUpdate = false;
 							// select the old device
@@ -424,7 +424,7 @@ namespace OPI
 			// select the right device
 			cuda->selectDevice(device - DEVICE_CUDA);
 			// copy data from host to device
-            cuda->copy(deviceData[device].ptr, hostData.data(), sizeof(DataType) * numObjects, true);
+            cuda->copy(deviceData[device].ptr, hostData.data(), sizeof(DataType), numObjects, true);
 			// select the old device again
 			cuda->selectDevice(oldDevice);
 		}

@@ -45,13 +45,7 @@ namespace OPI
 	// cpp propagator interface function
 	typedef Propagator* (*pluginPropagatorFunction)(OPI_Host host);
 	// c interface propagation function
-    typedef ErrorCode (*pluginPropagateFunction)(OPI_Propagator propagator, OPI_Population data, double julian_day, double dt);
-
-	// c interface propagation function
-    typedef ErrorCode (*pluginPropagateFunctionIndexed)(OPI_Propagator propagator, OPI_Population data, int* indices, int index_size, double julian_day, double dt);
-
-    // c interface propagation function
-    typedef ErrorCode (*pluginPropagateFunctionMultiTime)(OPI_Propagator propagator, OPI_Population data, double* julian_days, int length, double dt);
+    typedef ErrorCode (*pluginPropagateFunction)(OPI_Propagator propagator, OPI_Population data, double julian_day, double dt, PropagationMode mode, IndexList* indices);
 
 	// cpp distance query interface function
 	typedef DistanceQuery* (*pluginDistanceQueryFunction)(OPI_Host host);

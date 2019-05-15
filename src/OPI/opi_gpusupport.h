@@ -41,18 +41,18 @@ namespace OPI
 	{
 		public:
 			virtual ~GpuSupport() {}
-			virtual void init() = 0;
+            virtual void init(int platformNumber = 0, int deviceNumber = 0) = 0;
 
 			virtual void allocate(void** a, size_t size) = 0;
 			virtual void free(void* mem) = 0;
-			virtual void copy(void* dest, void* source, size_t size, bool host_to_device) = 0;
+            virtual void copy(void* dest, void* source, size_t size, unsigned int num_objects, bool host_to_device) = 0;
 
 			virtual void shutdown() = 0;
 
 			virtual void selectDevice(int device) = 0;
 			virtual int getCurrentDevice() = 0;
 			virtual int getCurrentDeviceCapability() = 0;
-			virtual std::string getCurrentDeviceName() = 0;
+            virtual const char* getCurrentDeviceName() = 0;
 
 			virtual int getDeviceCount() = 0;
 

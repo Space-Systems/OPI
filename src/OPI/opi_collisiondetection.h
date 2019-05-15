@@ -41,10 +41,10 @@ namespace OPI
 			virtual ~CollisionDetection();
 
 			//! Detect colliding pairs and store them in pairs_out, use the specified query object
-			ErrorCode detectPairs(Population& data, DistanceQuery* query, IndexPairList& pairs_out, float time_passed);
+			ErrorCode detectPairs(Population& population, DistanceQuery* query, IndexPairList& pairs_out, float time_passed);
 		private:
 			//! Implementation of pair detection
-			virtual ErrorCode runDetectPairs(Population& data, DistanceQuery* query, IndexPairList& pairs_out, float time_passed) = 0;
+			virtual ErrorCode runDetectPairs(Population& population, DistanceQuery* query, IndexPairList& pairs_out, float time_passed) = 0;
 			Pimpl<CollisionDetectionImpl> data;
 	};
 }

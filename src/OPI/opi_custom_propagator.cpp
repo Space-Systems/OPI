@@ -24,7 +24,7 @@ namespace OPI
 		PropagatorIntegrator* integrator;
 	};
 
-	CustomPropagator::CustomPropagator(const std::string &name)
+    CustomPropagator::CustomPropagator(const char* name)
 	{
 		setName(name);
 		impl->integrator = 0;
@@ -45,7 +45,7 @@ namespace OPI
 		impl->integrator = integrator;
 	}
 
-    ErrorCode CustomPropagator::runPropagation(Population& data, double julian_day, double dt )
+    ErrorCode CustomPropagator::runPropagation(Population& population, double julian_day, double dt, PropagationMode mode, IndexList* indices)
 	{
 		return SUCCESS;
 	}

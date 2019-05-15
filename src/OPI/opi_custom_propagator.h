@@ -24,7 +24,7 @@ namespace OPI
 	class PerturbationModule;
 	class PropagatorIntegrator;
 
-	class CustomPropagatorImpl;
+	struct CustomPropagatorImpl;
 
 	//! \brief This class represents a propagator which can be composed from different perturbation modules and an integrator at runtime.
 	//! \ingroup CPP_API_GROUP
@@ -33,16 +33,16 @@ namespace OPI
 	{
 		public:
 			//! Creates a new custom propagator with the specified name
-			CustomPropagator(const std::string& name);
-			~CustomPropagator();
+            OPI_API_EXPORT CustomPropagator(const char* name);
+			OPI_API_EXPORT ~CustomPropagator();
 			/// Adds a module to this propagator
-			void addModule(PerturbationModule* module);
+			OPI_API_EXPORT void addModule(PerturbationModule* module);
 			/// Sets the integrator for this propagator
-			void setIntegrator(PropagatorIntegrator* integrator);
+			OPI_API_EXPORT void setIntegrator(PropagatorIntegrator* integrator);
 
 		protected:
 			/// Override the propagation method
-            virtual ErrorCode runPropagation(Population& data, double julian_day, double dt);
+            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 			virtual int requiresCUDA();
 
 		private:

@@ -9,6 +9,7 @@ endif()
 
 set( OPI_SOURCE_FILES
   opi_population.cpp
+  opi_perturbations.cpp
   opi_error.cpp
   opi_host.cpp
   opi_plugininfo.cpp
@@ -26,6 +27,7 @@ set( OPI_SOURCE_FILES
   internal/opi_query_plugin.cpp
   internal/opi_plugin.cpp
   internal/dynlib.cpp
+  internal/miniz.c
   ${CMAKE_BINARY_DIR}/generated/OPI/opi_c_bindings.cpp
 )
 
@@ -37,6 +39,7 @@ set( OPI_LIBRARY_HEADER
   opi_error.h
   opi_datatypes.h
   opi_population.h
+  opi_perturbations.h
   opi_host.h
   opi_plugininfo.h
   opi_custom_propagator.h
@@ -171,13 +174,47 @@ if (ENABLE_PYTHON)
   set (OPI_INTERFACE_FILE bindings/opi.i)
   # Include SWIG-specific CMake commands.
   include(${SWIG_USE_FILE})
-  # Add Python headers and generated OPI headers to the include path.
-  include_directories(${PYTHON_INCLUDE_PATH} ${CMAKE_BINARY_DIR}/generated/OPI)
   # Put SWIG in C++ mode.
   set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES CPLUSPLUS ON)
-  # Create python module from interface definition file.
-  swig_add_module(OPI python ${OPI_INTERFACE_FILE})
-  # Link Python module to the library we created earlier,
-  # as well as the necessary Python libraries.
-  swig_link_libraries(OPI ${PYTHON_LIBRARIES} OPI)
- endif()
+  include_directories(${CMAKE_BINARY_DIR}/generated/OPI)
+
+  if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
+  	if (Python3_FOUND)
+	  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python3)
+      set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES GENERATED_INCLUDE_DIRECTORIES ${Python3_INCLUDE_DIRS})
+      swig_add_library(OPI_py3 TYPE MODULE LANGUAGE python SOURCES ${OPI_INTERFACE_FILE})
+      swig_link_libraries(OPI_py3 ${Python3_LIBRARIES} OPI)
+
+	  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/python3/OPI.py DESTINATION lib/python3)
+	  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py3.pyd DESTINATION lib/python3/ RENAME _OPI.pyd OPTIONAL)
+	  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py3.so DESTINATION lib/python3/ RENAME _OPI.so OPTIONAL)
+	endif()
+    if (Python2_FOUND)
+	  set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python2)
+      set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES GENERATED_INCLUDE_DIRECTORIES ${Python2_INCLUDE_DIRS})
+      swig_add_library(OPI_py2 TYPE MODULE LANGUAGE python SOURCES ${OPI_INTERFACE_FILE})
+      swig_link_libraries(OPI_py2 ${Python2_LIBRARIES} OPI)
+
+	  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/python2/OPI.py DESTINATION lib/python2)
+	  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py2.pyd DESTINATION lib/python2/ RENAME _OPI.pyd OPTIONAL)
+	  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py2.so DESTINATION lib/python2/ RENAME _OPI.so OPTIONAL)
+	endif()
+  else()
+    # Add Python headers and generated OPI headers to the include path.
+    include_directories(${PYTHON_INCLUDE_PATH})
+    # Create python module from interface definition file.
+    set(OPI_PY_MODULE_NAME OPI_py${PYTHONLIBS_VERSION_STRING})
+    swig_add_library(${OPI_PY_MODULE_NAME}
+	  TYPE MODULE
+	  LANGUAGE python
+	  SOURCES ${OPI_INTERFACE_FILE}
+	  )
+    # Link Python module to the library we created earlier,
+    # as well as the necessary Python libraries.
+    swig_link_libraries(${OPI_PY_MODULE_NAME} ${PYTHON_LIBRARIES} OPI)
+
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/OPI.py DESTINATION lib/python${PYTHONLIBS_VERSION_STRING})
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py${PYTHONLIBS_VERSION_STRING}.pyd DESTINATION lib/python${PYTHONLIBS_VERSION_STRING}/ RENAME _OPI.pyd OPTIONAL)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py${PYTHONLIBS_VERSION_STRING}.so DESTINATION lib/python${PYTHONLIBS_VERSION_STRING}/ RENAME _OPI.so OPTIONAL)
+  endif()
+endif()
