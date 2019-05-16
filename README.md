@@ -116,8 +116,8 @@ instead.
 
 
 
-BUILD INSTRUCTIONS
-------------------
+Building Instructions
+---------------------
 
 Building OPI has been tested on Linux (recent versions of Debian, Ubuntu and
 OpenSuSE), Windows (Visual Studio 2017/2019) and OSX (deprecated). OPI uses
