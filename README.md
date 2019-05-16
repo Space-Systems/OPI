@@ -84,6 +84,10 @@ support both individual epoch mode and indexed propagation.
 * Saved populations (.opi files) are now stored gzipped.
 * All modules can now read config files individually.
 
+Issues:
+* Example code is outdated
+* Fortran interface is untested
+
 
 
 
@@ -112,12 +116,14 @@ OpenSuSE), Windows (Visual Studio 2017/2019) and OSX (deprecated). OPI uses
 CMake as a build system, so simply follow the usual instructions below or use
 the GUI tool (in-place builds are not allowed):
 
+```
 mkdir build
 cd build
 cmake .. #or 'cmake-gui ..' - whichever you prefer
 make
 make install
 make doc #optional, to build the API documentation - requires Doxygen
+```
 
 You can set the CMAKE_INSTALL_PREFIX variable to a custom directory of you
 don't want a system-wide install. In that case, you must make sure that the
@@ -126,5 +132,4 @@ variable accordingly. If you require support for CUDA propagators, make sure
 the CUDA SDK is installed and can be found by CMake.
 
 To start using OPI, take a look at the documentation provided with the library.
-The example code is quite outdated and will be updated shortly.
 If you have any questions, please contact me (mmoeckel on GitHub).
