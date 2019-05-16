@@ -13,6 +13,14 @@ by providing a common way of handling propagation. Propagators using OPI are
 designed as plugins/shared libraries that can be loaded by a host program via
 the interface.
 
+Features at a glance:
+* Implement orbital propagators or force models as independent plugins
+* Automatically find and load propagator plugins available on your platform
+* Manage populations of orbital objects
+* Multi-language support (C, C++, Fortran, Python, C#)
+* Platform-independent (although hosts and propagators may not be)
+* Extensible GPU computing support
+
 OPI currently supports C, C++ and Fortran, as well as CUDA  and OpenCL for
 propagators. The C API can also be used for integration into other languages
 like Python or C#. Hosts and plugins don't have to be written in the same
