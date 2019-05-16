@@ -1,6 +1,6 @@
 
-OPI - Orbital Propagation Interface
------------------------------------
+OPI - Orbital Propagation Interface (2019 Version)
+--------------------------------------------------
 
 OPI is an interface with the goal to facilitate the implementation of orbital
 propagators into different applications.
@@ -25,6 +25,67 @@ Please note that this software is still under development and the interface
 functions are subject to change. Your feedback is appreciated.
 
 
+Changes From The 2015 Interface
+-------------------------------
+
+Over the last few years a few changes have been made to the interface that
+have now been merged into the master branch. Those changes, dubbed the 2019
+interface, deprecate the previous version and will require you to update
+propagators and hosts. Updated documentation and examples will follow shortly, until
+then the easiest way to get help at the moment is to contact me directly (mmoeckel
+on GitHub). A quick overview of the most significant changes:
+
+* Indexed propagation and multi-time propagation have moved from individual functions
+to the main "propagate"/"calculate" functions. A mode setting has been introduced to switch
+between single epoch (default) and individual epoch mode. If indexed propagation is not
+required the IndexList pointer should be set to nullptr (default). Propagators that don't
+support individual epoch mode or indexed propagation shall return NOT_IMPLEMENTED when
+IndexList is not null or individual epoch mode is selected, respectively. To update from
+the 2015 interface, simply implement your runPropagation function like this:
+```cpp
+OPI::ErrorCode MyPropagator::runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
+{
+  if (mode == OPI::MODE_INDIVIDUAL_EPOCHS)
+  {
+    // move code from runMultiTimePropagation() here, or:
+    return OPI::NOT_IMPLEMENTED;
+  }
+
+  if (indices != nullptr)
+  {
+    // move code from runIndexedPropagation() here, or:
+    return OPI::NOT_IMPLEMENTED;
+  }
+
+  // implement propagation function
+  return OPI::SUCCESS;
+}
+```
+* Beginning of life and end of life fields have moved to an "Epoch" struct inside
+the population. The Epoch also has a "current_epoch" field that is used for individual
+epoch propagation.
+* Perturbation modules now return a Perturbation instance containing delta values instead
+of a modified population:
+```cpp
+OPI::ErrorCode MyForceModel::runCalculation(OPI::Population& data, OPI::Perturbations& delta, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
+{
+  // Population is read-only
+  // Calculate changes and store them in the appropriate field in "delta"
+}
+```
+* Covariance matrix fields have been introduced.
+* Propagators can implement a "loadPopulation" function that loads propagator-specific
+files and creates OPI populations from it. The default behaviour of this function is to
+load a population in the binary .opi format.
+* Propagators now have an "align" function that brings all objects to the same epoch
+(that of its "latest" object). It should automatically work with all propagators that
+support both individual epoch mode and indexed propagation.
+* New functions to copy and append populations.
+* Saved populations (.opi files) are now stored gzipped.
+* All modules can now read config files individually.
+
+
+
 
 FAQ
 ---
@@ -47,9 +108,9 @@ BUILD INSTRUCTIONS
 ------------------
 
 Building OPI has been tested on Linux (recent versions of Debian, Ubuntu and
-OpenSuSE), Windows (Visual Studio 2013) and OSX. OPI uses CMake as a build
-system, so simply follow the usual instructions below or use the GUI tool
-(in-place builds are not allowed):
+OpenSuSE), Windows (Visual Studio 2017/2019) and OSX (deprecated). OPI uses
+CMake as a build system, so simply follow the usual instructions below or use
+the GUI tool (in-place builds are not allowed):
 
 mkdir build
 cd build
@@ -64,5 +125,6 @@ lib directory is in your library path at runtime by setting the LD_LIBRARY_PATH
 variable accordingly. If you require support for CUDA propagators, make sure
 the CUDA SDK is installed and can be found by CMake.
 
-To start using OPI, take a look at the documentation and the example code
-provided with the library. If you have any questions, feel free to contact us.
+To start using OPI, take a look at the documentation provided with the library.
+The example code is quite outdated and will be updated shortly.
+If you have any questions, please contact me (mmoeckel on GitHub).
