@@ -745,8 +745,48 @@ namespace OPI
         return data->host;
     }
 
+    double Population::getLatestEpoch() const
+    {
+        const double mjd1950 = 2433282.5;
+        double latestEpoch = 0.0;
+        for (int i=0; i<getSize(); i++)
+        {
+            double currentEpoch = getEpoch()[i].current_epoch;
+            if (currentEpoch < mjd1950)
+            {
+                return 0.0;
+            }
+            else {
+                latestEpoch = std::max(latestEpoch, currentEpoch);
+            }
+        }
+        return latestEpoch;
+    }
+
+    double Population::getEarliestEpoch() const
+    {
+        const double mjd1950 = 2433282.5;
+        double earliestEpoch = 9999999.0;
+        for (int i=0; i<getSize(); i++)
+        {
+            double currentEpoch = getEpoch()[i].current_epoch;
+            if (currentEpoch < mjd1950)
+            {
+                return 0.0;
+            }
+            else {
+                earliestEpoch = std::min(earliestEpoch, currentEpoch);
+            }
+        }
+        return earliestEpoch;
+    }
+
     std::string Population::validate(IndexList& invalidObjects) const
     {
+        //0: No object has a current epoch set
+        //1: All objects have a current epoch set
+        //-1: Some objects have a current epoch set while others do not (bad)
+        int epochCheck = 0;
         std::stringstream report;
         for (int i=0; i<data->size; i++)
         {
@@ -795,6 +835,7 @@ namespace OPI
             // check orbit and epoch
             Orbit orbit = getOrbit(DEVICE_HOST)[i];
             Epoch epoch = getEpoch(DEVICE_HOST)[i];
+            const double mjd1950 = 2433282.5;
             if (data->data_orbit.hasData() && !isZero(orbit))
             {
                 if (hasNaN(orbit))
@@ -823,6 +864,15 @@ namespace OPI
                 {
                     report << i << "/" << id << "/Orbit: EOL date precedes BOL date" << std::endl;
                     valid = false;
+                }
+                if (epoch.current_epoch < mjd1950)
+                {
+                    if (i == 0) epochCheck = 0;
+                    else if (epochCheck == 1) epochCheck == -1;
+                }
+                else {
+                    if (i == 0) epochCheck = 1;
+                    else if (epochCheck == 0) epochCheck == -1;
                 }
             }
 
@@ -858,6 +908,8 @@ namespace OPI
 
             if (!valid) invalidObjects.add(i);
         }
+
+        if (epochCheck == -1) report << "Population: Not all objects have a current epoch set." << std::endl;
 
         return report.str();
     }

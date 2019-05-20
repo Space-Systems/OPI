@@ -137,6 +137,20 @@ namespace OPI
             OPI_API_EXPORT const char* getObjectName(int index) const;
 
             /**
+             * @brief getEarliestEpoch Find the earliest epoch from the object's current_epoch fields.
+             * @return 0.0 if any object has an invalid (i.e. lower than Jan 1st, 1950) current epoch set,
+             * otherwise the earliest Julian date found.
+             */
+            OPI_API_EXPORT double getEarliestEpoch() const;
+
+            /**
+             * @brief getLatestEpoch Find the latest epoch from the object's current_epoch fields.
+             * @return 0.0 if any object has an invalid (i.e. lower than Jan 1st, 1950) current epoch set,
+             * otherwise the latest Julian date found.
+             */
+            OPI_API_EXPORT double getLatestEpoch() const;
+
+            /**
              * @brief setObjectName Set the name of the given object.
              * Names are host-only attributes and do not get synchronized to the GPU.
              * @param index The index of the object.
