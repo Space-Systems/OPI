@@ -116,16 +116,12 @@ namespace OPI
     OPI::ErrorCode Propagator::align(OPI::Population& population, double dt)
     {
         // Find the target epoch to align the population to
-        double latestEpoch = 0.0;
-        for (int i=0; i<population.getSize(); i++)
+        const double mjd1950 = 2433282.5;
+        double latestEpoch = population.getLatestEpoch();
+        if (latestEpoch < mjd1950)
         {
-            double currentEpoch = population.getEpoch()[i].current_epoch;
-            if (currentEpoch == 0.0)
-            {
-                std::cout << "Cannot align: Current epoch must be set for all objects." << std::endl;
-                return OPI::INVALID_DATA;
-            }
-            latestEpoch = std::max(latestEpoch, currentEpoch);
+            std::cout << "Cannot align: Current epoch must be set for all objects." << std::endl;
+            return OPI::INVALID_DATA;
         }
         std::cout << "Aligning to epoch " << std::setprecision(15) << latestEpoch << std::endl;
 
