@@ -149,10 +149,10 @@ namespace OPI
                     OPI::IndexList thisObject(population.getHostPointer());
                     thisObject.add(i);
                     //std::cout << "Object " << i << " closing in. Propagating for " << deltaSeconds << " seconds." << std::endl;
-                    error = runPropagation(population, 0.0, deltaSeconds, OPI::MODE_INDIVIDUAL_EPOCHS, &thisObject);
+                    error = propagate(population, 0.0, deltaSeconds, OPI::MODE_INDIVIDUAL_EPOCHS, &thisObject);
                 }
             }
-            if (trailingObjects.getSize() > 0) error = runPropagation(population, 0.0, dt, OPI::MODE_INDIVIDUAL_EPOCHS, &trailingObjects);
+            if (trailingObjects.getSize() > 0) error = propagate(population, 0.0, dt, OPI::MODE_INDIVIDUAL_EPOCHS, &trailingObjects);
             if (error == OPI::NOT_IMPLEMENTED)
             {
                 std::cout << "Cannot align: Propagator does not support the required functions." << std::endl;
