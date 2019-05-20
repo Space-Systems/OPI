@@ -54,18 +54,22 @@ namespace OPI
 
 	//! \endcond
 
-	Host::Host()
+    Host::Host(const char* logfileName)
 	{
 #ifdef WIN32
-		freopen("opi.log", "w", stdout);
+        // stdout isn't easily accessible on Windows so we'll log to a file by default.
+        if (logfileName == "") logfileName = "opi.log";
 #endif
-		impl->errorCallback = 0;
+        logToFile(logfileName);
+
+        impl->errorCallback = 0;
 		impl->lastError = SUCCESS;
 		impl->errorCallbackParameter = 0;
 
 		impl->gpuSupport = 0;
 		impl->gpuSupportPluginHandle = 0;
 	}
+
 	Host::~Host()
 	{
 		// free every propagator
@@ -97,11 +101,13 @@ namespace OPI
 		for(size_t i = 0; i < impl->pluginlist.size(); ++i)
 			delete impl->pluginlist[i];
 
-#ifdef WIN32
-		freopen("CON", "w", stdout);
-#endif
-
+        freopen("CON", "w", stdout);
 	}
+
+    void Host::logToFile(const char* logfileName)
+    {
+        if (logfileName != "") freopen(logfileName, "w", stdout);
+    }
 
 	void Host::setErrorCallback(OPI_ErrorCallback callback, void* privatedata)
 	{
