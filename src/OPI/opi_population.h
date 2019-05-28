@@ -21,6 +21,13 @@
 #include "opi_datatypes.h"
 #include "opi_pimpl_helper.h"
 #include <string>
+
+/* Revision number of the OPI data file format, stored for backwards compatibility
+ * 001 - Initial value for OPI-2019
+ * 002 - Added description field
+ */
+#define OPI_DATA_REVISION_NUMBER 2
+
 namespace OPI
 {
 	struct ObjectRawData;
@@ -129,6 +136,12 @@ namespace OPI
             OPI_API_EXPORT const char* getLastPropagatorName() const;
 
             /**
+             * @brief getDescription Get the population's description string.
+             * @return The string containing the description.
+             */
+            OPI_API_EXPORT const char* getDescription() const;
+
+            /**
              * @brief getObjectName Returns the name of the given object.
              * Names are host-only attributes and do not get synchronized to the GPU.
              * @return The object name as a string. If no name has been set or the index is out of
@@ -167,6 +180,15 @@ namespace OPI
              * @param propagatorName The name of the Propagator as returned by its getName() function.
              */
             OPI_API_EXPORT void setLastPropagatorName(const char* propagatorName);
+
+            /**
+             * @brief setDescription Set a description for the population.
+             *
+             * This can be displayed to the user and contain information about how and from what
+             * sources it was generated, coordinate system the objects are in, valid date range, etc.
+             * @param propagatorName The description string.
+             */
+            OPI_API_EXPORT void setDescription(const char* description);
 
             /**
              * @brief convertOrbitsToStateVectors convert the population's orbit information to state vectors.

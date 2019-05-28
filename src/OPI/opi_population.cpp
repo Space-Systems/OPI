@@ -65,6 +65,7 @@ namespace OPI
             // non-synchronized data
             std::vector<std::string> object_names;
             std::string lastPropagatorName;
+            std::string description;
 
 			// data size
 			int size;
@@ -79,6 +80,7 @@ namespace OPI
 		data->size = 0;
         data->byteArraySize = 1;
         data->lastPropagatorName = "None";
+        data->description = "";
 		resize(size);        
 	}
 
@@ -87,6 +89,7 @@ namespace OPI
         data->size = 0;
         data->byteArraySize = 1;
         data->lastPropagatorName = source.getLastPropagatorName();
+        data->description = source.getDescription();
         int s = source.getSize();
         int b = source.getByteArraySize();
         resize(s,b);
@@ -99,6 +102,7 @@ namespace OPI
         data->size = 0;
         data->byteArraySize = 1;
         data->lastPropagatorName = source.getLastPropagatorName();
+        data->description = source.getDescription();
         int s = list.getSize();
         int b = source.getByteArraySize();
         resize(s);
@@ -209,15 +213,18 @@ namespace OPI
     void Population::write(const char* filename)
     {
 		int temp;
-        int versionNumber = 1;
+        int versionNumber = OPI_DATA_REVISION_NUMBER;
         int magic = 47627;
-        int nameLength = data->lastPropagatorName.length();
+        int nameLength = data->lastPropagatorName.length();        
+        int descLength = data->description.length();
         std::stringstream out;
         out.write(reinterpret_cast<char*>(&magic), sizeof(int));
         out.write(reinterpret_cast<char*>(&versionNumber), sizeof(int));
         out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
         out.write(reinterpret_cast<char*>(&nameLength), sizeof(int));
         out.write(reinterpret_cast<const char*>(data->lastPropagatorName.c_str()), data->lastPropagatorName.length());
+        out.write(reinterpret_cast<char*>(&descLength), sizeof(int));
+        out.write(reinterpret_cast<const char*>(data->description.c_str()), data->description.length());
         for (int i=0; i<data->size; i++)
         {
             int objectNameLength = data->object_names[i].length();
@@ -352,12 +359,13 @@ namespace OPI
                 int magicNumber = 0;
                 int versionNumber = 0;
                 int propagatorNameLength = 0;
+                int descLength = 0;
 
                 in.read(reinterpret_cast<char*>(&magicNumber), sizeof(int));
                 if (magicNumber == 47627)
                 {
                     in.read(reinterpret_cast<char*>(&versionNumber), sizeof(int));
-                    if (versionNumber == 1)
+                    if (versionNumber >= 1)
                     {
                         in.read(reinterpret_cast<char*>(&number_of_objects), sizeof(int));
                         resize(number_of_objects);
@@ -365,7 +373,14 @@ namespace OPI
                         in.read(reinterpret_cast<char*>(&propagatorNameLength), sizeof(int));
                         char* propagatorName = new char[propagatorNameLength];
                         in.read(propagatorName, propagatorNameLength);
-                        data->lastPropagatorName = std::string(propagatorName, propagatorNameLength);
+                        if (versionNumber >= 2)
+                        {
+                            data->lastPropagatorName = std::string(propagatorName, propagatorNameLength);
+                            in.read(reinterpret_cast<char*>(&descLength), sizeof(int));
+                            char* description = new char[descLength];
+                            in.read(description, descLength);
+                            data->description = std::string(description, descLength);
+                        }
                         for (int i=0; i<data->size; i++)
                         {
                             int objectNameLength = 0;
@@ -503,9 +518,19 @@ namespace OPI
         return data->lastPropagatorName.c_str();
     }
 
+    const char* Population::getDescription() const
+    {
+        return data->description.c_str();
+    }
+
     void Population::setLastPropagatorName(const char* propagatorName)
     {
         data->lastPropagatorName = std::string(propagatorName);
+    }
+
+    void Population::setDescription(const char* description)
+    {
+        data->description = std::string(description);
     }
 
     const char* Population::getObjectName(int index) const
