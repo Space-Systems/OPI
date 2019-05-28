@@ -175,7 +175,7 @@ namespace OPI
         if ((offset + length) <= data->size)
         {
             bool copyBytes = (data->byteArraySize == source.getByteArraySize());
-            if (!copyBytes) std::cout << "Warning: Copying population without the byte array" << std::endl;
+            //if (!copyBytes) std::cout << "Warning: Copying population without the byte array" << std::endl;
 
             // TODO Use std::copy instead
             memcpy(&getOrbit()[offset], &source.getOrbit(DEVICE_HOST, false)[firstIndex], length*sizeof(Orbit));
