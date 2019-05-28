@@ -54,13 +54,12 @@ namespace OPI
 
 	//! \endcond
 
-    Host::Host(const char* logfileName)
+    Host::Host()
 	{
 #ifdef WIN32
         // stdout isn't easily accessible on Windows so we'll log to a file by default.
-        if (logfileName == "") logfileName = "opi.log";
+        logToFile("opi.log");
 #endif
-        logToFile(logfileName);
 
         impl->errorCallback = 0;
 		impl->lastError = SUCCESS;
@@ -100,8 +99,9 @@ namespace OPI
 		// free all plugin handles
 		for(size_t i = 0; i < impl->pluginlist.size(); ++i)
 			delete impl->pluginlist[i];
-
+#ifdef WIN32
         freopen("CON", "w", stdout);
+#endif
 	}
 
     void Host::logToFile(const char* logfileName)
