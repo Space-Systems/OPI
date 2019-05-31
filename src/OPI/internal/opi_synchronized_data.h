@@ -21,6 +21,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cstring>
 namespace OPI
 {
 	//! Template based inter-device synchronization helper class
@@ -262,8 +263,10 @@ namespace OPI
 				// then delete all device data
 				clearDevices();
 				// resize the host vector
-				hostData.reserve(num_Objects);
-				// now the host holds the latest information
+                hostData.reserve(num_Objects);
+                // zero the new elements
+                std::memset(hostData.data()+reservedSize, 0, (num_Objects-reservedSize)*sizeof(DataType));
+                // now the host holds the latest information
 				hostNeedsUpdate = false;
 				latestDevice = DEVICE_HOST;
 			}
@@ -320,9 +323,12 @@ namespace OPI
 	{
 		// host device?
 		if(device == DEVICE_HOST) {
+            size_t currentSize = hostData.size();
 			if(hostData.capacity() != (size_t)reservedSize)
 				hostData.reserve(reservedSize);
 			hostData.resize(numObjects);
+            if (numObjects > currentSize)
+                std::memset(hostData.data()+currentSize, 0, (numObjects-currentSize)*sizeof(DataType));
 		}
 		else if ((device >= DEVICE_CUDA)&&(device <= DEVICE_CUDA_LAST)) {
 			// retrieve cuda support object from host
