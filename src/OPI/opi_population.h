@@ -233,6 +233,9 @@ namespace OPI
 			//! Loads the Object Data from disk
             OPI_API_EXPORT ErrorCode read(const char* filename);
 
+            //! Stores the Object Data as a JSON file. Does not include the byte array.
+            OPI_API_EXPORT void writeJSON(const char* filename);
+
 			//! Notify about updates on the specified device
 			OPI_API_EXPORT ErrorCode update(int type, Device device = DEVICE_HOST);
 

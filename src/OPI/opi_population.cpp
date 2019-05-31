@@ -20,6 +20,7 @@
 #include "opi_indexlist.h"
 #include "internal/opi_synchronized_data.h"
 #include "internal/miniz.h"
+#include "internal/json.hpp"
 #include <iostream>
 #include <vector>
 #include <cassert>
@@ -28,6 +29,9 @@
 #include <string.h> //memcpy
 #define _USE_MATH_DEFINES
 #include <math.h>
+
+using json = nlohmann::json;
+
 namespace OPI
 {
 	/**
@@ -488,6 +492,50 @@ namespace OPI
         else std::cout << "Unable to open file " << filename << "!" << std::endl;
 		return SUCCESS;
 	}
+
+    void Population::writeJSON(const char* filename)
+    {
+        json objects;
+        for (int i=0; i<getSize(); i++)
+        {
+            json o;
+            Vector3 p = getPosition()[i];
+            Vector3 v = getVelocity()[i];
+            Vector3 a = getAcceleration()[i];
+            Orbit orb = getOrbit()[i];
+            Epoch e = getEpoch()[i];
+            ObjectProperties pr = getObjectProperties()[i];
+            Covariance c = getCovariance()[i];
+            if (getObjectName(i) != "")
+                o["name"] = getObjectName(i);
+            if (!isZero(p))
+                o["position"] = {{"x",p.x}, {"y",p.y}, {"z",p.z}};
+            if (!isZero(v))
+                o["velocity"] = {{"x",v.x}, {"y",v.y}, {"z",v.z}};
+            if (!isZero(a))
+                o["acceleration"] = {{"x",a.x}, {"y",a.y}, {"z",a.z}};
+            if (!isZero(orb))
+                o["orbit"] = {{"sma",orb.semi_major_axis}, {"ecc",orb.eccentricity}, {"inc",orb.inclination}, {"raan",orb.raan}, {"aop",orb.arg_of_perigee}, {"ma",orb.mean_anomaly}};
+            if (!isZero(e))
+                o["epoch"] = {{"bol",e.beginning_of_life}, {"eol",e.end_of_life}, {"current",e.current_epoch}};
+            if (!isZero(pr))
+                o["properties"] = {{"id",pr.id},{"mass",pr.mass},{"dia",pr.diameter},{"a2m",pr.area_to_mass},{"cd",pr.drag_coefficient},{"cr",pr.reflectivity}};
+            if (!isZero(c))
+                o["covariance"] = {c.k1_k1, c.k2_k1, c.k2_k2, c.k3_k1, c.k3_k2, c.k3_k3, c.k4_k1, c.k4_k2, c.k4_k3, c.k4_k4, c.k5_k1, c.k5_k2, c.k5_k3, c.k5_k4, c.k5_k5,
+                        c.k6_k1, c.k6_k2, c.k6_k3, c.k6_k4, c.k6_k5, c.k6_k6, c.d1_k1, c.d1_k2, c.d1_k3, c.d1_k4, c.d1_k5, c.d1_k6, c.d1_d1,
+                        c.d2_k1, c.d2_k2, c.d2_k3, c.d2_k4, c.d2_k5, c.d2_k6, c.d2_d1, c.d2_d2};
+            objects.push_back(o);
+        }
+        json jp;
+        jp["description"] = getDescription();
+        jp["earliest_epoch"] = getEarliestEpoch();
+        jp["latest_epoch"] = getLatestEpoch();
+        jp["objects"] = objects;
+        std::ofstream outfile(filename);
+        std::string jsonString = jp.dump(2);
+        outfile.write(jsonString.c_str(), jsonString.size());
+        outfile.close();
+    }
 
     void Population::resize(int size, int byteArraySize)
 	{
