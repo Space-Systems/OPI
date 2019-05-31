@@ -297,6 +297,11 @@ namespace OPI
         return (v.x == 0.0 && v.y == 0.0 && v.z == 0.0);
     }
 
+    OPI_CUDA_PREFIX inline bool isZero(const Epoch& e)
+    {
+        return (e.beginning_of_life == 0.0 && e.end_of_life == 0.0 && e.current_epoch == 0.0);
+    }
+
     OPI_CUDA_PREFIX inline bool isZero(const ObjectProperties& p)
     {
         // ID can be zero
@@ -307,6 +312,48 @@ namespace OPI
                 && p.reflectivity == 0.0
                 );
     }
+
+    OPI_CUDA_PREFIX inline bool isZero(const Covariance& c)
+    {
+        return (c.k1_k1 == 0.0 &&
+                c.k2_k1 == 0.0 &&
+                c.k2_k2 == 0.0 &&
+                c.k3_k1 == 0.0 &&
+                c.k3_k2 == 0.0 &&
+                c.k3_k3 == 0.0 &&
+                c.k4_k1 == 0.0 &&
+                c.k4_k2 == 0.0 &&
+                c.k4_k3 == 0.0 &&
+                c.k4_k4 == 0.0 &&
+                c.k5_k1 == 0.0 &&
+                c.k5_k2 == 0.0 &&
+                c.k5_k3 == 0.0 &&
+                c.k5_k4 == 0.0 &&
+                c.k5_k5 == 0.0 &&
+                c.k6_k1 == 0.0 &&
+                c.k6_k2 == 0.0 &&
+                c.k6_k3 == 0.0 &&
+                c.k6_k4 == 0.0 &&
+                c.k6_k5 == 0.0 &&
+                c.k6_k6 == 0.0 &&
+                c.d1_k1 == 0.0 &&
+                c.d1_k2 == 0.0 &&
+                c.d1_k3 == 0.0 &&
+                c.d1_k4 == 0.0 &&
+                c.d1_k5 == 0.0 &&
+                c.d1_k6 == 0.0 &&
+                c.d1_d1 == 0.0 &&
+                c.d2_k1 == 0.0 &&
+                c.d2_k2 == 0.0 &&
+                c.d2_k3 == 0.0 &&
+                c.d2_k4 == 0.0 &&
+                c.d2_k5 == 0.0 &&
+                c.d2_k6 == 0.0 &&
+                c.d2_d1 == 0.0 &&
+                c.d2_d2 == 0.0
+                );
+    }
+
 
     OPI_CUDA_PREFIX inline bool hasNaN(const Orbit& o)
     {
