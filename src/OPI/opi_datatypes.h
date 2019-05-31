@@ -473,6 +473,104 @@ namespace OPI
         v[35] = m.accZ_k6;
     }
 
+    //! writes the covariance matrix (lower triangular) to a C vector (no bounds check!)
+    OPI_CUDA_PREFIX inline void covarianceToArray(const Covariance c, double* v)
+    {
+        v[0] = c.k1_k1;
+
+        v[1] = c.k2_k1;
+        v[2] = c.k2_k2;
+
+        v[3] = c.k3_k1;
+        v[4] = c.k3_k2;
+        v[5] = c.k3_k3;
+
+        v[6] = c.k4_k1;
+        v[7] = c.k4_k2;
+        v[8] = c.k4_k3;
+        v[9] = c.k4_k4;
+
+        v[10] = c.k5_k1;
+        v[11] = c.k5_k2;
+        v[12] = c.k5_k3;
+        v[13] = c.k5_k4;
+        v[14] = c.k5_k5;
+
+        v[15] = c.k6_k1;
+        v[16] = c.k6_k2;
+        v[17] = c.k6_k3;
+        v[18] = c.k6_k4;
+        v[19] = c.k6_k5;
+        v[20] = c.k6_k6;
+
+        v[21] = c.d1_k1;
+        v[22] = c.d1_k2;
+        v[23] = c.d1_k3;
+        v[24] = c.d1_k4;
+        v[25] = c.d1_k5;
+        v[26] = c.d1_k6;
+        v[27] = c.d1_d1;
+
+        v[28] = c.d2_k1;
+        v[29] = c.d2_k2;
+        v[30] = c.d2_k3;
+        v[31] = c.d2_k4;
+        v[32] = c.d2_k5;
+        v[33] = c.d2_k6;
+        v[34] = c.d2_d1;
+        v[35] = c.d2_d2;
+    }
+
+    OPI_CUDA_PREFIX inline Covariance arrayToCovariance(double* v)
+    {
+        Covariance c;
+        c.k1_k1 = v[0];
+
+        c.k2_k1 = v[1];
+        c.k2_k2 = v[2];
+
+        c.k3_k1 = v[3];
+        c.k3_k2 = v[4];
+        c.k3_k3 = v[5];
+
+        c.k4_k1 = v[6];
+        c.k4_k2 = v[7];
+        c.k4_k3 = v[8];
+        c.k4_k4 = v[9];
+
+        c.k5_k1 = v[10];
+        c.k5_k2 = v[11];
+        c.k5_k3 = v[12];
+        c.k5_k4 = v[13];
+        c.k5_k5 = v[14];
+
+        c.k6_k1 = v[15];
+        c.k6_k2 = v[16];
+        c.k6_k3 = v[17];
+        c.k6_k4 = v[18];
+        c.k6_k5 = v[19];
+        c.k6_k6 = v[20];
+
+        c.d1_k1 = v[21];
+        c.d1_k2 = v[22];
+        c.d1_k3 = v[23];
+        c.d1_k4 = v[24];
+        c.d1_k5 = v[25];
+        c.d1_k6 = v[26];
+        c.d1_d1 = v[27];
+
+        c.d2_k1 = v[28];
+        c.d2_k2 = v[29];
+        c.d2_k3 = v[30];
+        c.d2_k4 = v[31];
+        c.d2_k5 = v[32];
+        c.d2_k6 = v[33];
+        c.d2_d1 = v[34];
+        c.d2_d2 = v[35];
+
+        return c;
+    }
+
 }
 
 #endif
