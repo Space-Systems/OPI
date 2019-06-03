@@ -506,7 +506,7 @@ namespace OPI
             Epoch e = getEpoch()[i];
             ObjectProperties pr = getObjectProperties()[i];
             Covariance c = getCovariance()[i];
-            if (getObjectName(i) != "")
+            if (std::string(getObjectName(i)) != "")
                 o["name"] = getObjectName(i);
             if (!isZero(p))
                 o["position"] = {{"x",p.x}, {"y",p.y}, {"z",p.z}};
@@ -941,11 +941,11 @@ namespace OPI
                 if (epoch.current_epoch < mjd1950)
                 {
                     if (i == 0) epochCheck = 0;
-                    else if (epochCheck == 1) epochCheck == -1;
+                    else if (epochCheck == 1) epochCheck = -1;
                 }
                 else {
                     if (i == 0) epochCheck = 1;
-                    else if (epochCheck == 0) epochCheck == -1;
+                    else if (epochCheck == 0) epochCheck = -1;
                 }
             }
 

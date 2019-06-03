@@ -327,8 +327,8 @@ namespace OPI
 			if(hostData.capacity() != (size_t)reservedSize)
 				hostData.reserve(reservedSize);
 			hostData.resize(numObjects);
-            if (numObjects > currentSize)
-                std::memset(hostData.data()+currentSize, 0, (numObjects-currentSize)*sizeof(DataType));
+            if ((size_t)numObjects > currentSize)
+                std::memset(hostData.data()+currentSize, 0, ((size_t)numObjects-currentSize)*sizeof(DataType));
 		}
 		else if ((device >= DEVICE_CUDA)&&(device <= DEVICE_CUDA_LAST)) {
 			// retrieve cuda support object from host
