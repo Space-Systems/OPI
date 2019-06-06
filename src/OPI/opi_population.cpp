@@ -546,9 +546,10 @@ namespace OPI
             objects.push_back(o);
         }
         json jp;
+        jp["data_revision"] = OPI_DATA_REVISION_NUMBER;
         jp["description"] = getDescription();
-        jp["earliest_epoch"] = getEarliestEpoch();
-        jp["latest_epoch"] = getLatestEpoch();
+        jp["epoch_earliest"] = getEarliestEpoch();
+        jp["epoch_latest"] = getLatestEpoch();
         jp["objects"] = objects;
         std::string rf = referenceFrameToString(data->frame);
         if (rf != "") jp["frame"] = rf;
