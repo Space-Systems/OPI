@@ -70,6 +70,7 @@ namespace OPI
             std::vector<std::string> object_names;
             std::string lastPropagatorName;
             std::string description;
+            ReferenceFrame frame;
 
 			// data size
 			int size;
@@ -85,6 +86,7 @@ namespace OPI
         data->byteArraySize = 1;
         data->lastPropagatorName = "None";
         data->description = "";
+        data->frame = REF_UNSPECIFIED;
 		resize(size);        
 	}
 
@@ -94,6 +96,7 @@ namespace OPI
         data->byteArraySize = 1;
         data->lastPropagatorName = source.getLastPropagatorName();
         data->description = source.getDescription();
+        data->frame = source.getReferenceFrame();
         int s = source.getSize();
         int b = source.getByteArraySize();
         resize(s,b);
@@ -107,6 +110,7 @@ namespace OPI
         data->byteArraySize = 1;
         data->lastPropagatorName = source.getLastPropagatorName();
         data->description = source.getDescription();
+        data->frame = source.getReferenceFrame();
         int s = list.getSize();
         int b = source.getByteArraySize();
         resize(s);
@@ -221,14 +225,18 @@ namespace OPI
         int magic = 47627;
         int nameLength = data->lastPropagatorName.length();        
         int descLength = data->description.length();
+        std::string frame = std::string(referenceFrameToString(data->frame));
+        int rfLength = frame.length();
         std::stringstream out;
         out.write(reinterpret_cast<char*>(&magic), sizeof(int));
         out.write(reinterpret_cast<char*>(&versionNumber), sizeof(int));
         out.write(reinterpret_cast<char*>(&data->size), sizeof(int));
         out.write(reinterpret_cast<char*>(&nameLength), sizeof(int));
-        out.write(reinterpret_cast<const char*>(data->lastPropagatorName.c_str()), data->lastPropagatorName.length());
+        out.write(reinterpret_cast<const char*>(data->lastPropagatorName.c_str()), nameLength);
         out.write(reinterpret_cast<char*>(&descLength), sizeof(int));
-        out.write(reinterpret_cast<const char*>(data->description.c_str()), data->description.length());
+        out.write(reinterpret_cast<const char*>(data->description.c_str()), descLength);
+        out.write(reinterpret_cast<char*>(&rfLength), sizeof(int));
+        out.write(reinterpret_cast<const char*>(frame.c_str()), rfLength);
         for (int i=0; i<data->size; i++)
         {
             int objectNameLength = data->object_names[i].length();
@@ -364,6 +372,7 @@ namespace OPI
                 int versionNumber = 0;
                 int propagatorNameLength = 0;
                 int descLength = 0;
+                data->frame = REF_UNSPECIFIED;
 
                 in.read(reinterpret_cast<char*>(&magicNumber), sizeof(int));
                 if (magicNumber == 47627)
@@ -384,6 +393,16 @@ namespace OPI
                             char* description = new char[descLength];
                             in.read(description, descLength);
                             data->description = std::string(description, descLength);
+                            delete[] description;
+                            if (versionNumber >= 3)
+                            {
+                                int rfLength = 0;
+                                in.read(reinterpret_cast<char*>(&rfLength), sizeof(int));
+                                char* rfName = new char[rfLength];
+                                in.read(rfName, rfLength);
+                                data->frame = referenceFrameFromString(rfName);
+                                delete[] rfName;
+                            }
                         }
                         for (int i=0; i<data->size; i++)
                         {
@@ -531,6 +550,8 @@ namespace OPI
         jp["earliest_epoch"] = getEarliestEpoch();
         jp["latest_epoch"] = getLatestEpoch();
         jp["objects"] = objects;
+        std::string rf = referenceFrameToString(data->frame);
+        if (rf != "") jp["frame"] = rf;
         std::ofstream outfile(filename);
         std::string jsonString = jp.dump(2);
         outfile.write(jsonString.c_str(), jsonString.size());
@@ -571,6 +592,11 @@ namespace OPI
         return data->description.c_str();
     }
 
+    ReferenceFrame Population::getReferenceFrame() const
+    {
+        return data->frame;
+    }
+
     void Population::setLastPropagatorName(const char* propagatorName)
     {
         data->lastPropagatorName = std::string(propagatorName);
@@ -579,6 +605,11 @@ namespace OPI
     void Population::setDescription(const char* description)
     {
         data->description = std::string(description);
+    }
+
+    void Population::setReferenceFrame(const ReferenceFrame referenceFrame)
+    {
+        data->frame = referenceFrame;
     }
 
     const char* Population::getObjectName(int index) const

@@ -25,8 +25,9 @@
 /* Revision number of the OPI data file format, stored for backwards compatibility
  * 001 - Initial value for OPI-2019
  * 002 - Added description field
+ * 003 - Added reference frame
  */
-#define OPI_DATA_REVISION_NUMBER 2
+#define OPI_DATA_REVISION_NUMBER 3
 
 namespace OPI
 {
@@ -142,6 +143,12 @@ namespace OPI
             OPI_API_EXPORT const char* getDescription() const;
 
             /**
+             * @brief getReferenceFrame Get the population's reference frame.
+             * @return The reference frame information.
+             */
+            OPI_API_EXPORT ReferenceFrame getReferenceFrame() const;
+
+            /**
              * @brief getObjectName Returns the name of the given object.
              * Names are host-only attributes and do not get synchronized to the GPU.
              * @return The object name as a string. If no name has been set or the index is out of
@@ -189,6 +196,15 @@ namespace OPI
              * @param propagatorName The description string.
              */
             OPI_API_EXPORT void setDescription(const char* description);
+
+            /**
+             * @brief setReferenceFrame Set the reference frame this population's coordinates are in.
+             *
+             * May be used by the propagator to determine whether this population can be used or
+             * needs to be converted.
+             * @param referenceFrame The reference frame this population is in.
+             */
+            OPI_API_EXPORT void setReferenceFrame(const ReferenceFrame referenceFrame);
 
             /**
              * @brief convertOrbitsToStateVectors convert the population's orbit information to state vectors.
