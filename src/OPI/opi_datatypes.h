@@ -25,6 +25,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <limits>
+#include <string>
 
 namespace OPI
 {
@@ -569,6 +570,48 @@ namespace OPI
         c.d2_d2 = v[35];
 
         return c;
+    }
+
+    inline const char* referenceFrameToString(ReferenceFrame rf)
+    {
+        switch (rf)
+        {
+        case REF_NONE: return "NONE";
+        case REF_UNSPECIFIED: return "UNSPECIFIED";
+        case REF_TEME: return "TEME";
+        case REF_GCRF: return "GCRF";
+        case REF_ITRF: return "ITRF";
+        case REF_ECI: return "ECI";
+        case REF_ECEF: return "ECEF";
+        case REF_MOD: return "MOD";
+        case REF_TOD: return "TOD";
+        case REF_TOR: return "TOR";
+        case REF_J2000: return "J2000";
+        case REF_MULTIPLE: return "MULTIPLE";
+        case REF_UNLISTED: return "UNLISTED";
+        }
+        return "";
+    }
+
+    inline ReferenceFrame referenceFrameFromString(const char* frame)
+    {
+        std::string f(frame);
+        if (f == "NONE") return REF_NONE;
+        else if (f == "UNSPECIFIED") return REF_UNSPECIFIED;
+        else if (f == "TEME") return REF_TEME;
+        else if (f == "GCRF") return REF_GCRF;
+        else if (f == "ITRF") return REF_ITRF;
+        else if (f == "ITRF") return REF_ITRF;
+        else if (f == "ECI") return REF_ECI;
+        else if (f == "ECEF") return REF_ECEF;
+        else if (f == "MOD") return REF_MOD;
+        else if (f == "TOD") return REF_TOD;
+        else if (f == "TOR") return REF_TOR;
+        else if (f == "J2000") return REF_J2000;
+        else if (f == "MULTIPLE") return REF_MULTIPLE;
+        else if (f == "UNLISTED") return REF_UNLISTED;
+
+        return REF_UNSPECIFIED;
     }
 
 }
