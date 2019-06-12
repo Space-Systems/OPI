@@ -316,6 +316,7 @@ namespace OPI
 			}
 		};
 	}
+
 	class ModuleImpl
 	{
 		public:
@@ -457,7 +458,6 @@ namespace OPI
         data->properties.insert(std::make_pair(std::string(name), Property(location, false, size)));
 	}
 
-
     void Module::createProperty(const char* name, int value)
 	{
         data->properties.insert(std::make_pair(std::string(name), Property(&value, true)));
@@ -495,10 +495,12 @@ namespace OPI
 	{
         return data->setValue(std::string(name), value);
 	}
+
     ErrorCode Module::setProperty(const char* name, float value)
 	{
         return data->setValue(std::string(name), value);
 	}
+
     ErrorCode Module::setProperty(const char* name, double value)
 	{
         return data->setValue(std::string(name), value);
@@ -695,7 +697,6 @@ namespace OPI
         return getPropertyString(getPropertyName(index), element);
 	}
 
-
 	void Module::setPrivateData(void* private_data)
 	{
 		data->privateData = private_data;
@@ -846,7 +847,6 @@ namespace OPI
         }
         data->configFileName = filenameStr;
     }
-
 
     size_t Module::loadResource(const char* resname, const char** buffer)
     {
