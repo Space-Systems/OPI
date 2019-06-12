@@ -75,7 +75,7 @@ public:
 
 The `runPropagation()` function is executed from the host application (via calls to `propagate()`), in a loop over all
 propagation time steps. Its implementation inside the plugin manipulates the given population based on time information
-as well as the state of the population itself. The following example also shows a way to hanfle index lists which can
+as well as the state of the population itself. The following example also shows a way to handle index lists which can
 optionally be provided by the host to specify which objects to consider:
 
 ```cpp
