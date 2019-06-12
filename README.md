@@ -58,7 +58,8 @@ at the very least, its `runPropagation()` function:
 class MyPropagator: public OPI::Propagator
 {
 public:
-  OPI::ErrorCode MyPropagator::runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
+  OPI::ErrorCode MyPropagator::runPropagation(OPI::Population& population, double julian_day, double dt,
+    OPI::PropagationMode mode = OPI::MODE_SINGLE_EPOCH, OPI::IndexList* indices = nullptr)
   {
     // If an index list is given, loop over the size of the index list.
     // Otherwise, loop over the entire population.
@@ -130,6 +131,7 @@ int main(int argc, char* argv[])
     for (int i=0; i<1440; i++)
     {
       double currentTime = startDate + i * stepSize / 86400.0;
+      // Propagate with the default settings (single epoch, no index list)
       OPI::ErrorCode status = myPropagator.propagate(populaion, currentTime, stepSize);
     }
 
