@@ -190,6 +190,7 @@ propagators and hosts. Updated documentation and examples will follow shortly, u
 then the easiest way to get help at the moment is to contact me directly (mmoeckel
 on GitHub). A quick overview of the most significant changes:
 
+* New license: Moved from LGPL to the simpler and more permissive MIT license.
 * Indexed propagation and multi-time propagation have moved from individual functions
 to the main "propagate"/"calculate" functions. A mode setting has been introduced to switch
 between single epoch (default) and individual epoch mode. If indexed propagation is not
@@ -238,6 +239,7 @@ support both individual epoch mode and indexed propagation.
 * New functions to copy and append populations.
 * Saved populations (.opi files) are now stored gzipped.
 * All modules can now read config files individually.
+* Support for reading files from resource archives.
 
 Issues:
 * Example code is outdated
