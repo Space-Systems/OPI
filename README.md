@@ -43,6 +43,7 @@ Usage (C++ Example)
 To implement a basic OPI propagator in C++, create a class that inherits from
 OPI::Propagator. Apart from setting some basic constants you need to implement,
 at the very least, its `runPropagation()` function:
+
 ```cpp
 #include "OPI/opi_cpp.h"
 
@@ -61,32 +62,8 @@ class MyPropagator: public OPI::Propagator
 {
 public:
   OPI::ErrorCode MyPropagator::runPropagation(OPI::Population& population, double julian_day, double dt,
-    OPI::PropagationMode mode = OPI::MODE_SINGLE_EPOCH, OPI::IndexList* indices = nullptr)
-  {
-    // If an index list is given, loop over the size of the index list.
-    // Otherwise, loop over the entire population.
-    int loopSize = (indices ? indices->getSize() : population.getSize());
-
-    for (int i=0; i<loopSize; i++)
-    {
-      // Get pointer to the Population's orbital data
-      OPI::Orbit orbits = population.getOrbit();
-
-      // Get object index from index list if given, or use loop counter otherwise
-      int objectIndex = (indices ? indices->getData(OPI::DEVICE_HOST)[i] : i);
-
-      // Calculate mean motion for the length of the given time step
-      double meanMotion = sqrt(EARTH_GRAVITATIONAL_CONSTANT
-        / pow(orbits[objectIndex].semi_major_axis, 3.0));
-
-      // Add mean motion to the object's mean anomaly and normalize to radian range
-      orbits[objectIndex].mean_anomaly =
-        fmod(orbits[objectIndex].mean_anomaly + meanMotion * dt, 2*M_PI);
-    }
-
-    return OPI::SUCCESS;
-  }
-
+    OPI::PropagationMode mode = OPI::MODE_SINGLE_EPOCH, OPI::IndexList* indices = nullptr);
+  
   // Implement additional functions for returning information about the propagator,
   // loading proprietary file formats and defining init and de-init behaviour
 };
@@ -96,11 +73,65 @@ public:
 #include "OPI/opi_implement_plugin.h"
 ```
 
+The `runPropagation()` function is executed from the host application (via calls to `propagate()`), in a loop over all
+propagation time steps. Its implementation inside the plugin manipulates the given population based on time information
+as well as the state of the population itself. The following example also shows a way to hanfle index lists which can
+optionally be provided by the host to specify which objects to consider:
+
+```cpp
+OPI::ErrorCode MyPropagator::runPropagation(OPI::Population& population, double julian_day, double dt,
+    OPI::PropagationMode mode, OPI::IndexList* indices)
+{
+  // If an index list is given, loop over the size of the index list.
+  // Otherwise, loop over the entire population.
+  int loopSize = (indices ? indices->getSize() : population.getSize());
+
+  for (int i=0; i<loopSize; i++)
+  {
+    // Get pointer to the Population's orbital data
+    OPI::Orbit orbits = population.getOrbit();
+
+    // Get object index from index list if given, or use loop counter otherwise
+    int objectIndex = (indices ? indices->getData(OPI::DEVICE_HOST)[i] : i);
+
+    // Calculate mean motion for the length of the given time step
+    double meanMotion = sqrt(EARTH_GRAVITATIONAL_CONSTANT
+      / pow(orbits[objectIndex].semi_major_axis, 3.0));
+
+    // Add mean motion to the object's mean anomaly and normalize to radian range
+    orbits[objectIndex].mean_anomaly =
+      fmod(orbits[objectIndex].mean_anomaly + meanMotion * dt, 2*M_PI);
+  }
+  
+  // Tell OPI that the population has been updated on the host device. This
+  // ensures correct synchronization with CUDA and OpenCL devices.
+  population.update(OPI::DATA_ORBIT, OPI::DEVICE_HOST);
+
+  return OPI::SUCCESS;
+}
+```
+
+If your propagator needs to read object data in a proprietary format, implement
+the `loadPopulation()` function which is accessible from the host and allows you
+to define the conversion to an OPI population. By default, it should read data in
+OPI's own binary format.
+
+```cpp
+OPI::ErrorCode loadPopulation(OPI::Population& population, const char* filename)
+{
+  // Load given file or directory and fill population accordingly
+  // The default is to simply load OPI's own binary format:
+  population.read(filename);
+  return OPI::SUCCESS;
+}
+```
+
 ### Host Application
 
 To implement a basic host in C++, create a class that derives from OPI::Host, or
 create an instance of it directly. Use it to load a plugin directory, select the
 desired plugin and use it to propagate a population.
+
 ```cpp
 int main(int argc, char* argv[])
 {
