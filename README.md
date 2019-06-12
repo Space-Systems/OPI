@@ -33,6 +33,117 @@ Please note that this software is still under development and the interface
 functions are subject to change. Your feedback is appreciated.
 
 
+Usage (C++ Example)
+-------------------
+
+### Propagator
+
+To implement a basic OPI propagator in C++, create a class that inherits from
+OPI::Propagator. Apart from setting some basic constants you need to implement,
+at the very least, its `runPropagation()` function:
+```cpp
+#include "OPI/opi_cpp.h"
+
+// Set the name the plugin will appear as to the host
+#define OPI_PLUGIN_NAME "MyPropagator"
+// Set optional author and description
+#define OPI_PLUGIN_AUTHOR "My Organization"
+#define OPI_PLUGIN_DESC "Example Propagator"
+
+// Set the version number for the plugin here.
+#define OPI_PLUGIN_VERSION_MAJOR 0
+#define OPI_PLUGIN_VERSION_MINOR 1
+#define OPI_PLUGIN_VERSION_PATCH 0
+
+class MyPropagator: public OPI::Propagator
+{
+public:
+  OPI::ErrorCode MyPropagator::runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
+  {
+    // If an index list is given, loop over the size of the index list.
+    // Otherwise, loop over the entire population.
+    int loopSize = (indices ? indices->getSize() : population.getSize());
+
+    for (int i=0; i<loopSize; i++)
+    {
+      // Get pointer to the Population's orbital data
+      OPI::Orbit orbits = population.getOrbit();
+
+      // Get object index from index list if given, or use loop counter otherwise
+      int objectIndex = (indices ? indices->getData(OPI::DEVICE_HOST)[i] : i);
+
+      // Calculate mean motion for the length of the given time step
+      double meanMotion = sqrt(EARTH_GRAVITATIONAL_CONSTANT
+        / pow(orbits[objectIndex].semi_major_axis, 3.0));
+
+      // Add mean motion to the object's mean anomaly and normalize to radian range
+      orbits[objectIndex].mean_anomaly =
+        fmod(orbits[objectIndex].mean_anomaly + meanMotion * dt, 2*M_PI);
+    }
+
+    return OPI::SUCCESS;
+  }
+
+  // Implement additional functions for returning information about the propagator,
+  // loading proprietary file formats and defining init and de-init behaviour
+};
+
+// Include the macro that makes the propagator available as a plugin
+#define OPI_IMPLEMENT_CPP_PROPAGATOR MyPropagator
+#include "OPI/opi_implement_plugin.h"
+```
+
+### Host Application
+
+To implement a basic host in C++, create a class that derives from OPI::Host, or
+create an instance of it directly. Use it to load a plugin directory, select the
+desired plugin and use it to propagate a population.
+```cpp
+int main(int argc, char* argv[])
+{
+  // Initialize host
+  OPI::Host host;
+
+  // Load plugin directory. Optionally, specify a GPU computing platform with
+  // platform number and device number.
+  host.loadPlugins("plugins",OPI::Host::PLATFORM_OPENCL, 0, 0);
+
+  // Create a population with a single object on the given host
+  OPI::Population population(host, 1);
+
+  // Fill the population with orbit data
+  population.getOrbit()[0] = { 6800.0, 0.0001, 23.5, 0.0, 0.0, 0.0 };
+
+  // Get the desired propagator
+  OPI::Propagator* myPropagator = host.getPropagator("MyPropagator");
+
+  if (myPropagator)
+  {
+    // Initialize the propagator
+    myPropagator->enable();
+
+    // Set a start date and time step size for the propagation
+    const double startDate = 2458201.5;
+    const double stepSize = 60.0;
+
+    // Propagate population for one day (1440 time steps at 60 seconds each)
+    for (int i=0; i<1440; i++)
+    {
+      double currentTime = startDate + i * stepSize / 86400.0;
+      OPI::ErrorCode status = myPropagator.propagate(populaion, currentTime, stepSize);
+    }
+
+    // Print the first object's mean anomaly
+    std::cout << population.getOrbit()[0].mean_anomaly << endl;
+
+    // Deinitialize the propagator
+    myPropagator.disable();
+  }
+
+  return 0;
+}
+```
+
 Changes From The 2015 Interface
 -------------------------------
 
