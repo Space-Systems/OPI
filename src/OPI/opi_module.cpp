@@ -850,35 +850,40 @@ namespace OPI
 
     size_t Module::loadResource(const char* resname, const char** buffer)
     {
-        mz_zip_archive archive;
-        memset(&archive, 0, sizeof(archive));
-        std::string filename = data->configFileName.substr(0,data->configFileName.length()-4) + ".dat";
-        mz_bool status = mz_zip_reader_init_file(&archive, filename.c_str(), 0);
-        if (status)
+        if (data->configFileName.find_first_of(".cfg") != std::string::npos)
         {
-            int index = mz_zip_reader_locate_file(&archive, resname, "", 0);
-            if (index > -1)
+            std::string filename = data->configFileName.substr(0,data->configFileName.length()-4) + ".dat";
+            mz_zip_archive archive;
+            memset(&archive, 0, sizeof(archive));
+            if (mz_zip_reader_init_file(&archive, filename.c_str(), 0))
             {
-                mz_zip_archive_file_stat file_stat;
-                if (mz_zip_reader_file_stat(&archive, index, &file_stat))
+                int index = mz_zip_reader_locate_file(&archive, resname, "", 0);
+                if (index > -1)
                 {
-                    size_t fileSize = (size_t)file_stat.m_uncomp_size;
-                    *buffer = (const char*)mz_zip_reader_extract_file_to_heap(&archive, resname, &fileSize, 0);
-                    // Buffer must be freed by the caller
-                    //mz_free(resBuffer);
-                    mz_zip_reader_end(&archive);
-                    return fileSize;
+                    mz_zip_archive_file_stat file_stat;
+                    if (mz_zip_reader_file_stat(&archive, index, &file_stat))
+                    {
+                        size_t fileSize = (size_t)file_stat.m_uncomp_size;
+                        *buffer = (const char*)mz_zip_reader_extract_file_to_heap(&archive, resname, &fileSize, 0);
+                        // Buffer must be freed by the caller
+                        //mz_free(resBuffer);
+                        mz_zip_reader_end(&archive);
+                        return fileSize;
+                    }
+                    else {
+                        std::cout << "Unable to determine file size of resource " << resname << "!" << std::endl;
+                    }
                 }
                 else {
-                    std::cout << "Unable to determine file size of resource " << resname << "!" << std::endl;
+                    std::cout << "Unable to locate resource " << resname << "!" << std::endl;
                 }
             }
             else {
-                std::cout << "Unable to locate resource " << resname << "!" << std::endl;
+                std::cout << "Unable to load resource archive " << filename << "!" << std::endl;
             }
         }
         else {
-            std::cout << "Unable to load resource file " << filename << "!" << std::endl;
+            std::cout << "Unable to determine resource archive location!" << std::endl;
         }
         return 0;
     }
