@@ -2,6 +2,8 @@
 OPI - Orbital Propagation Interface (2019 Version)
 --------------------------------------------------
 
+![OPI logo](https://raw.githubusercontent.com/ILR/OPI/master/logo/opi_logo_circular_small.png)
+
 OPI is an interface with the goal to facilitate the implementation of orbital
 propagators into different applications.
 
