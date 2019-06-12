@@ -18,10 +18,11 @@ the interface.
 Features at a glance:
 * Implement orbital propagators or force models as independent plugins
 * Automatically find and load propagator plugins available on your platform
-* Manage populations of orbital objects
+* Create, manage, copy and modify populations of orbital objects
 * Multi-language support (C, C++, Fortran, Python, C#)
 * Platform-independent (although hosts and propagators may not be)
 * Extensible GPU computing support
+* Automatic reading of configuration files
 
 OPI currently supports C, C++ and Fortran, as well as CUDA  and OpenCL for
 propagators. The C API can also be used for integration into other languages
