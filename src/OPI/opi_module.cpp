@@ -17,6 +17,8 @@
 #include "opi_module.h"
 
 #include "opi_host.h"
+#include "internal/miniz.h"
+
 #include <map>
 #include <sstream>
 #include <fstream>
@@ -843,6 +845,42 @@ namespace OPI
             }
         }
         data->configFileName = filenameStr;
+    }
+
+
+    size_t Module::loadResource(const char* resname, const char** buffer)
+    {
+        mz_zip_archive archive;
+        memset(&archive, 0, sizeof(archive));
+        std::string filename = data->configFileName.substr(0,data->configFileName.length()-4) + ".dat";
+        mz_bool status = mz_zip_reader_init_file(&archive, filename.c_str(), 0);
+        if (status)
+        {
+            int index = mz_zip_reader_locate_file(&archive, resname, "", 0);
+            if (index > -1)
+            {
+                mz_zip_archive_file_stat file_stat;
+                if (mz_zip_reader_file_stat(&archive, index, &file_stat))
+                {
+                    size_t fileSize = (size_t)file_stat.m_uncomp_size;
+                    *buffer = (const char*)mz_zip_reader_extract_file_to_heap(&archive, resname, &fileSize, 0);
+                    // Buffer must be freed by the caller
+                    //mz_free(resBuffer);
+                    mz_zip_reader_end(&archive);
+                    return fileSize;
+                }
+                else {
+                    std::cout << "Unable to determine file size of resource " << resname << "!" << std::endl;
+                }
+            }
+            else {
+                std::cout << "Unable to locate resource " << resname << "!" << std::endl;
+            }
+        }
+        else {
+            std::cout << "Unable to load resource file " << filename << "!" << std::endl;
+        }
+        return 0;
     }
 
     std::vector<std::string> Module::tokenize(std::string line, std::string delimiter)

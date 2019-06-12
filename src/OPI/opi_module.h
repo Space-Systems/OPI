@@ -81,6 +81,19 @@ namespace OPI
              */
             OPI_API_EXPORT void loadConfigFile(const char* filename);
 
+            /**
+             * @brief loadResource Load the given resource from the standard resource archive.
+             *
+             * The resource archive is a zip archive with the same base name as the plugin (and
+             * config file) and a ".dat" suffix. Propagator authors can use it to store files that
+             * are required for operation and access the resources inside by using this function.
+             * @param resname The path of the file inside the resource archive.
+             * @param buffer A buffer to hold the resource's contents. Must be freed by the caller
+             * if returned size is larger than zero.
+             * @return The size in bytes of the loaded resource.
+             */
+            OPI_API_EXPORT size_t loadResource(const char* resname, const char** buffer);
+
             /* NOT YET IMPLEMENTED
 			//! Sets the version number of this module
 			void setVersion(int major, int minor, int patch);

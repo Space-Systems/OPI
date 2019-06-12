@@ -22,7 +22,7 @@ Features at a glance:
 * Multi-language support (C, C++, Fortran, Python, C#)
 * Platform-independent (although hosts and propagators may not be)
 * Extensible GPU computing support
-* Automatic reading of configuration files
+* Automatic reading of configuration and resource files for propagators
 
 OPI currently supports C, C++ and Fortran, as well as CUDA  and OpenCL for
 propagators. The C API can also be used for integration into other languages
