@@ -89,6 +89,13 @@ namespace OPI
              */
 			OPI_API_EXPORT ~Population();
 
+            /**
+             * @brief operator = Copy assignment operator for the Population.
+             * @param other The population to assign data from.
+             * @return A copy of the other population.
+             */
+            OPI_API_EXPORT Population& operator=(const Population& other);
+
             OPI_API_EXPORT void copy(const Population& source, int firstIndex, int length, int offset);
 
             /**

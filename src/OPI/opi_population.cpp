@@ -188,6 +188,15 @@ namespace OPI
 	{
     }
 
+    Population& Population::operator=(const Population& other)
+    {
+        if (&other != this)
+        {
+            data = other.data->clone();
+        }
+        return *this;
+    }
+
     void Population::append(const Population& other)
     {
         const int oldSize = data->size;
