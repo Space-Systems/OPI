@@ -129,8 +129,6 @@ namespace OPI
 
     Population::Population(const Population& source, IndexList &list) : data(source.getHostPointer())
     {
-        data->size = 0;
-        data->byteArraySize = 1;
         data->lastPropagatorName = source.getLastPropagatorName();
         data->description = source.getDescription();
         data->frame = source.getReferenceFrame();
