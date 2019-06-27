@@ -27,8 +27,10 @@ namespace OPI
 		public:
 			//! allocate impl data on construction
 			Pimpl() { data = new T; }
-			template< class T2>
-			Pimpl(T2& value) { data = new T(value); }
+            template< class T2>
+            Pimpl(T2& value) { data = new T(value); }
+
+            Pimpl(T* value) { data = value; }
 
 			~Pimpl() { delete data; }
 			T* operator->() const { return data; }

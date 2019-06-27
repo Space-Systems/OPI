@@ -113,8 +113,9 @@ namespace OPI
 		resize(size);        
 	}
 
-    Population::Population(const Population& source): data(source.getHostPointer())
+    Population::Population(const Population& source): data(source.data->clone())
     {
+        /*
         data->size = 0;
         data->byteArraySize = 1;
         data->lastPropagatorName = source.getLastPropagatorName();
@@ -122,9 +123,10 @@ namespace OPI
         data->frame = source.getReferenceFrame();
         int s = source.getSize();
         int b = source.getByteArraySize();
-        resize(s,b);
+        resize(s,b);                
 
-        copy(source, 0, s, 0);
+        copy(source, 0, s, 0);        
+        */
     }
 
     Population::Population(const Population& source, IndexList &list) : data(source.getHostPointer())
