@@ -59,6 +59,30 @@ namespace OPI
                 frame = REF_UNSPECIFIED;
 			}
 
+            ObjectRawData(const ObjectRawData& source):
+                host(source.host),
+                data_orbit(source.data_orbit),
+                data_properties(source.data_properties),
+                data_position(source.data_position),
+                data_velocity(source.data_velocity),
+                data_acceleration(source.data_acceleration),
+                data_epoch(source.data_epoch),
+                data_covariance(source.data_covariance),
+                data_bytes(source.data_bytes)
+            {
+                object_names = source.object_names;
+                lastPropagatorName = source.lastPropagatorName;
+                description = source.description;
+                frame = source.frame;
+
+                size = source.size;
+                byteArraySize = source.byteArraySize;
+            }
+
+            ~ObjectRawData() {}
+
+            ObjectRawData* clone() { return new ObjectRawData(*this); }
+
 			Host& host;
 
 			SynchronizedData<Orbit> data_orbit;
