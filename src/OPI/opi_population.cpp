@@ -52,7 +52,11 @@ namespace OPI
                 data_covariance(host),
                 data_bytes(host)
 			{
-
+                size = 0;
+                byteArraySize = 1;
+                lastPropagatorName = "None";
+                description = "";
+                frame = REF_UNSPECIFIED;
 			}
 
 			Host& host;
@@ -82,11 +86,6 @@ namespace OPI
 
     Population::Population(Host& host, int size): data(host)
 	{
-		data->size = 0;
-        data->byteArraySize = 1;
-        data->lastPropagatorName = "None";
-        data->description = "";
-        data->frame = REF_UNSPECIFIED;
 		resize(size);        
 	}
 
