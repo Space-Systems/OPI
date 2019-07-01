@@ -35,33 +35,69 @@ namespace OPI
     // this holds all internal Perturbations variables (pimpl)
     struct PerturbationRawData
     {
-		PerturbationRawData(Host& _host) :
-                host(_host),
-                data_orbit(host),
-                data_position(host),
-                data_velocity(host),
-                data_acceleration(host),
-                data_partials(host),
-                data_bytes(host)
-            {
+        PerturbationRawData(Host& _host) :
+            host(_host),
+            data_orbit(host),
+            data_position(host),
+            data_velocity(host),
+            data_acceleration(host),
+            data_partials(host),
+            data_bytes(host)
+        {
 
-            }
+        }
 
-            Host& host;
+        PerturbationRawData(const PerturbationRawData& source):
+            host(source.host),
+            data_orbit(source.data_orbit),
+            data_position(source.data_position),
+            data_velocity(source.data_velocity),
+            data_acceleration(source.data_acceleration),
+            data_partials(source.data_partials),
+            data_bytes(source.data_bytes)
+        {
+            lastPropagatorName = source.lastPropagatorName;
 
-            SynchronizedData<Orbit> data_orbit;
-            SynchronizedData<Vector3> data_position;
-            SynchronizedData<Vector3> data_velocity;
-            SynchronizedData<Vector3> data_acceleration;
-            SynchronizedData<PartialsMatrix> data_partials;
-            SynchronizedData<char> data_bytes;
+            size = source.size;
+            byteArraySize = source.byteArraySize;
+        }
 
-            // non-synchronized data
-            std::string lastPropagatorName;
+        // This will cause both objects to be synchronized to the host.
+        PerturbationRawData& operator+=(PerturbationRawData& other)
+        {
+            data_orbit.add(other.data_orbit);
+            data_position.add(other.data_position);
+            data_velocity.add(other.data_velocity);
+            data_acceleration.add(other.data_acceleration);
+            data_partials.add(other.data_partials);
 
-            // data size
-            int size;
-            int byteArraySize;
+            size += other.size;
+
+            if (byteArraySize == other.byteArraySize) data_bytes.add(other.data_bytes);
+            else data_bytes.resize(size);
+
+            if (lastPropagatorName != other.lastPropagatorName) lastPropagatorName = "";
+
+            return *this;
+        }
+
+        ~PerturbationRawData() {}
+
+        Host& host;
+
+        SynchronizedData<Orbit> data_orbit;
+        SynchronizedData<Vector3> data_position;
+        SynchronizedData<Vector3> data_velocity;
+        SynchronizedData<Vector3> data_acceleration;
+        SynchronizedData<PartialsMatrix> data_partials;
+        SynchronizedData<char> data_bytes;
+
+        // non-synchronized data
+        std::string lastPropagatorName;
+
+        // data size
+        int size;
+        int byteArraySize;
     };
     /**
      * \endcond
@@ -74,16 +110,8 @@ namespace OPI
         resize(size);
     }
 
-    Perturbations::Perturbations(const Perturbations& source) : data(source.getHostPointer())
+    Perturbations::Perturbations(const Perturbations& source) : data(source.data)
     {
-        data->size = 0;
-        data->byteArraySize = 1;
-        //data->lastPropagatorName = source.getLastPropagatorName();
-        int s = source.getSize();
-        int b = source.getByteArraySize();
-        resize(s,b);
-
-        copy(source, 0, s, 0);
     }
 
     Perturbations::Perturbations(const Perturbations& source, IndexList &list) : data(source.getHostPointer())
@@ -137,45 +165,24 @@ namespace OPI
     {
     }
 
-    void Perturbations::append(const Perturbations& other)
+    Perturbations& Perturbations::operator=(const Perturbations& other)
     {
-        const int oldSize = data->size;
-        const int newSize = oldSize + other.getSize();
-
-        // use the byte array size from this population
-        // byte array data from appended population will only be copied
-        // if it has the same size.
-        resize(newSize, data->byteArraySize);
-
-        copy(other, 0, other.getSize(), oldSize);
-
+        if (&other != this)
+        {
+            data = Pimpl<PerturbationRawData>(other.data);
+        }
+        return *this;
     }
 
-    void Perturbations::copy(const Perturbations& source, int firstIndex, int length, int offset)
+    Perturbations& Perturbations::operator+=(const Perturbations& other)
     {
-        if ((offset + length) <= data->size)
-        {
-            bool copyBytes =(data->byteArraySize == source.getByteArraySize());
-            if (!copyBytes) std::cout << "Warning: Copying perturbations without the byte array" << std::endl;
+        data += other.data;
+        return *this;
+    }
 
-            // TODO Use std::copy instead
-            memcpy(&getDeltaOrbit()[offset], &source.getDeltaOrbit(DEVICE_HOST, false)[firstIndex], length*sizeof(Orbit));
-            memcpy(&getDeltaPosition()[offset], &source.getDeltaPosition(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
-            memcpy(&getDeltaVelocity()[offset], &source.getDeltaVelocity(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
-            memcpy(&getDeltaAcceleration()[offset], &source.getDeltaAcceleration(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
-            memcpy(&getPartialsMatrix()[offset], &source.getPartialsMatrix(DEVICE_HOST, false)[firstIndex], length*sizeof(PartialsMatrix));
-            if (copyBytes) memcpy(&getBytes()[offset], &source.getBytes(DEVICE_HOST, false)[firstIndex], data->byteArraySize*length*sizeof(char));
-            else memset(&getBytes()[offset], 0, data->byteArraySize*length*sizeof(char));
-
-            update(DATA_ORBIT);
-            update(DATA_PROPERTIES);
-            update(DATA_POSITION);
-            update(DATA_VELOCITY);
-            update(DATA_ACCELERATION);
-            update(DATA_PARTIALS);
-            if (copyBytes) update(DATA_BYTES);
-        }
-        else std::cout << "Cannot copy perturbation: Trying to copy " << length << " objects with offset " << offset << " but size is " << length << std::endl;
+    void Perturbations::append(const Perturbations& other)
+    {
+        data += other.data;
     }
 
     /**

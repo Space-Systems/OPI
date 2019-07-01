@@ -57,7 +57,7 @@ namespace OPI
 			//! Adds an object to the back of the host memory
 			void add(const DataType& object);
             //! Adds a synchronized data object of the same type to the back of the host memory
-            void add(const SynchronizedData<DataType>& object);
+            void add(SynchronizedData<DataType>& object);
 			//! Sets an specific object
 			void set(const DataType& object, int index);
 
@@ -159,16 +159,14 @@ namespace OPI
 		update(DEVICE_HOST);
 	}
 
-    //FIXME: Untested!
     template<class DataType>
-    void SynchronizedData<DataType>::add(const SynchronizedData<DataType> &objects)
+    void SynchronizedData<DataType>::add(SynchronizedData<DataType> &objects)
     {
-        DataType* newData = objects.getData(DEVICE_HOST);
+        objects.ensure_synchronization(DEVICE_HOST);
         int newDataSize = objects.getSize();
         ensure_synchronization(DEVICE_HOST);
         reserve(numObjects + newDataSize);
-        hostData.resize(numObjects + newDataSize);
-        hostData.insert(hostData.end(), &newData[0], &newData[newDataSize]);
+        hostData.insert(hostData.end(), objects.hostData.begin(), objects.hostData.end());
         resize(numObjects + newDataSize);
         update(DEVICE_HOST);
     }

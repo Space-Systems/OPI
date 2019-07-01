@@ -79,9 +79,32 @@ namespace OPI
                 byteArraySize = source.byteArraySize;
             }
 
-            ~ObjectRawData() {}
+            // This will cause both objects to be synchronized to the host.
+            ObjectRawData& operator+=(ObjectRawData& other)
+            {
+                data_orbit.add(other.data_orbit);
+                data_position.add(other.data_position);
+                data_velocity.add(other.data_velocity);
+                data_properties.add(other.data_properties);
+                data_acceleration.add(other.data_acceleration);
+                data_epoch.add(other.data_epoch);
+                data_covariance.add(other.data_covariance);
+                object_names.insert(object_names.end(), other.object_names.begin(), other.object_names.end());
 
-            ObjectRawData* clone() { return new ObjectRawData(*this); }
+                size += other.size;
+
+                if (byteArraySize == other.byteArraySize) data_bytes.add(other.data_bytes);
+                else data_bytes.resize(size);
+
+                if (lastPropagatorName != other.lastPropagatorName) lastPropagatorName = "";
+                if (frame != other.frame) frame = REF_MULTIPLE;
+
+                description = "Merged Population";
+
+                return *this;
+            }
+
+            ~ObjectRawData() {}
 
 			Host& host;
 
@@ -113,23 +136,11 @@ namespace OPI
 		resize(size);        
 	}
 
-    Population::Population(const Population& source): data(source.data->clone())
+    Population::Population(const Population& source): data(source.data)
     {
-        /*
-        data->size = 0;
-        data->byteArraySize = 1;
-        data->lastPropagatorName = source.getLastPropagatorName();
-        data->description = source.getDescription();
-        data->frame = source.getReferenceFrame();
-        int s = source.getSize();
-        int b = source.getByteArraySize();
-        resize(s,b);                
-
-        copy(source, 0, s, 0);        
-        */
     }
 
-    Population::Population(const Population& source, IndexList &list) : data(source.getHostPointer())
+    Population::Population(Population& source, IndexList &list) : data(source.getHostPointer())
     {
         data->lastPropagatorName = source.getLastPropagatorName();
         data->description = source.getDescription();
@@ -192,53 +203,39 @@ namespace OPI
     {
         if (&other != this)
         {
-            data = other.data->clone();
+            data = Pimpl<ObjectRawData>(other.data);
+        }
+        return *this;
+    }
+
+    Population& Population::operator+=(const Population& other)
+    {
+        data += other.data;
+        return *this;
+    }
+
+    Population& Population::operator+=(const Perturbations& delta)
+    {
+        if (delta.getSize() >= getSize())
+        {
+            for (int i=0; i<getSize(); i++)
+            {
+                getOrbit()[i] += delta.getDeltaOrbit()[i];
+                getPosition()[i] += delta.getDeltaPosition()[i];
+                getVelocity()[i] += delta.getDeltaVelocity()[i];
+                getAcceleration()[i] += delta.getDeltaAcceleration()[i];
+            }
+            update(DATA_ORBIT);
+            update(DATA_POSITION);
+            update(DATA_VELOCITY);
+            update(DATA_ACCELERATION);
         }
         return *this;
     }
 
     void Population::append(const Population& other)
     {
-        const int oldSize = data->size;
-        const int newSize = oldSize + other.getSize();
-
-        // use the byte array size from this population
-        // byte array data from appended population will only be copied
-        // if it has the same size.
-        resize(newSize, data->byteArraySize);
-
-        copy(other, 0, other.getSize(), oldSize);
-    }
-
-    void Population::copy(const Population& source, int firstIndex, int length, int offset)
-    {
-        if ((offset + length) <= data->size)
-        {
-            bool copyBytes = (data->byteArraySize == source.getByteArraySize());
-            //if (!copyBytes) std::cout << "Warning: Copying population without the byte array" << std::endl;
-
-            // TODO Use std::copy instead
-            memcpy(&getOrbit()[offset], &source.getOrbit(DEVICE_HOST, false)[firstIndex], length*sizeof(Orbit));
-            memcpy(&getObjectProperties()[offset], &source.getObjectProperties(DEVICE_HOST, false)[firstIndex], length*sizeof(ObjectProperties));
-            memcpy(&getPosition()[offset], &source.getPosition(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
-            memcpy(&getVelocity()[offset], &source.getVelocity(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
-            memcpy(&getAcceleration()[offset], &source.getAcceleration(DEVICE_HOST, false)[firstIndex], length*sizeof(Vector3));
-            memcpy(&getEpoch()[offset], &source.getEpoch(DEVICE_HOST, false)[firstIndex], length*sizeof(Epoch));
-            memcpy(&getCovariance()[offset], &source.getCovariance(DEVICE_HOST, false)[firstIndex], length*sizeof(Covariance));
-            for (int i=0; i<length; i++) data->object_names[offset+i] = source.getObjectName(firstIndex+i);
-            if (copyBytes) memcpy(&getBytes()[offset], &source.getBytes(DEVICE_HOST, false)[firstIndex], data->byteArraySize*length*sizeof(char));
-            else memset(&getBytes()[offset], 0, data->byteArraySize*length*sizeof(char));
-
-            update(DATA_ORBIT);
-            update(DATA_PROPERTIES);
-            update(DATA_POSITION);
-            update(DATA_VELOCITY);
-            update(DATA_ACCELERATION);
-            update(DATA_EPOCH);
-            update(DATA_COVARIANCE);
-            if (copyBytes) update(DATA_BYTES);
-        }
-        else std::cout << "Cannot copy population: Trying to copy " << length << " objects with offset " << offset << " but size is " << length << std::endl;
+        data += other.data;
     }
 
 	/**
@@ -790,6 +787,7 @@ namespace OPI
                     thisAcc[l] = acc[i];
                     thisEp[l] = ep[i];
                     thisCov[l] = cov[i];
+                    data->object_names[l] = source.getObjectName(i);
                     if (getByteArraySize() == source.getByteArraySize())
                     {
                         int b = getByteArraySize();

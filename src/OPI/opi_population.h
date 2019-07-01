@@ -20,6 +20,7 @@
 #include "opi_error.h"
 #include "opi_datatypes.h"
 #include "opi_pimpl_helper.h"
+#include "opi_perturbations.h"
 #include <string>
 
 /* Revision number of the OPI data file format, stored for backwards compatibility
@@ -37,6 +38,7 @@ namespace OPI
 	struct Vector3;
 	struct IndexPair;
 	class IndexList;
+    class Perturbations;
 
 	/*! \brief This class contains all parameters required for processing orbital objects.
 	 * \ingroup CPP_API_GROUP
@@ -82,7 +84,7 @@ namespace OPI
              * @param list An IndexList containing the indices of the elements of the source
              * Population that should be copied.
              */
-			OPI_API_EXPORT Population(const Population& source, IndexList &list);
+            OPI_API_EXPORT Population(Population& source, IndexList &list);
 
             /**
              * @brief Destructor. Cleans up host and device memory.
@@ -96,12 +98,17 @@ namespace OPI
              */
             OPI_API_EXPORT Population& operator=(const Population& other);
 
-            OPI_API_EXPORT void copy(const Population& source, int firstIndex, int length, int offset);
-
             /**
              * @brief Append a population to this one.
              */
             OPI_API_EXPORT void append(const Population& other);
+
+            /**
+             * @brief operator += Same as append().
+             */
+            OPI_API_EXPORT Population& operator+=(const Population& other);
+
+            OPI_API_EXPORT Population& operator+=(const Perturbations& delta);
 
             /**
              * @brief resize Sets the number of elements of the Population.
