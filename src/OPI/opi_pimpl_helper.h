@@ -34,7 +34,7 @@ namespace OPI
 
 			~Pimpl() { delete data; }
 			T* operator->() const { return data; }
-			T* operator*() const { return data; }
+            T& operator*() const { return data; }
 
 		private:
 			T* data;
