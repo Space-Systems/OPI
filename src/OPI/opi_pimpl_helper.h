@@ -35,7 +35,7 @@ namespace OPI
             Pimpl& operator=(const Pimpl& source)
             {
                 if (&source != this) {
-                    delete data; \
+                    delete data;
                     data = new T(*source.data);
                 }
                 return *this;
