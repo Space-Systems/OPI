@@ -20,7 +20,6 @@
 #include "opi_error.h"
 #include "opi_datatypes.h"
 #include "opi_pimpl_helper.h"
-#include "opi_population.h"
 #include <string>
 namespace OPI
 {
@@ -46,7 +45,7 @@ namespace OPI
              * @param host A pointer to the OPI Host that this instance is intended for.
              * @param size The number of elements. It should match the size of the corresponding Population.
              */
-            OPI_API_EXPORT Perturbations(const Population& population);
+            OPI_API_EXPORT Perturbations(Host& host, int size = 0);
 
             /**
              * @brief Population Copy constructor
