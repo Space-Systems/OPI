@@ -19,25 +19,36 @@
 
 namespace OPI
 {
-	template<class T>
+    template<class T>
 	//! Helper class for pimpl-idiom
 	//!
 	class Pimpl
 	{
 		public:
 			//! allocate impl data on construction
-			Pimpl() { data = new T; }
+            Pimpl() { data = new T; }
             template< class T2>
             Pimpl(T2& value) { data = new T(value); }
 
-            Pimpl(T* value) { data = value; }
+            // Make impl data copyable
+            Pimpl(const Pimpl& source): data(new T(*source.data)) {}
+            Pimpl& operator=(const Pimpl& source)
+            {
+                if (&source != this) {
+                    delete data; \
+                    data = new T(*source.data);
+                }
+                return *this;
+            }
 
-			~Pimpl() { delete data; }
+            Pimpl& operator+=(const Pimpl& other) { *data += *other.data; return *this; }
+
+            ~Pimpl() { delete data; }
 			T* operator->() const { return data; }
             T& operator*() const { return data; }
 
 		private:
-			T* data;
+            T* data;
 	};
 }
 
