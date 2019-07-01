@@ -42,6 +42,18 @@ namespace OPI
 		return out;
 	}
 
+    //! Addition assignment operator for Orbit
+    OPI_CUDA_PREFIX inline Orbit& operator+=(Orbit& a, const Orbit& b)
+    {
+        a.semi_major_axis += b.semi_major_axis;
+        a.eccentricity += b.eccentricity;
+        a.inclination += b.inclination;
+        a.raan += b.raan;
+        a.arg_of_perigee += b.arg_of_perigee;
+        a.mean_anomaly += b.mean_anomaly;
+        return a;
+    }
+
 	//! Subtraction operator for Orbit
 	OPI_CUDA_PREFIX inline Orbit operator-(const Orbit& a, const Orbit& b)
 	{
