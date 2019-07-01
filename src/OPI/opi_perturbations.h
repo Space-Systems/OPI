@@ -48,7 +48,7 @@ namespace OPI
             OPI_API_EXPORT Perturbations(Host& host, int size = 0);
 
             /**
-             * @brief Population Copy constructor
+             * @brief Perturbations Copy constructor
              *
              * This function creates a deep copy of a Population on the host. Device data
              * will be downloaded as part of this operation. The copy does not contain any
@@ -61,7 +61,7 @@ namespace OPI
 			OPI_API_EXPORT Perturbations(const Perturbations& source);
 
             /**
-             * @brief Population Copy constructor (indexed copy)
+             * @brief Perturbations Copy constructor (indexed copy)
              *
              * Creates a selective deep copy of a Population on the host. Only
              * elements that appear in the given index list are copied to the new Population.
@@ -82,14 +82,14 @@ namespace OPI
             OPI_API_EXPORT void copy(const Perturbations& source, int firstIndex, int length, int offset);
 
             /**
-             * @brief Append a population to this one.
+             * @brief Append a perturbations object to this one.
              */
             OPI_API_EXPORT void append(const Perturbations& other);
 
             /**
-             * @brief resize Sets the number of elements of the Population.
+             * @brief resize Sets the number of elements of the perturbations object.
              *
-             * @param size The new number of elements the Population should contain.
+             * @param size The new number of elements the perturbations object should contain.
              * @param byteArraySize The per-object size of the byte array that can be queried
              * with the getBytes() function. Defaults to 1 if unset.
              */
@@ -106,7 +106,7 @@ namespace OPI
 			OPI_API_EXPORT void resizeByteArray(int size);
 
             /**
-             * @brief getSize Returns the number of elements in the Population.
+             * @brief getSize Returns the number of elements in the perturbations object.
              * @return Number of elements.
              */
 			OPI_API_EXPORT int getSize() const;
@@ -120,15 +120,15 @@ namespace OPI
 			OPI_API_EXPORT int getByteArraySize() const;
 
             /**
-             * @brief getLastPropagatorName Returns the name of the last plugin the Population
-             * was propagated with.
-             * @return The Propagator name as defined by the plugin last used on this Population.
+             * @brief getLastPropagatorName Returns the name of the plugin the perturbations object
+             * was created with.
+             * @return The Propagator name as defined by the plugin last used on this perturbations object.
              */
             OPI_API_EXPORT const char* getLastPropagatorName() const;
 
             /**
-             * @brief setLastPropagatorName Set the name of the last Propagator the population was
-             * propagated with.
+             * @brief setLastPropagatorName Set the name of the Propagator the perturbations object was
+             * created with.
              *
              * This is done automatically by OPI on successful propagation
              * and should not require any extra effort from the plugin author.
