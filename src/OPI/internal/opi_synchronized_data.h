@@ -31,7 +31,7 @@ namespace OPI
 		public:
             //! Initialize with a reference to the host object
             SynchronizedData(Host& owning_host);
-            SynchronizedData(const SynchronizedData<DataType>& source);
+            SynchronizedData(SynchronizedData<DataType>& source);
 			~SynchronizedData();
 
 			//! Reserves space to hold a specific amount of objects
@@ -115,14 +115,20 @@ namespace OPI
 
     // Copy constructor
     template<class DataType>
-    SynchronizedData<DataType>::SynchronizedData(const SynchronizedData<DataType>& source): host(source.host)
+    SynchronizedData<DataType>::SynchronizedData(SynchronizedData<DataType>& source): host(source.host)
     {
+        // download device data from source if necessary
+        source.ensure_synchronization(DEVICE_HOST);
+
         latestDevice = DEVICE_NOT_SET;
         hostNeedsUpdate = false;
 
         numObjects = source.numObjects;
         reservedSize = source.reservedSize;
         hostData = source.hostData;
+
+        // update host
+        update(DEVICE_HOST);
     }
 
 	template<class DataType>

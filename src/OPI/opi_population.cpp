@@ -59,7 +59,7 @@ namespace OPI
                 frame = REF_UNSPECIFIED;
 			}
 
-            ObjectRawData(const ObjectRawData& source):
+            ObjectRawData(ObjectRawData& source):
                 host(source.host),
                 data_orbit(source.data_orbit),
                 data_properties(source.data_properties),

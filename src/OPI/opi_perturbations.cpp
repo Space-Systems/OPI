@@ -47,7 +47,7 @@ namespace OPI
 
         }
 
-        PerturbationRawData(const PerturbationRawData& source):
+        PerturbationRawData(PerturbationRawData& source):
             host(source.host),
             data_orbit(source.data_orbit),
             data_position(source.data_position),
