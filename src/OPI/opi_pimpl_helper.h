@@ -43,6 +43,7 @@ namespace OPI
 
             // Addition assignment operator for ObjectRawData and PerturbationRawData
             Pimpl& operator+=(const Pimpl& other) { *data += *other.data; return *this; }
+            Pimpl operator+(const Pimpl& other) { return Pimpl(data+other.data); }
 
             ~Pimpl() { delete data; }
 			T* operator->() const { return data; }

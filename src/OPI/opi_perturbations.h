@@ -79,13 +79,9 @@ namespace OPI
              */
 			OPI_API_EXPORT ~Perturbations();
 
-            /**
-             * @brief Append a perturbations object to this one.
-             */
-            OPI_API_EXPORT void append(const Perturbations& other);
-
             Perturbations& operator=(const Perturbations& other);
             Perturbations& operator+=(const Perturbations& other);
+            Perturbations operator+(const Perturbations& other);
 
             /**
              * @brief resize Sets the number of elements of the perturbations object.

@@ -62,6 +62,13 @@ namespace OPI
             byteArraySize = source.byteArraySize;
         }
 
+        PerturbationRawData operator+(PerturbationRawData& other)
+        {
+            PerturbationRawData out(*this);
+            out += other;
+            return out;
+        }
+
         // This will cause both objects to be synchronized to the host.
         PerturbationRawData& operator+=(PerturbationRawData& other)
         {
@@ -174,15 +181,17 @@ namespace OPI
         return *this;
     }
 
+    Perturbations Perturbations::operator+(const Perturbations& other)
+    {
+        Perturbations p(*this);
+        p.data += other.data;
+        return p;
+    }
+
     Perturbations& Perturbations::operator+=(const Perturbations& other)
     {
         data += other.data;
         return *this;
-    }
-
-    void Perturbations::append(const Perturbations& other)
-    {
-        data += other.data;
     }
 
     /**

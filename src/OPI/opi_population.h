@@ -32,32 +32,32 @@
 
 namespace OPI
 {
-	struct ObjectRawData;
-	class Host;
-	struct ObjectProperties;
-	struct Vector3;
-	struct IndexPair;
-	class IndexList;
+    struct ObjectRawData;
+    class Host;
+    struct ObjectProperties;
+    struct Vector3;
+    struct IndexPair;
+    class IndexList;
     class Perturbations;
 
-	/*! \brief This class contains all parameters required for processing orbital objects.
-	 * \ingroup CPP_API_GROUP
-	 *
-	 * When a Population object is created with a specific size, arrays of the types Orbit,
-	 * ObjectProperties and ObjectStatus are initialized with that size. These arrays are empty
+    /*! \brief This class contains all parameters required for processing orbital objects.
+     * \ingroup CPP_API_GROUP
+     *
+     * When a Population object is created with a specific size, arrays of the types Orbit,
+     * ObjectProperties and ObjectStatus are initialized with that size. These arrays are empty
      * and must be filled with actual data by the host or the plugin. The "bytes" array can be
      * used to store arbitrary, per-object information. Its per-object size (default: 1 byte)
      * can be adjusted using the resizeByteArray function.
-	 */
-	class Population
-	{
-		public:
+     */
+    class Population
+    {
+        public:
             /**
              * @brief Population Creates a new empty Population, optionally with a given size.
              * @param host A pointer to the OPI Host that this Population is intended for.
              * @param size The number of elements of the Population. Defaults to zero if unset.
              */
-			OPI_API_EXPORT Population(Host& host, int size = 0);
+            OPI_API_EXPORT Population(Host& host, int size = 0);
 
             /**
              * @brief Population Copy constructor
@@ -70,7 +70,7 @@ namespace OPI
              *
              * @param source The Population to be copied from.
              */
-			OPI_API_EXPORT Population(const Population& source);
+            OPI_API_EXPORT Population(const Population& source);
 
             /**
              * @brief Population Copy constructor (indexed copy)
@@ -89,7 +89,7 @@ namespace OPI
             /**
              * @brief Destructor. Cleans up host and device memory.
              */
-			OPI_API_EXPORT ~Population();
+            OPI_API_EXPORT ~Population();
 
             /**
              * @brief operator = Copy assignment operator for the Population.
@@ -98,17 +98,9 @@ namespace OPI
              */
             OPI_API_EXPORT Population& operator=(const Population& other);
 
-            /**
-             * @brief Append a population to this one.
-             */
-            OPI_API_EXPORT void append(const Population& other);
-
-            /**
-             * @brief operator += Same as append().
-             */
             OPI_API_EXPORT Population& operator+=(const Population& other);
-
             OPI_API_EXPORT Population& operator+=(const Perturbations& delta);
+            OPI_API_EXPORT Population operator+(const Population& other);
 
             /**
              * @brief resize Sets the number of elements of the Population.
@@ -117,7 +109,7 @@ namespace OPI
              * @param byteArraySize The per-object size of the byte array that can be queried
              * with the getBytes() function. Defaults to 1 if unset.
              */
-			OPI_API_EXPORT void resize(int size, int byteArraySize = 1);
+            OPI_API_EXPORT void resize(int size, int byteArraySize = 1);
 
             /**
              * @brief resizeByteArray Set the per-object size of the byte array.
@@ -127,13 +119,13 @@ namespace OPI
              * object in the Population.
              * @param size The new byte array size.
              */
-			OPI_API_EXPORT void resizeByteArray(int size);
+            OPI_API_EXPORT void resizeByteArray(int size);
 
             /**
              * @brief getSize Returns the number of elements in the Population.
              * @return Number of elements.
              */
-			OPI_API_EXPORT int getSize() const;
+            OPI_API_EXPORT int getSize() const;
 
             //! Returns the per-object size of the byte buffer
 
@@ -141,7 +133,7 @@ namespace OPI
              * @brief getByteArraySize Returns the per-object size of the byte array.
              * @return Number of bytes every object can store in the byte array.
              */
-			OPI_API_EXPORT int getByteArraySize() const;
+            OPI_API_EXPORT int getByteArraySize() const;
 
             /**
              * @brief getLastPropagatorName Returns the name of the last plugin the Population
@@ -227,7 +219,7 @@ namespace OPI
              * and velocity vectors by converting the orbits.
              * @return INVALID_DATA if orbit data has not been set, SUCCESS otherwise.
              */
-			OPI_API_EXPORT ErrorCode convertOrbitsToStateVectors();
+            OPI_API_EXPORT ErrorCode convertOrbitsToStateVectors();
 
             /**
              * @brief convertStateVectorsToOrbits convert the population's state vectors to orbits.
@@ -237,7 +229,7 @@ namespace OPI
              * @return INVALID_DATA if position/velocity data has not been set or any of the oprations results
              * in NaN, SUCCESS otherwise.
              */
-			OPI_API_EXPORT ErrorCode convertStateVectorsToOrbits();
+            OPI_API_EXPORT ErrorCode convertStateVectorsToOrbits();
 
             /**
              * @brief insert Insert all elements from another population into this one.
@@ -251,40 +243,40 @@ namespace OPI
              * @param source The Population from which the elements are copied.
              * @param list A list of indices into the destination Population.
              */
-			OPI_API_EXPORT void insert(Population& source, IndexList& list);
+            OPI_API_EXPORT void insert(Population& source, IndexList& list);
 
-			//! Removes an object
-			OPI_API_EXPORT void remove(int index);
-			//! Removes a number of objects
-			OPI_API_EXPORT void remove(IndexList& list);
+            //! Removes an object
+            OPI_API_EXPORT void remove(int index);
+            //! Removes a number of objects
+            OPI_API_EXPORT void remove(IndexList& list);
 
-			//! Stores the Object Data to disk
+            //! Stores the Object Data to disk
             OPI_API_EXPORT void write(const char* filename);
-			//! Loads the Object Data from disk
+            //! Loads the Object Data from disk
             OPI_API_EXPORT ErrorCode read(const char* filename);
 
             //! Stores the Object Data as a JSON file. Does not include the byte array.
             OPI_API_EXPORT void writeJSON(const char* filename);
 
-			//! Notify about updates on the specified device
-			OPI_API_EXPORT ErrorCode update(int type, Device device = DEVICE_HOST);
+            //! Notify about updates on the specified device
+            OPI_API_EXPORT ErrorCode update(int type, Device device = DEVICE_HOST);
 
-			//! Retrieve the orbital parameters on the specified device
-			OPI_API_EXPORT Orbit* getOrbit(Device device = DEVICE_HOST, bool no_sync = false) const;
-			//! Retrieve the object properties on the specified device
-			OPI_API_EXPORT ObjectProperties* getObjectProperties(Device device = DEVICE_HOST, bool no_sync = false) const;
-			//! Retrieve the position in cartesian coordinates on the specified device
-			OPI_API_EXPORT Vector3* getPosition(Device device = DEVICE_HOST, bool no_sync = false) const;
-			//! Retrieve the velocity in cartesian coordinates on the specified device
-			OPI_API_EXPORT Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
-			//! Retrieve the acceleration in cartesian coordinates on the specified device
-			OPI_API_EXPORT Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Retrieve the orbital parameters on the specified device
+            OPI_API_EXPORT Orbit* getOrbit(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Retrieve the object properties on the specified device
+            OPI_API_EXPORT ObjectProperties* getObjectProperties(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Retrieve the position in cartesian coordinates on the specified device
+            OPI_API_EXPORT Vector3* getPosition(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Retrieve the velocity in cartesian coordinates on the specified device
+            OPI_API_EXPORT Vector3* getVelocity(Device device = DEVICE_HOST, bool no_sync = false) const;
+            //! Retrieve the acceleration in cartesian coordinates on the specified device
+            OPI_API_EXPORT Vector3* getAcceleration(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve epoch information on the specified device
             OPI_API_EXPORT Epoch* getEpoch(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the covariance information on the specified device
-			OPI_API_EXPORT Covariance* getCovariance(Device device = DEVICE_HOST, bool no_sync = false) const;
+            OPI_API_EXPORT Covariance* getCovariance(Device device = DEVICE_HOST, bool no_sync = false) const;
             //! Retrieve the arbitrary binary information on the specified device
-			OPI_API_EXPORT char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
+            OPI_API_EXPORT char* getBytes(Device device = DEVICE_HOST, bool no_sync = false) const;
 
             /**
              * @brief validate Performs various checks on the Population data and generate a debug string.
@@ -303,10 +295,10 @@ namespace OPI
             OPI_API_EXPORT std::string validate(IndexList& invalidObjects) const;
 
         //protected:
-			OPI_API_EXPORT Host& getHostPointer() const;
+            OPI_API_EXPORT Host& getHostPointer() const;
 
-		private:
-			//! Private implementation data
+        private:
+            //! Private implementation data
             Pimpl<ObjectRawData> data;
     };
 }

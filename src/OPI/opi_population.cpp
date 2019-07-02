@@ -79,6 +79,13 @@ namespace OPI
                 byteArraySize = source.byteArraySize;
             }
 
+            ObjectRawData operator+(ObjectRawData& other)
+            {
+                ObjectRawData out(*this);
+                out += other;
+                return out;
+            }
+
             // This will cause both objects to be synchronized to the host.
             ObjectRawData& operator+=(ObjectRawData& other)
             {
@@ -208,6 +215,13 @@ namespace OPI
         return *this;
     }
 
+    Population Population::operator+(const Population& other)
+    {
+        Population p(*this);
+        p.data += other.data;
+        return p;
+    }
+
     Population& Population::operator+=(const Population& other)
     {
         data += other.data;
@@ -231,11 +245,6 @@ namespace OPI
             update(DATA_ACCELERATION);
         }
         return *this;
-    }
-
-    void Population::append(const Population& other)
-    {
-        data += other.data;
     }
 
 	/**
