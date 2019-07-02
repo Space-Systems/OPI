@@ -87,6 +87,8 @@ namespace OPI
             }
 
             // This will cause both objects to be synchronized to the host.
+            // Descriptions will be lost as well as the byte array of the second
+            // population if its size differs from the first.
             ObjectRawData& operator+=(ObjectRawData& other)
             {
                 data_orbit.add(other.data_orbit);
@@ -250,6 +252,9 @@ namespace OPI
             update(DATA_POSITION);
             update(DATA_VELOCITY);
             update(DATA_ACCELERATION);
+        }
+        else {
+            std::cout << "Cannot add perturbations and populations of different sizes!" << std::endl;
         }
         return *this;
     }
