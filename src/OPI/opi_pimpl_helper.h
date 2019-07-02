@@ -41,6 +41,7 @@ namespace OPI
                 return *this;
             }
 
+            // Addition assignment operator for ObjectRawData and PerturbationRawData
             Pimpl& operator+=(const Pimpl& other) { *data += *other.data; return *this; }
 
             ~Pimpl() { delete data; }
