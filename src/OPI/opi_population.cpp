@@ -228,9 +228,16 @@ namespace OPI
         return *this;
     }
 
+    Population Population::operator+(const Perturbations& delta)
+    {
+        Population p(*this);
+        p += delta;
+        return p;
+    }
+
     Population& Population::operator+=(const Perturbations& delta)
     {
-        if (delta.getSize() >= getSize())
+        if (delta.getSize() == getSize())
         {
             for (int i=0; i<getSize(); i++)
             {

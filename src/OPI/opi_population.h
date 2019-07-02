@@ -101,6 +101,7 @@ namespace OPI
             OPI_API_EXPORT Population& operator+=(const Population& other);
             OPI_API_EXPORT Population& operator+=(const Perturbations& delta);
             OPI_API_EXPORT Population operator+(const Population& other);
+            OPI_API_EXPORT Population operator+(const Perturbations& delta);
 
             /**
              * @brief resize Sets the number of elements of the Population.
