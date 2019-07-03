@@ -112,7 +112,7 @@ include_directories( ${CMAKE_BINARY_DIR}/generated)
 
 add_subdirectory(src)
 
-option(ENABLE_EXAMPLES "Build examples" ON)
+option(ENABLE_EXAMPLES "Build examples" OFF)
 if(ENABLE_EXAMPLES)
 add_subdirectory(examples)
 endif()
