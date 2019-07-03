@@ -7,6 +7,10 @@ if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 # State the name of the project/executable and the programming language
 project(OPI CXX)
+
+# C++11 is required for OPI
+set(CMAKE_CXX_STANDARD 11)
+
 option(ENABLE_FORTRAN_SUPPORT "Enable Fortran (default=ON)" ON)
 
 enable_language(C OPTIONAL)
@@ -85,13 +89,6 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "None" "Debug" "Release" "RelWithDebInfo" "MinSizeRel" )
 endif(NOT CMAKE_BUILD_TYPE)
-
-# add option to enable c++11 compiler features
-option(ENABLE_CXX11 "Enable C++11" ON)
-if(ENABLE_CXX11)
-  set(CMAKE_CXX_STANDARD 11)
-  message( "C++11 enabled")
-endif()
 
 set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/fortran_modules)
 
