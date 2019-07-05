@@ -30,8 +30,20 @@ class BasicCPP: public OPI::Propagator
         }
 
         // This is the main function every plugin needs to implement to do the actual propagation.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
         {
+            // We have not implemented indexed propagation in this plugin.
+            if (indices == nullptr)
+            {
+                return OPI::NOT_IMPLEMENTED;
+            }
+
+            // We have only implemented single epoch propagation in this plugin.
+            if (mode != OPI::MODE_SINGLE_EPOCH)
+            {
+                return OPI::NOT_IMPLEMENTED;
+            }
+
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
             // look at the seconds that have elapsed since the first call of the propagator. The first
             // time runPropagation() is called, the given day is saved and then subtracted from the
@@ -48,31 +60,10 @@ class BasicCPP: public OPI::Propagator
 
             // The propagation function writes to the Population's position and orbit vectors, so
             // these two have to be marked for updated values on the host device.
-			population.update(OPI::DATA_POSITION, OPI::DEVICE_HOST);
-			population.update(OPI::DATA_ORBIT, OPI::DEVICE_HOST);
+            population.update(OPI::DATA_POSITION, OPI::DEVICE_HOST);
+            population.update(OPI::DATA_ORBIT, OPI::DEVICE_HOST);
 
             return OPI::SUCCESS;
-        }
-
-        // Especially with GPU-based propagators, you'll almost certainly also want to override
-        // runIndexedPropagation() and runMultiTimePropagation(). The former propagates only
-        // objects that appear in the given index list while the latter propgates objects to
-        // individual Julian dates given in an array.
-        // OPI provides basic implementations that call the (mandatory) runPropagation()
-        // function in a loop but they are very inefficient and likely to severly impact the
-        // performance of a CUDA- or OpenCL-based propagator.
-        // I'll leave this to you to implement them properly. For runIndexedPropagation() it
-        // is helpful to know that the IndexList synchronizes with the GPU just like the
-        // Population - the functions IndexList::getData() and IndexList::update() work
-        // just like their Population counterparts.
-        OPI::ErrorCode runIndexedPropagation(OPI::Population& population, OPI::IndexList& indices, double julian_day, double dt)
-        {
-            return OPI::NOT_IMPLEMENTED;
-        }
-
-        OPI::ErrorCode runMultiTimePropagation(OPI::Population& population, double* julian_days, int length, double dt)
-        {
-            return OPI::NOT_IMPLEMENTED;
         }
 
         // Saving a member variable like baseDay in the propagator can lead to problems because

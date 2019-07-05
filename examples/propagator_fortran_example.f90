@@ -23,7 +23,7 @@ subroutine OPI_Plugin_init( propagator) bind(c, name="OPI_Plugin_init")
   call OPI_Module_createProperty(propagator, "string", "hello world!")
 end subroutine
 
-function OPI_Plugin_propagate( propagator, data, julian_day, dt) result(error_code) bind(c, name="OPI_Plugin_propagate")
+function OPI_Plugin_propagate( propagator, data, julian_day, dt, mode, indices) result(error_code) bind(c, name="OPI_Plugin_propagate")
   use OPI
   use OPI_Types
   use ISO_C_BINDING
@@ -33,6 +33,8 @@ function OPI_Plugin_propagate( propagator, data, julian_day, dt) result(error_co
   real(c_float) :: years
   real(c_float) :: seconds
   real(c_float) :: dt
+  type(c_ptr), value :: mode
+  type(c_ptr), value :: indices
   integer(c_int) :: size
   type(OPI_Orbit), dimension(:), pointer :: orbit
 
