@@ -183,11 +183,15 @@ if (ENABLE_PYTHON)
     include_directories(${PYTHON_INCLUDE_PATH})
     # Create python module from interface definition file.
     set(OPI_PY_MODULE_NAME OPI_py${PYTHONLIBS_VERSION_STRING})
-    swig_add_library(${OPI_PY_MODULE_NAME}
+    if (${CMAKE_VERSION} VERSION_LESS "3.8")
+      swig_add_module(${OPI_PY_MODULE_NAME} python ${OPI_INTERFACE_FILE})
+    else()
+      swig_add_library(${OPI_PY_MODULE_NAME}
 	  TYPE MODULE
 	  LANGUAGE python
 	  SOURCES ${OPI_INTERFACE_FILE}
 	  )
+    endif()
     # Link Python module to the library we created earlier,
     # as well as the necessary Python libraries.
     swig_link_libraries(${OPI_PY_MODULE_NAME} ${PYTHON_LIBRARIES} OPI)
