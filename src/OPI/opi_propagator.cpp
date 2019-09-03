@@ -97,7 +97,7 @@ namespace OPI
         return NOT_IMPLEMENTED;
     }  
 
-    OPI::ErrorCode Propagator::align(OPI::Population& population, double dt)
+    OPI::ErrorCode Propagator::align(OPI::Population& population, double dt, double toEpoch)
     {
         if (population.getSize() > 1)
         {
@@ -108,6 +108,14 @@ namespace OPI
             {
                 std::cout << "Cannot align: Current epoch must be set for all objects." << std::endl;
                 return OPI::INVALID_DATA;
+            }
+            if (toEpoch >= latestEpoch)
+            {
+                latestEpoch = toEpoch;
+            }
+            else if (toEpoch > 0.0)
+            {
+                std::cout << "Given epoch is too small. Using latest epoch from the population instead." << std::endl;
             }
             std::cout << "Aligning to epoch " << std::setprecision(15) << latestEpoch << ". This may take a while." << std::endl;
 

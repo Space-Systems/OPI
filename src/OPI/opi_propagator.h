@@ -132,11 +132,13 @@ namespace OPI
              * set to a value larger than zero for this to work.
              * @param population The population to be aligned.
              * @param dt The step size, in seconds, used for alignment.
+             * @param toEpoch Epoch to align to, must be later than any object in the population. If not set or <0,
+             * the latest epoch from the population will be used instead.
              * @return OPI::NOT_IMPLEMENTED if the propagator does not support the required functions, OPI::INVALID_VALUE
              * if the population does not have all required fields filled out, OPI::SUCCESS if the propagator returns
              * no errors.
              */
-            OPI_API_EXPORT virtual OPI::ErrorCode align(OPI::Population& population, double dt);
+            OPI_API_EXPORT virtual OPI::ErrorCode align(OPI::Population& population, double dt, double toEpoch = 0.0);
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
