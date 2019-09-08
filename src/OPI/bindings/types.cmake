@@ -47,7 +47,7 @@ COMMENT( "Beginning of life" )
 STRUCTURE_VARIABLE(double beginning_of_life)
 COMMENT( "End of life" )
 STRUCTURE_VARIABLE(double end_of_life)
-COMMENT( "Current epoch" )
+COMMENT( "Epoch for which the object data is valid" )
 STRUCTURE_VARIABLE(double current_epoch)
 END_STRUCTURE( Epoch )
 

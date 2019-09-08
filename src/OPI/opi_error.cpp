@@ -21,7 +21,7 @@ namespace OPI
 			case INVALID_DEVICE:
 				return "Invalid device";
 			case INVALID_PROPERTY:
-				return "Invalid property";
+                return "Invalid property / missing config file";
 			case INCOMPATIBLE_TYPES:
 				return "INCOMPATIBLE_TYPES";
 			case NOT_IMPLEMENTED:
