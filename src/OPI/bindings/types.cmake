@@ -49,6 +49,8 @@ COMMENT( "End of life" )
 STRUCTURE_VARIABLE(double end_of_life)
 COMMENT( "Epoch for which the object data is valid" )
 STRUCTURE_VARIABLE(double current_epoch)
+COMMENT( "Epoch at which the data for this object was created")
+STRUCTURE_VARIABLE(double original_epoch)
 END_STRUCTURE( Epoch )
 
 COMMENT("This type represents a covariance matrix")
