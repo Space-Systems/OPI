@@ -104,6 +104,7 @@ namespace OPI
             // Find the target epoch to align the population to.
             const double mjd1950 = 2433282.5;
             double latestEpoch = population.getLatestEpoch();
+            double earliestEpoch = population.getEarliestEpoch();
             if (latestEpoch < mjd1950)
             {
                 std::cout << "Cannot align: Current epoch must be set for all objects." << std::endl;
@@ -118,6 +119,10 @@ namespace OPI
                 std::cout << "Given epoch is too small. Using latest epoch from the population instead." << std::endl;
             }
             std::cout << "Aligning to epoch " << std::setprecision(15) << latestEpoch << ". This may take a while." << std::endl;
+
+            int stepsRequired = int((latestEpoch - earliestEpoch)*86400.0 / dt) + 1;
+            int stepsDone = 0;
+            int percentDone = -1;
 
             OPI::ErrorCode error;
             int objectsAligned = 0;
@@ -145,7 +150,7 @@ namespace OPI
                         // Object is close to the target epoch. Propagate individually.
                         OPI::IndexList thisObject(population.getHostPointer());
                         thisObject.add(i);
-                        //std::cout << "Object " << i << " closing in. Propagating for " << deltaSeconds << " seconds." << std::endl;
+                        std::cout << "Object " << i << " closing in. Propagating for " << deltaSeconds << " seconds." << std::endl;
                         error = propagate(population, 0.0, deltaSeconds, OPI::MODE_INDIVIDUAL_EPOCHS, &thisObject);
                     }
                 }
@@ -165,6 +170,13 @@ namespace OPI
                     return error;
                 }
                 //std::cout << objectsAligned << " objects aligned." << std::endl;
+                stepsDone++;
+                int p = stepsDone * 100 / stepsRequired;
+                if (p > percentDone)
+                {
+                    percentDone = p;
+                    std::cout << p << "% done." << std::endl;
+                }
             }
         }
         else {
