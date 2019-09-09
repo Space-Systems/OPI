@@ -11,8 +11,9 @@
  * 001 - Initial value for OPI-2019
  * 002 - Added description field
  * 003 - Added reference frame
+ * 004 - Added original_epoch field
  */
-#define OPI_DATA_REVISION_NUMBER 3
+#define OPI_DATA_REVISION_NUMBER 4
 
 namespace OPI
 {

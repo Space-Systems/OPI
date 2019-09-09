@@ -502,13 +502,28 @@ namespace OPI
                                         break;
                                     }
                                 case DATA_EPOCH:
-                                    if(size == sizeof(Epoch))
+                                {
+                                    // for backwards compatibility
+                                    if (versionNumber < 4)
                                     {
-                                        Epoch* ep = getEpoch(DEVICE_HOST, true);
-                                        in.read(reinterpret_cast<char*>(ep), sizeof(Epoch) * number_of_objects);
-                                        data->data_epoch.update(DEVICE_HOST);
-                                        break;
+                                        size_t s = sizeof(double) * 3;
+                                        for (int i=0; i<number_of_objects; i++)
+                                        {
+                                            Epoch* ep = &(getEpoch(DEVICE_HOST, true)[i]);
+                                            in.read(reinterpret_cast<char*>(ep), s);
+                                            ep->original_epoch = 0.0;
+                                        }
                                     }
+                                    else {
+                                        if(size == sizeof(Epoch))
+                                        {
+                                            Epoch* ep = getEpoch(DEVICE_HOST, true);
+                                            in.read(reinterpret_cast<char*>(ep), sizeof(Epoch) * number_of_objects);
+                                        }
+                                    }
+                                    data->data_epoch.update(DEVICE_HOST);
+                                    break;
+                                }
                                 case DATA_COVARIANCE:
                                     if(size == sizeof(Covariance))
                                     {
@@ -570,7 +585,7 @@ namespace OPI
             if (!isZero(orb))
                 o["orbit"] = {{"sma",orb.semi_major_axis}, {"ecc",orb.eccentricity}, {"inc",orb.inclination}, {"raan",orb.raan}, {"aop",orb.arg_of_perigee}, {"ma",orb.mean_anomaly}};
             if (!isZero(e))
-                o["epoch"] = {{"bol",e.beginning_of_life}, {"eol",e.end_of_life}, {"current",e.current_epoch}};
+                o["epoch"] = {{"bol",e.beginning_of_life}, {"eol",e.end_of_life}, {"current",e.current_epoch}, {"original",e.original_epoch}};
             if (!isZero(pr))
                 o["properties"] = {{"id",pr.id},{"mass",pr.mass},{"dia",pr.diameter},{"a2m",pr.area_to_mass},{"cd",pr.drag_coefficient},{"cr",pr.reflectivity}};
             if (!isZero(c))
