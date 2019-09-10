@@ -936,6 +936,13 @@ namespace OPI
         return earliestEpoch;
     }
 
+    bool Population::markedAsDeorbited(int index) const
+    {
+        if (index < 0 || index >= getSize()) return false;
+        Epoch e = getEpoch()[index];
+        return (e.end_of_life > 0.0 && e.current_epoch > 0.0 && e.end_of_life >= e.current_epoch);
+    }
+
     std::string Population::validate(IndexList& invalidObjects) const
     {
         //0: No object has a current epoch set

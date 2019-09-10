@@ -163,6 +163,13 @@ namespace OPI
             OPI_API_EXPORT double getLatestEpoch() const;
 
             /**
+             * @brief markedAsDeorbited Checks whether an object has been marked as deorbited (EOL >= current epoch)
+             * @param index Index of object to check for
+             * @return true if object has been marked as deorbited
+             */
+            OPI_API_EXPORT bool markedAsDeorbited(int index) const;
+
+            /**
              * @brief setObjectName Set the name of the given object.
              * Names are host-only attributes and do not get synchronized to the GPU.
              * @param index The index of the object.
