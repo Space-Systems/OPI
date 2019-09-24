@@ -470,6 +470,58 @@ namespace OPI
         v[35] = m.accZ_k6;
     }
 
+    //! Sets the PartialsMatrix from a C vector (no bounds check!)
+    OPI_CUDA_PREFIX inline PartialsMatrix arrayToPartials(double* v)
+    {
+        PartialsMatrix m;
+        m.accX_posX = v[0];
+        m.accY_posX = v[1];
+        m.accZ_posX = v[2];
+        m.accX_posY = v[3];
+        m.accY_posY = v[4];
+        m.accZ_posY = v[5];
+        m.accX_posZ = v[6];
+        m.accY_posZ = v[7];
+        m.accZ_posZ = v[8];
+
+        m.accX_velX = v[9];
+        m.accY_velX = v[10];
+        m.accZ_velX = v[11];
+        m.accX_velY = v[12];
+        m.accY_velY = v[13];
+        m.accZ_velY = v[14];
+        m.accX_velZ = v[15];
+        m.accY_velZ = v[16];
+        m.accZ_velZ = v[17];
+
+        m.accX_k1 = v[18];
+        m.accY_k1 = v[19];
+        m.accZ_k1 = v[20];
+
+        m.accX_k2 = v[21];
+        m.accY_k2 = v[22];
+        m.accZ_k2 = v[23];
+
+        m.accX_k3 = v[24];
+        m.accY_k3 = v[25];
+        m.accZ_k3 = v[26];
+
+        m.accX_k4 = v[27];
+        m.accY_k4 = v[28];
+        m.accZ_k4 = v[29];
+
+        m.accX_k5 = v[30];
+        m.accY_k5 = v[31];
+        m.accZ_k5 = v[32];
+
+        m.accX_k6 = v[33];
+        m.accY_k6 = v[34];
+        m.accZ_k6 = v[35];
+
+        return m;
+    }
+
+
     //! writes the covariance matrix (lower triangular) to a C vector (no bounds check!)
     OPI_CUDA_PREFIX inline void covarianceToArray(const Covariance c, double* v)
     {
