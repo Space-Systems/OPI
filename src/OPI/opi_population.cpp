@@ -846,6 +846,7 @@ namespace OPI
         data->data_epoch.remove(index);
         data->data_covariance.remove(index);
         data->data_bytes.remove(index*data->byteArraySize, data->byteArraySize);
+        data->object_names.erase(data->object_names.begin()+index);
 		data->size--;
 	}
 
