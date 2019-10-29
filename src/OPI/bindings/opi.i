@@ -21,7 +21,7 @@
 %include "opi_datatypes.h"
 %include "opi_error.h"
 %include "opi_host.h"
-#include "opi_indexlist.h"
+%include "opi_indexlist.h"
 %include "opi_population.h"
 %include "opi_module.h"
 %include "opi_propagator.h"
