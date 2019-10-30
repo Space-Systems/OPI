@@ -36,45 +36,39 @@
 %array_functions(OPI::Epoch, epoch)
 
 // In python, the population getters are changed from C arrays to indexed setters and getters.
-// So instead of getOrbit()[i] in C++, use getOrbit(i) in python.
+// So instead of getOrbit()[i] in C++, use getOrbitByIndex(i) in python.
+// Alternatively, orbit_getitem(population.getOrbit(), i) will work.
 // Instead of getOrbit()[i] = o, use setOrbit(i,o).
 
-%feature("shadow") Population::getOrbit() %{
-def getOrbit(index):
-  return orbit_getitem(getOrbit(),index)
-%}
-
-%feature("shadow") Population::getPosition() %{
-def getPosition(index):
-  return vector3_getitem(getPosition(),index)
-%}
-
-%feature("shadow") Population::getVelocity() %{
-def getVelocity(index):
-  return vector3_getitem(getVelocity(),index)
-%}
-
-%feature("shadow") Population::getAcceleration() %{
-def getAcceleration(index):
-  return vector3_getitem(getAcceleration(),index)
-%}
-
-%feature("shadow") Population::getEpoch() %{
-def getEpoch(index):
-  return epoch_getitem(getEpoch(),index)
-%}
-
-%feature("shadow") Population::getObjectProperties() %{
-def getObjectProperties(index):
-  return props_getitem(getObjectProperties(),index)
-%}
-
-%feature("shadow") Population::getCovariance() %{
-def getCovariance(index):
-  return covariance_getitem(getCovariance(),index)
-%}
-
 %extend OPI::Population {
+        Orbit getOrbitByIndex(int index, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            return $self->getOrbit(device, no_sync)[index];
+        }
+        Vector3 getPositionByIndex(int index, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            return $self->getPosition(device, no_sync)[index];
+        }
+        Vector3 getVelocityByIndex(int index, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            return $self->getVelocity(device, no_sync)[index];
+        }
+        Vector3 getAccelerationByIndex(int index, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            return $self->getAcceleration(device, no_sync)[index];
+        }
+        Epoch getEpochByIndex(int index, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            return $self->getEpoch(device, no_sync)[index];
+        }
+        ObjectProperties getObjectPropertiesByIndex(int index, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            return $self->getObjectProperties(device, no_sync)[index];
+        }
+        Covariance getCovarianceByIndex(int index, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            return $self->getCovariance(device, no_sync)[index];
+        }
         void setOrbit(int index, Orbit o, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
         {
             if (index < $self->getSize()) $self->getOrbit(device, no_sync)[index] = o;
