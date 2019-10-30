@@ -75,11 +75,32 @@ def getCovariance(index):
 %}
 
 %extend OPI::Population {
-        void setOrbit(int index, Orbit o) { if (index < $self->getSize()) $self->getOrbit()[index] = o; }
-        void setPosition(int index, Vector3 pos) { if (index < $self->getSize()) $self->getPosition()[index] = pos; }
-        void setVelocity(int index, Vector3 vel) { if (index < $self->getSize()) $self->getVelocity()[index] = vel; }
-        void setAcceleration(int index, Vector3 acc) { if (index < $self->getSize()) $self->getAcceleration()[index] = acc; }
-        void setEpoch(int index, Epoch ep) { if (index < $self->getSize()) $self->getEpoch()[index] = ep; }
-        void setObjectProperties(int index, ObjectProperties props) { if (index < $self->getSize()) $self->getObjectProperties()[index] = props; }
-        void setCovariance(int index, Covariance c) { if (index < $self->getSize()) $self->getCovariance()[index] = c; }
+        void setOrbit(int index, Orbit o, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            if (index < $self->getSize()) $self->getOrbit(device, no_sync)[index] = o;
+        }
+        void setPosition(int index, Vector3 pos, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            if (index < $self->getSize()) $self->getPosition(device, no_sync)[index] = pos;
+        }
+        void setVelocity(int index, Vector3 vel, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            if (index < $self->getSize()) $self->getVelocity(device, no_sync)[index] = vel;
+        }
+        void setAcceleration(int index, Vector3 acc, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            if (index < $self->getSize()) $self->getAcceleration(device, no_sync)[index] = acc;
+        }
+        void setEpoch(int index, Epoch ep, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            if (index < $self->getSize()) $self->getEpoch(device, no_sync)[index] = ep;
+        }
+        void setObjectProperties(int index, ObjectProperties props, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            if (index < $self->getSize()) $self->getObjectProperties(device, no_sync)[index] = props;
+        }
+        void setCovariance(int index, Covariance c, OPI::Device device=OPI::DEVICE_HOST, bool no_sync=false)
+        {
+            if (index < $self->getSize()) $self->getCovariance(device, no_sync)[index] = c;
+        }
 };
