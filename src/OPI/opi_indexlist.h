@@ -35,7 +35,7 @@ namespace OPI
 			OPI_API_EXPORT int* getData(Device device, bool no_sync = false) const;
 
 			//! Removes duplicate entries from this list
-			void removeDuplicates();
+			OPI_API_EXPORT void removeDuplicates();
 		private:
 			//! Private implementation details (pimpl-idiom)
 			Pimpl<IndexListImpl> impl;
