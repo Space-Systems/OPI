@@ -24,13 +24,13 @@ Features at a glance:
 * Extensible GPU computing support
 * Automatic reading of configuration and resource files for propagators
 
-OPI currently supports C, C++ and Fortran, as well as CUDA  and OpenCL for
-propagators. The C API can also be used for integration into other languages
-like Python or C#. Hosts and plugins don't have to be written in the same
-language in order to collaborate. OPI itself is written in C++, with
-auto-generated bindings for C and Fortran. For GPU support, it supplies a plugin
-that scans for capable devices and helps to initialize CUDA or OpenCL-enabled
-propagators.
+OPI currently supports C, C++, Fortran, CUDA and OpenCL for propagators, and
+C, C++, Fortran and Python for hosts. The C API can also be used for integration
+into other languages like C#. Hosts and plugins don't have to be written in the
+same language in order to collaborate. OPI itself is written in C++, with
+auto-generated bindings for C, Fortran and Python. For GPU support, it supplies
+a plugin that scans for capable devices and helps to initialize CUDA or
+OpenCL-enabled propagators.
 
 Please note that this software is still under development and the interface
 functions are subject to change. Your feedback is appreciated.
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
     {
       double currentTime = startDate + i * stepSize / 86400.0;
       // Propagate with the default settings (single epoch, no index list)
-      OPI::ErrorCode status = myPropagator.propagate(populaion, currentTime, stepSize);
+      OPI::ErrorCode status = myPropagator.propagate(population, currentTime, stepSize);
     }
 
     // Print the first object's mean anomaly
