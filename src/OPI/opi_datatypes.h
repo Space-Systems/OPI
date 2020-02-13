@@ -351,6 +351,22 @@ namespace OPI
                 );
     }
 
+    OPI_CUDA_PREFIX inline bool isValid(const Covariance& c)
+    {
+        // Check for unused terms:
+        // If one of the diagonal terms is zero, all corresponding rows and columns must be zero as well.
+        if ((c.k1_k1 == 0.0 && (c.k2_k1 != 0.0 || c.k3_k1 != 0.0 || c.k4_k1 != 0.0 || c.k5_k1 != 0.0 || c.k6_k1 != 0.0 || c.d1_k1 != 0.0 || c.d2_k1 != 0.0))
+         || (c.k2_k2 == 0.0 && (c.k2_k1 != 0.0 || c.k3_k2 != 0.0 || c.k4_k2 != 0.0 || c.k5_k2 != 0.0 || c.k6_k2 != 0.0 || c.d1_k2 != 0.0 || c.d2_k2 != 0.0))
+         || (c.k3_k3 == 0.0 && (c.k3_k1 != 0.0 || c.k3_k2 != 0.0 || c.k4_k3 != 0.0 || c.k5_k3 != 0.0 || c.k6_k3 != 0.0 || c.d1_k3 != 0.0 || c.d2_k3 != 0.0))
+         || (c.k4_k4 == 0.0 && (c.k4_k1 != 0.0 || c.k4_k2 != 0.0 || c.k4_k3 != 0.0 || c.k5_k4 != 0.0 || c.k6_k4 != 0.0 || c.d1_k4 != 0.0 || c.d2_k4 != 0.0))
+         || (c.k5_k5 == 0.0 && (c.k5_k1 != 0.0 || c.k5_k2 != 0.0 || c.k5_k3 != 0.0 || c.k5_k4 != 0.0 || c.k6_k5 != 0.0 || c.d1_k5 != 0.0 || c.d2_k5 != 0.0))
+         || (c.k6_k6 == 0.0 && (c.k6_k1 != 0.0 || c.k6_k2 != 0.0 || c.k6_k3 != 0.0 || c.k6_k4 != 0.0 || c.k6_k5 != 0.0 || c.d1_k6 != 0.0 || c.d2_k6 != 0.0))
+         || (c.d1_d1 == 0.0 && (c.d1_k1 != 0.0 || c.d1_k2 != 0.0 || c.d1_k3 != 0.0 || c.d1_k4 != 0.0 || c.d1_k5 != 0.0 || c.d1_k6 != 0.0 || c.d2_d1 != 0.0))
+         || (c.d2_d2 == 0.0 && (c.d2_k1 != 0.0 || c.d2_k2 != 0.0 || c.d2_k3 != 0.0 || c.d2_k4 != 0.0 || c.d2_k5 != 0.0 || c.d2_k6 != 0.0 || c.d2_d1 != 0.0)))
+        return false;
+        else return true;
+    }
+
 
     OPI_CUDA_PREFIX inline bool hasNaN(const Orbit& o)
     {
