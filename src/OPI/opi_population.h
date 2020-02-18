@@ -162,6 +162,9 @@ namespace OPI
              */
             OPI_API_EXPORT double getLatestEpoch() const;
 
+            //! Retrieve an object's index based on the ID given in its ObjectProperties field.
+            OPI_API_EXPORT int findByID(int id) const;
+
             /**
              * @brief markedAsDeorbited Checks whether an object has been marked as deorbited (EOL >= current epoch)
              * @param index Index of object to check for
@@ -293,6 +296,8 @@ namespace OPI
         private:
             //! Private implementation data
             Pimpl<ObjectRawData> data;
+
+            void rebuildNoradIndex();
     };
 }
 

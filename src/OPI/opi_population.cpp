@@ -7,6 +7,7 @@
 #include "internal/json.hpp"
 #include <iostream>
 #include <vector>
+#include <map>
 #include <cassert>
 #include <fstream>
 #include <sstream>
@@ -41,6 +42,7 @@ namespace OPI
                 lastPropagatorName = "None";
                 description = "";
                 frame = REF_UNSPECIFIED;
+                noradIndex.clear();
 			}
 
             ObjectRawData(ObjectRawData& source):
@@ -58,6 +60,7 @@ namespace OPI
                 lastPropagatorName = source.lastPropagatorName;
                 description = source.description;
                 frame = source.frame;
+                noradIndex = source.noradIndex;
 
                 size = source.size;
                 byteArraySize = source.byteArraySize;
@@ -83,6 +86,7 @@ namespace OPI
                 data_epoch.add(other.data_epoch);
                 data_covariance.add(other.data_covariance);
                 object_names.insert(object_names.end(), other.object_names.begin(), other.object_names.end());
+                noradIndex.insert(other.noradIndex.begin(), other.noradIndex.end());
 
                 size += other.size;
 
@@ -115,6 +119,8 @@ namespace OPI
             std::string lastPropagatorName;
             std::string description;
             ReferenceFrame frame;
+
+            std::map<int,int> noradIndex;
 
 			// data size
 			int size;
@@ -558,6 +564,7 @@ namespace OPI
             }
         }
         else std::cout << "Unable to open file " << filename << "!" << std::endl;
+        rebuildNoradIndex();
 		return SUCCESS;
 	}
 
@@ -676,6 +683,13 @@ namespace OPI
             data->object_names[index] = std::string(name);
         }
         else std::cout << "Cannot set object name: Index (" << index << ") out of range!" << std::endl;
+    }
+
+    int Population::findByID(int id) const
+    {
+        std::map<int,int>::iterator it = data->noradIndex.find(id);
+        if (it == data->noradIndex.end()) return -1;
+        else return it->second;
     }
 
 
@@ -838,6 +852,7 @@ namespace OPI
 
 	void Population::remove(int index)
 	{
+        data->noradIndex.erase(findByID(index));
 		data->data_acceleration.remove(index);
 		data->data_orbit.remove(index);
 		data->data_position.remove(index);
@@ -846,7 +861,7 @@ namespace OPI
         data->data_epoch.remove(index);
         data->data_covariance.remove(index);
         data->data_bytes.remove(index*data->byteArraySize, data->byteArraySize);
-        data->object_names.erase(data->object_names.begin()+index);
+        data->object_names.erase(data->object_names.begin()+index);        
 		data->size--;
 	}
 
@@ -860,6 +875,7 @@ namespace OPI
 				break;
 			case DATA_PROPERTIES:
 				data->data_properties.update(device);
+                rebuildNoradIndex();
 				break;
 			case DATA_VELOCITY:
 				data->data_velocity.update(device);
@@ -1364,4 +1380,12 @@ namespace OPI
         else return INVALID_DATA;
     }
 
+    void Population::rebuildNoradIndex()
+    {
+        data->noradIndex.clear();
+        for (int i=0; i<getSize(); i++)
+        {
+            data->noradIndex.insert(std::pair<int,int>(getObjectProperties(OPI::DEVICE_HOST)[i].id, i));
+        }
+    }
 }
