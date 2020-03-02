@@ -258,7 +258,7 @@ namespace OPI
 	 *
 	 * This will not work between machines with different endianness!
 	 */
-    void Population::write(const char* filename)
+    void Population::write(const char* filename) const
     {
 		int temp;
         int versionNumber = OPI_DATA_REVISION_NUMBER;
@@ -568,7 +568,7 @@ namespace OPI
 		return SUCCESS;
 	}
 
-    void Population::writeJSON(const char* filename)
+    void Population::writeJSON(const char* filename) const
     {
         json objects;
         for (int i=0; i<getSize(); i++)
