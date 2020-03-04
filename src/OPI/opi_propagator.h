@@ -138,7 +138,7 @@ namespace OPI
              * if the population does not have all required fields filled out, OPI::SUCCESS if the propagator returns
              * no errors.
              */
-            OPI_API_EXPORT virtual OPI::ErrorCode align(OPI::Population& population, double dt, double toEpoch = 0.0);
+            OPI_API_EXPORT virtual ErrorCode align(Population& population, double dt, IndexList* indices = nullptr, double toEpoch = 0.0, bool quiet = false);
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
