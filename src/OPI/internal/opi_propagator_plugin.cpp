@@ -17,9 +17,9 @@ namespace OPI
 			proc_init(this);
 		}
 		proc_propagate = (pluginPropagateFunction)(handle->loadFunction("OPI_Plugin_propagate", true));
-		setName(plugin->getName());
-		setAuthor(plugin->getAuthor());
-		setDescription(plugin->getDescription());
+        setName(plugin->getName().c_str());
+        setAuthor(plugin->getAuthor().c_str());
+        setDescription(plugin->getDescription().c_str());
 	}
 
 	PropagatorPlugin::~PropagatorPlugin()

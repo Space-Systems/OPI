@@ -26,11 +26,11 @@ namespace OPI
 			ErrorCode disable();
 
 			/// Return the plugins name
-            const char* getName() const;
+            std::string getName() const;
 			/// Return the plugins author
-            const char* getAuthor() const;
+            std::string getAuthor() const;
 			/// Return the plugins description
-            const char* getDescription() const;
+            std::string getDescription() const;
 			/// Return the plugins information structure
 			const PluginInfo& getInfo() const;
 			/// Return the plugin shared object handle

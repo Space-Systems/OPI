@@ -57,19 +57,19 @@ namespace OPI
 		return SUCCESS;
 	}
 
-    const char* Plugin::getName() const
+    std::string Plugin::getName() const
 	{
-        return std::string(info.name, info.name_len).c_str();
+        return std::string(info.name, info.name_len);
 	}
 
-    const char* Plugin::getAuthor() const
+    std::string Plugin::getAuthor() const
 	{
-        return std::string(info.author, info.author_len).c_str();
+        return std::string(info.author, info.author_len);
 	}
 
-    const char* Plugin::getDescription() const
+    std::string Plugin::getDescription() const
 	{
-        return std::string(info.desc, info.desc_len).c_str();
+        return std::string(info.desc, info.desc_len);
 	}
 	/// @endcond
 }
