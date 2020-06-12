@@ -134,6 +134,9 @@ create an instance of it directly. Use it to load a plugin directory, select the
 desired plugin and use it to propagate a population.
 
 ```cpp
+#define OPI_DISABLE_OPENCL //OpenCL not required for host
+#include "OPI/opi_cpp.h"
+
 int main(int argc, char* argv[])
 {
   // Initialize host
