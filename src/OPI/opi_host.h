@@ -40,14 +40,34 @@ namespace OPI
 		public:
             OPI_API_EXPORT Host();
 			OPI_API_EXPORT ~Host();
-
-            OPI_API_EXPORT void logToFile(const char* logfileName, bool append = false);
 	
 			enum gpuPlatform {
 				PLATFORM_NONE,
 				PLATFORM_CUDA,
 				PLATFORM_OPENCL
 			};
+
+			//! Let OPI and supported propagators log their output to a file.
+			/** This will redirect all output from OPI and from propagators that use the OPI::Logger
+			 * for debugging output. You can use the propagator's supportsOPILogger() function to
+			 * check whether or not it uses the logger.
+			 * \param logfileName Name of the log file, or "" to revert back to stdout.
+			 * \param append Set to true to append to an existing file instead of overwriting it.
+			 */
+			OPI_API_EXPORT void logToFile(const char* logfileName, bool append = false);
+
+			//! Set the desired amount of detail for the log output.
+			/** How this is used depends largely on the implementation in the propagator, but
+			 * in general, verbose levels are:
+             * -1 : No message output at all.
+		     *  0 : Default level: Regular output and errors.
+		     *  1 : Warnings.
+		     *  2 : Status messages.
+		     *  3 : Detailed status and debug messages.
+		     *  4 : Very detailed status and debug messages.
+			 */
+			OPI_API_EXPORT void setVerboseLevel(int level);
+
 
 			//! Check whether CUDA is supported on the current hardware.
 			OPI_API_EXPORT bool hasCUDASupport() const;

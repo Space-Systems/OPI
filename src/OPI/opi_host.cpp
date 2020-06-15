@@ -89,6 +89,11 @@ namespace OPI
 			Logger::setMode(Logger::LOGMODE_FILE, logfileName, nullptr, append);
     }
 
+	void Host::setVerboseLevel(int level)
+	{
+		Logger::setVerboseLevel(level);
+	}
+
 	void Host::setErrorCallback(OPI_ErrorCallback callback, void* privatedata)
 	{
 		impl->errorCallback = callback;
