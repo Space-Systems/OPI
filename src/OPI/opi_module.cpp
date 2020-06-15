@@ -911,6 +911,11 @@ namespace OPI
         return 0;
     }
 
+    int Module::minorOPIVersionRequired()
+    {
+        return 0;
+    }
+
 	int Module::supportsOPILogger()
 	{
 		return 0;

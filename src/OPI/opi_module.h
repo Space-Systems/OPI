@@ -199,6 +199,13 @@ namespace OPI
             virtual int minimumOPIVersionRequired();
 
             /**
+             * @brief minorOPIVersionRequired Returns the minor version of the given API level that this module requires.
+             *
+             * @return An integer representing the minimum minor version required. Zero for any minor version.
+             */
+            virtual int minorOPIVersionRequired();
+
+            /**
              * @brief supportsOPILogger Check whether this modules uses the OPI Logger.
              *
              * @return 0 if this module does not use OPI::Logger for message output (default),

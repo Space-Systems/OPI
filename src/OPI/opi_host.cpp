@@ -226,22 +226,31 @@ namespace OPI
     bool Host::pluginSupported(Module *plugin, gpuPlatform platform)
     {
         bool support = false;
-		if (plugin->minimumOPIVersionRequired() <= 0)
+        int pluginMajor = plugin->minimumOPIVersionRequired();
+        int pluginMinor = plugin->minorOPIVersionRequired();
+
+        if (pluginMajor <= 0)
 		{
 			Logger::out(0) << "Warning: " << plugin->getName() << " has no minimum OPI version set. "
 				<< "It may not function correctly and should be removed from the plugin folder." << std::endl;
 			support = true;
 		}
-        else if (plugin->minimumOPIVersionRequired() < OPI_API_VERSION_MAJOR)
+        else if (pluginMajor < OPI_API_VERSION_MAJOR)
         {
             Logger::out(0) << "Warning: " << plugin->getName() << " was made for a previous version of OPI. "
                       << "It may not function correctly and should be removed from the plugin folder." << std::endl;
 			support = true;
         }
-        else if (plugin->minimumOPIVersionRequired() > OPI_API_VERSION_MAJOR)
+        else if (pluginMajor > OPI_API_VERSION_MAJOR)
         {
             Logger::out(0) << plugin->getName() << ": Skipped because it needs at least OPI version "
-                      << plugin->minimumOPIVersionRequired() << "." << std::endl;
+                      << pluginMajor << "." << pluginMinor << "." << std::endl;
+            support = false;
+        }
+        else if (pluginMinor > OPI_API_VERSION_MINOR)
+        {
+            Logger::out(0) << plugin->getName() << ": Skipped because it needs at least OPI version "
+                      << pluginMajor << "." << pluginMinor << "." << std::endl;
             support = false;
         }
         else if (plugin->requiresCUDA() <= 0 && plugin->requiresOpenCL() <= 0) {
