@@ -198,6 +198,14 @@ namespace OPI
              */
             virtual int minimumOPIVersionRequired();
 
+            /**
+             * @brief supportsOPILogger Check whether this modules uses the OPI Logger.
+             *
+             * @return 0 if this module does not use OPI::Logger for message output (default),
+             * 1 otherwise.
+             */
+            virtual int supportsOPILogger();
+
 		protected:
 			//! Returns the Host of this propagator
 			Host* getHost() const;

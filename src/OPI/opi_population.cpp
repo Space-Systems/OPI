@@ -2,6 +2,7 @@
 #include "opi_host.h"
 #include "opi_gpusupport.h"
 #include "opi_indexlist.h"
+#include "opi_logger.h"
 #include "internal/opi_synchronized_data.h"
 #include "internal/miniz.h"
 #include "internal/json.hpp"
@@ -244,7 +245,7 @@ namespace OPI
             update(DATA_ACCELERATION);
         }
         else {
-            std::cout << "Cannot add perturbations and populations of different sizes!" << std::endl;
+            Logger::out(0) << "Cannot add perturbations and populations of different sizes!" << std::endl;
         }
         return *this;
     }
@@ -369,7 +370,7 @@ namespace OPI
             outfile.close();
         }
         else {
-            std::cout << "Failed to compress population data!" << std::endl;
+            Logger::out(0) << "Failed to compress population data!" << std::endl;
         }
         delete[] compressedData;
         delete[] bytes;
@@ -548,22 +549,22 @@ namespace OPI
                                         break;
                                     }
                                 default:
-                                    std::cout << "Found unknown block id " << type << std::endl;
+                                    Logger::out(0) << "Found unknown block id " << type << std::endl;
                                     in.seekg(number_of_objects * size);
                                 }
                             }
                         }
                     }
-                    else std::cout << "Unknown file version" << std::endl;
+                    else Logger::out(0) << "Unknown file version" << std::endl;
                 }
-                else std::cout << filename << " does not appear to be an OPI population file." << std::endl;
+                else Logger::out(0) << filename << " does not appear to be an OPI population file." << std::endl;
             }
             else {
-                std::cout << "Failed to decompress population data! " << std::endl;
+                Logger::out(0) << "Failed to decompress population data! " << std::endl;
                 delete[] uncompressedData;
             }
         }
-        else std::cout << "Unable to open file " << filename << "!" << std::endl;
+        else Logger::out(0) << "Unable to open file " << filename << "!" << std::endl;
         rebuildNoradIndex();
 		return SUCCESS;
 	}
@@ -682,7 +683,7 @@ namespace OPI
         {
             data->object_names[index] = std::string(name);
         }
-        else std::cout << "Cannot set object name: Index (" << index << ") out of range!" << std::endl;
+        else Logger::out(0) << "Cannot set object name: Index (" << index << ") out of range!" << std::endl;
     }
 
     int Population::findByID(int id) const
@@ -804,7 +805,7 @@ namespace OPI
 
         if (getByteArraySize() != source.getByteArraySize())
         {
-            std::cout << "Warning: Cannot insert byte array into population!" << std::endl;
+            Logger::out(0) << "Warning: Cannot insert byte array into population!" << std::endl;
         }
 
         if (list.getSize() >= source.getSize())
@@ -832,12 +833,12 @@ namespace OPI
                     }
                 }
                 else {
-                    std::cout << "Cannot insert - index out of range: " << l << std::endl;
+                    Logger::out(0) << "Cannot insert - index out of range: " << l << std::endl;
                 }
             }
         }
         else {
-            std::cout << "Cannot insert - not enough elements in index list!" << std::endl;
+            Logger::out(0) << "Cannot insert - not enough elements in index list!" << std::endl;
         }
 
         update(DATA_ORBIT);

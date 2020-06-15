@@ -41,7 +41,7 @@ namespace OPI
             OPI_API_EXPORT Host();
 			OPI_API_EXPORT ~Host();
 
-            OPI_API_EXPORT void logToFile(const char* logfileName);
+            OPI_API_EXPORT void logToFile(const char* logfileName, bool append = false);
 	
 			enum gpuPlatform {
 				PLATFORM_NONE,

@@ -1,5 +1,6 @@
 #include "opi_host.h"
 #include "internal/opi_plugin.h"
+#include "opi_logger.h"
 #include "opi_propagator.h"
 #include "opi_gpusupport.h"
 #include "internal/opi_propagator_plugin.h"
@@ -40,11 +41,6 @@ namespace OPI
 
     Host::Host()
 	{
-#ifdef WIN32
-        // stdout isn't easily accessible on Windows so we'll log to a file by default.
-        logToFile("opi.log");
-#endif
-
         impl->errorCallback = 0;
 		impl->lastError = SUCCESS;
 		impl->errorCallbackParameter = 0;
@@ -83,14 +79,14 @@ namespace OPI
 		// free all plugin handles
 		for(size_t i = 0; i < impl->pluginlist.size(); ++i)
 			delete impl->pluginlist[i];
-#ifdef WIN32
-        freopen("CON", "w", stdout);
-#endif
 	}
 
-    void Host::logToFile(const char* logfileName)
+    void Host::logToFile(const char* logfileName, bool append)
     {
-        if (logfileName != "") freopen(logfileName, "w", stdout);
+		if (logfileName == "")
+			Logger::setMode(Logger::LOGMODE_STDOUT);
+		else
+			Logger::setMode(Logger::LOGMODE_FILE, logfileName, nullptr, append);
     }
 
 	void Host::setErrorCallback(OPI_ErrorCallback callback, void* privatedata)
@@ -107,7 +103,8 @@ namespace OPI
     ErrorCode Host::loadPlugins(const char* plugindir, gpuPlatform platformSupport, int platformNumber, int deviceNumber)
 	{
 		ErrorCode status = SUCCESS;
-		std::cout << "Loading plugins from " << plugindir << std::endl;
+		Logger::out(0) << "OPI " << OPI_API_VERSION_MAJOR << "." << OPI_API_VERSION_MINOR << std::endl;
+		Logger::out(0) << "Loading plugins from " << plugindir << std::endl;
         std::string suffix = DynLib::getSuffix();
 
 		// check if the cuda support plugin is loaded
@@ -117,7 +114,7 @@ namespace OPI
 			std::string pluginName = (platformSupport == PLATFORM_OPENCL ? "OPI-cl" : "OPI-cuda");
 			std::string gpuFrameworkName = (platformSupport == PLATFORM_OPENCL ? "OpenCL" : "CUDA");
             std::string libraryFileName = std::string(plugindir) + "/support/" + pluginName + suffix;
-			std::cout << "Loading support library " << libraryFileName << std::endl;
+			Logger::out(0) << "Loading support library " << libraryFileName << std::endl;
 
 			impl->gpuSupportPluginHandle = new DynLib(libraryFileName, true);
 			if(impl->gpuSupportPluginHandle)
@@ -141,12 +138,12 @@ namespace OPI
 #else
 					std::string message = "";
 #endif
-					std::cout << "[OPI] Unable to load GPU support library. " << message << std::endl;
+					Logger::out(0) << "[OPI] Unable to load GPU support library. " << message << std::endl;
 				}
 			}
 			else {
 				platformSupport = PLATFORM_NONE;
-				std::cout << "[OPI] Cannot find GPU support library (" << libraryFileName << ")."<< std::endl
+				Logger::out(0) << "[OPI] Cannot find GPU support library (" << libraryFileName << ")."<< std::endl
 					<< "Check your path and make sure your " << gpuFrameworkName << " drivers are installed correctly." << std::endl;
 			}
 		}
@@ -179,7 +176,7 @@ namespace OPI
                             configFileName = std::string(plugindir) + "/" + entry_name.substr(0,entry_name.find_last_of(".")) + ".cfg";
                         }
 
-                        std::cout << "Found " << getPluginTypeString(plugin->getInfo().type) << " " << plugin->getInfo().name << " (" << pluginpath << ")" << std::endl;
+                        Logger::out(0) << "Found " << getPluginTypeString(plugin->getInfo().type) << " " << plugin->getInfo().name << " (" << pluginpath << ")" << std::endl;
                         loadPlugin(plugin,platformSupport,configFileName.c_str());
 					}
 					else
@@ -229,15 +226,21 @@ namespace OPI
     bool Host::pluginSupported(Module *plugin, gpuPlatform platform)
     {
         bool support = false;
-        if (plugin->minimumOPIVersionRequired() < OPI_API_VERSION_MAJOR)
+		if (plugin->minimumOPIVersionRequired() <= 0)
+		{
+			Logger::out(0) << "Warning: " << plugin->getName() << " has no minimum OPI version set. "
+				<< "It may not function correctly and should be removed from the plugin folder." << std::endl;
+			support = true;
+		}
+        else if (plugin->minimumOPIVersionRequired() < OPI_API_VERSION_MAJOR)
         {
-            std::cout << plugin->getName() << ": Skipped because it is outdated. "
-                      << "You should update this plugin, or delete it from the plugin folder." << std::endl;
-            support = false;
+            Logger::out(0) << "Warning: " << plugin->getName() << " was made for a previous version of OPI. "
+                      << "It may not function correctly and should be removed from the plugin folder." << std::endl;
+			support = true;
         }
         else if (plugin->minimumOPIVersionRequired() > OPI_API_VERSION_MAJOR)
         {
-            std::cout << plugin->getName() << ": Skipped because it needs at least OPI version "
+            Logger::out(0) << plugin->getName() << ": Skipped because it needs at least OPI version "
                       << plugin->minimumOPIVersionRequired() << "." << std::endl;
             support = false;
         }
@@ -247,14 +250,14 @@ namespace OPI
         }
         else if (plugin->requiresCUDA() > 0) {
             if (platform != PLATFORM_CUDA) {
-                std::cout << plugin->getName()
+                Logger::out(0) << plugin->getName()
                 << ": Skipped - no CUDA support available." << std::endl;
                 support = false;
             }
             else if (getCurrentCudaDeviceCapability() <= 0) {
-                std::cout << "[OPI] Warning: Cannot determine CUDA compute capability of selected device "
+                Logger::out(0) << "[OPI] Warning: Cannot determine CUDA compute capability of selected device "
                     << "(perhaps no CUDA device was selected?). " << std::endl;
-                std::cout << "[OPI] Propagator " << plugin->getName() << " requires at least "
+                Logger::out(0) << "[OPI] Propagator " << plugin->getName() << " requires at least "
                     << plugin->requiresCUDA() << ".x - "
                     << "otherwise propagation might fail." << std::endl;
                 support = true;
@@ -263,7 +266,7 @@ namespace OPI
                 support = true;
             }
             else {
-                std::cout << plugin->getName()
+                Logger::out(0) << plugin->getName()
                 << ": Skipped - Compute capability too low (" <<
                 getCurrentCudaDeviceCapability() << ", needs at least" <<
                 plugin->requiresCUDA() << ")" << std::endl;
@@ -275,7 +278,7 @@ namespace OPI
                 support = true;
             }
             else {
-                std::cout << plugin->getName()
+                Logger::out(0) << plugin->getName()
                 << ": Skipped - no OpenCL support available." << std::endl;
                 support = false;
             }
@@ -342,7 +345,7 @@ namespace OPI
         }
             // unknown/ not implemented plugin types
         default:
-            std::cout << "Skipping unknown plugin " << plugin->getInfo().name << "." << std::endl;
+            Logger::out(0) << "Skipping unknown plugin " << plugin->getInfo().name << "." << std::endl;
         }
 
     }

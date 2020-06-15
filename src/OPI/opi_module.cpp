@@ -1,6 +1,7 @@
 #include "opi_module.h"
 
 #include "opi_host.h"
+#include "opi_logger.h"
 #include "internal/miniz.h"
 
 #include <map>
@@ -765,7 +766,7 @@ namespace OPI
                 std::ifstream in(filename, std::ifstream::in);
                 if (in.is_open())
                 {
-                    std::cout << "Applying settings for " << getName() << " from config file" << std::endl;
+                    Logger::out(0) << "Applying settings for " << getName() << " from config file" << std::endl;
                     while (in.good())
                     {
                         std::string line;
@@ -783,7 +784,7 @@ namespace OPI
                                 {
                                     if (!hasProperty(property.c_str()))
                                     {
-                                        //std::cout << "Registering new PropagatorProperty from config file: " << property << " (string)" << std::endl;
+                                        //Logger::out(0) << "Registering new PropagatorProperty from config file: " << property << " (string)" << std::endl;
                                         createProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
                                     }
                                     else setProperty(property.c_str(), value.substr(1,value.length()-2).c_str());
@@ -794,7 +795,7 @@ namespace OPI
                                     {
                                         if (!hasProperty(property.c_str()))
                                         {
-                                            //std::cout << "Registering new PropagatorProperty from config file: " << property << " (float)" << std::endl;
+                                            //Logger::out(0) << "Registering new PropagatorProperty from config file: " << property << " (float)" << std::endl;
                                             createProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
                                         }
                                         else setProperty(property.c_str(), (float)atof(value.substr(0,value.length()-2).c_str()));
@@ -802,7 +803,7 @@ namespace OPI
                                     else {
                                         if (!hasProperty(property.c_str()))
                                         {
-                                            //std::cout << "Registering new PropagatorProperty from config file: " << property << " (double)" << std::endl;
+                                            //Logger::out(0) << "Registering new PropagatorProperty from config file: " << property << " (double)" << std::endl;
                                             createProperty(property.c_str(), atof(value.c_str()));
                                         }
                                         else setProperty(property.c_str(), atof(value.c_str()));
@@ -811,7 +812,7 @@ namespace OPI
                                 else {
                                     if (!hasProperty(property.c_str()))
                                     {
-                                        //std::cout << "Registering new PropagatorProperty from config file: " << property << " (int)" << std::endl;
+                                        //Logger::out(0) << "Registering new PropagatorProperty from config file: " << property << " (int)" << std::endl;
                                         createProperty(property.c_str(), atoi(value.c_str()));
                                     }
                                     else setProperty(property.c_str(), atoi(value.c_str()));
@@ -822,11 +823,11 @@ namespace OPI
                     in.close();
                 }
                 else {
-                    //std::cout << "No config file found for propagator " << getName() << std::endl;
+                    //Logger::out(0) << "No config file found for propagator " << getName() << std::endl;
                 }
             }
             else {
-                std::cout << filenameStr << " is not a valid config file for propagator " << getName() << std::endl;
+                Logger::out(0) << filenameStr << " is not a valid config file for propagator " << getName() << std::endl;
             }
         }
         data->configFileName = filenameStr;
@@ -855,19 +856,19 @@ namespace OPI
                         return fileSize;
                     }
                     else {
-                        std::cout << "Unable to determine file size of resource " << resname << "!" << std::endl;
+                        Logger::out(0) << "Unable to determine file size of resource " << resname << "!" << std::endl;
                     }
                 }
                 else {
-                    std::cout << "Unable to locate resource " << resname << "!" << std::endl;
+                    Logger::out(0) << "Unable to locate resource " << resname << "!" << std::endl;
                 }
             }
             else {
-                std::cout << "Unable to load resource archive " << filename << "!" << std::endl;
+                Logger::out(0) << "Unable to load resource archive " << filename << "!" << std::endl;
             }
         }
         else {
-            std::cout << "Unable to determine resource archive location!" << std::endl;
+            Logger::out(0) << "Unable to determine resource archive location!" << std::endl;
         }
         return 0;
     }
@@ -909,5 +910,10 @@ namespace OPI
     {
         return 0;
     }
+
+	int Module::supportsOPILogger()
+	{
+		return 0;
+	}
 
 }

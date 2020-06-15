@@ -2,6 +2,7 @@
 #include "opi_host.h"
 #include "opi_indexlist.h"
 #include "opi_gpusupport.h"
+#include "opi_logger.h"
 #include "internal/opi_synchronized_data.h"
 #include "internal/miniz.h"
 #include <iostream>
@@ -266,7 +267,7 @@ namespace OPI
             outfile.close();
         }
         else {
-            std::cout << "Failed to compress perturbation data!" << std::endl;
+            Logger::out(0) << "Failed to compress perturbation data!" << std::endl;
         }
         delete[] compressedData;
         delete[] bytes;
@@ -381,22 +382,22 @@ namespace OPI
                                         break;
                                     }
                                 default:
-                                    std::cout << "Found unknown block id " << type << std::endl;
+                                    Logger::out(0) << "Found unknown block id " << type << std::endl;
                                     in.seekg(number_of_objects * size);
                                 }
                             }
                         }
                     }
-                    else std::cout << "Unknown file version" << std::endl;
+                    else Logger::out(0) << "Unknown file version" << std::endl;
                 }
-                else std::cout << std::string(filename) << " does not appear to be an OPI perturbations file." << std::endl;
+                else Logger::out(0) << std::string(filename) << " does not appear to be an OPI perturbations file." << std::endl;
             }
             else {
-                std::cout << "Failed to decompress perturbation data! " << std::endl;
+                Logger::out(0) << "Failed to decompress perturbation data! " << std::endl;
                 delete[] uncompressedData;
             }
         }
-        else std::cout << "Unable to open file " << filename << "!" << std::endl;
+        else Logger::out(0) << "Unable to open file " << filename << "!" << std::endl;
         return SUCCESS;
     }
 
@@ -535,7 +536,7 @@ namespace OPI
 
         if (getByteArraySize() != source.getByteArraySize())
         {
-            std::cout << "Warning: Cannot insert byte array into perturbations!" << std::endl;
+            Logger::out(0) << "Warning: Cannot insert byte array into perturbations!" << std::endl;
         }
 
         if (list.getSize() >= source.getSize())
@@ -560,12 +561,12 @@ namespace OPI
                     }
                 }
                 else {
-                    std::cout << "Cannot insert - index out of range: " << l << std::endl;
+                    Logger::out(0) << "Cannot insert - index out of range: " << l << std::endl;
                 }
             }
         }
         else {
-            std::cout << "Cannot insert - not enough elements in index list!" << std::endl;
+            Logger::out(0) << "Cannot insert - not enough elements in index list!" << std::endl;
         }
 
         update(DATA_ORBIT);

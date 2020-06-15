@@ -1,4 +1,5 @@
 #include "dynlib.h"
+#include "opi_logger.h"
 #include <iostream>
 namespace OPI
 {
@@ -11,14 +12,14 @@ namespace OPI
 		handle = LoadLibrary(buffer.c_str());
 		if((!handle) && (!silentfail))
 		{
-			std::cout << "Error loading library " << name << ": " << GetLastError() << std::endl;
+			Logger::out(0) << "Error loading library " << name << ": " << GetLastError() << std::endl;
 		}
 #else
 		std::string buffer = name;
 		handle = dlopen(buffer.c_str(), RTLD_LAZY);
 		if((!handle) && (!silentfail))
 		{
-			std::cout << dlerror() << std::endl;
+			Logger::out(0) << dlerror() << std::endl;
 		}
 #endif
 	}
@@ -33,7 +34,7 @@ namespace OPI
 		if(!result)
 		{
 			if(!silentfail)
-				std::cout << "Error loading Function " << name << std::endl;
+				Logger::out(0) << "Error loading Function " << name << std::endl;
 		}
 #else
 		void* result = 0;
@@ -42,7 +43,7 @@ namespace OPI
 		if((error = dlerror()) != NULL)
 		{
 			if(!silentfail)
-				std::cout << "Error loading Function " << name << ": " << error << std::endl;
+				Logger::out(0) << "Error loading Function " << name << ": " << error << std::endl;
 		}
 #endif
 		return result;

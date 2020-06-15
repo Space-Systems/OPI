@@ -8,6 +8,7 @@ include_directories(${OpenCL_INCLUDE_DIR})
 endif()
 
 set( OPI_SOURCE_FILES
+  opi_logger.cpp
   opi_population.cpp
   opi_perturbations.cpp
   opi_error.cpp
@@ -38,6 +39,7 @@ set( OPI_LIBRARY_HEADER
   opi_common.h
   opi_error.h
   opi_datatypes.h
+  opi_logger.h
   opi_population.h
   opi_perturbations.h
   opi_host.h
@@ -69,8 +71,8 @@ set( OPI_INTERNAL_HEADER
   internal/opi_query_plugin.h
   internal/opi_pluginprocs.h
   internal/opi_plugin.h
-  internal/opi_synchronized_data.h
-  internal/dynlib.h
+  internal/opi_synchronized_data.h  
+  internal/dynlib.h  
 )
 
 # we need the following for our compilation

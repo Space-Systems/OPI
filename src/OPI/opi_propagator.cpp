@@ -2,6 +2,7 @@
 #include "opi_host.h"
 #include "opi_perturbation_module.h"
 #include "opi_indexlist.h"
+#include "opi_logger.h"
 #include <iostream>
 #include <iomanip>
 
@@ -110,7 +111,7 @@ namespace OPI
             double earliestEpoch = population.getEarliestEpoch();
             if (latestEpoch < mjd1950)
             {
-                std::cout << "Cannot align: Current epoch must be set for all objects." << std::endl;
+                Logger::out(0) << "Cannot align: Current epoch must be set for all objects." << std::endl;
                 return INVALID_DATA;
             }
             if (toEpoch >= latestEpoch)
@@ -119,9 +120,9 @@ namespace OPI
             }
             else if (toEpoch > 0.0)
             {
-                std::cout << "Given epoch is too small. Using latest epoch from the population instead." << std::endl;
+                Logger::out(0) << "Given epoch is too small. Using latest epoch from the population instead." << std::endl;
             }
-            std::cout << "Aligning " << loopSize << " objects to epoch " << std::setprecision(15) << latestEpoch << ". This may take a while." << std::endl;
+            Logger::out(0) << "Aligning " << loopSize << " objects to epoch " << std::setprecision(15) << latestEpoch << ". This may take a while." << std::endl;
 
             int stepsRequired = int((latestEpoch - earliestEpoch)*86400.0 / dt) + 1;
             int stepsDone = 0;
@@ -156,7 +157,7 @@ namespace OPI
                         // Object is close to the target epoch. Propagate individually.
                         IndexList thisObject(population.getHostPointer());
                         thisObject.add(i);
-                        std::cout << "Object " << i << " closing in. Propagating for " << deltaSeconds << " seconds." << std::endl;
+                        Logger::out(0) << "Object " << i << " closing in. Propagating for " << deltaSeconds << " seconds." << std::endl;
                         error = propagate(population, 0.0, deltaSeconds, MODE_INDIVIDUAL_EPOCHS, &thisObject);
                     }
                 }
@@ -167,28 +168,28 @@ namespace OPI
                 // Check for errors
                 if (error == NOT_IMPLEMENTED)
                 {
-                    std::cout << "Cannot align: Propagator does not support the required functions." << std::endl;
+                    Logger::out(0) << "Cannot align: Propagator does not support the required functions." << std::endl;
                     return error;
                 }
                 else if (error != SUCCESS)
                 {
-                    std::cout << "Propagator returned an error during object alignment." << std::endl;
+                    Logger::out(0) << "Propagator returned an error during object alignment." << std::endl;
                     return error;
                 }
-                //std::cout << objectsAligned << " objects aligned." << std::endl;
+                //Logger::out(0) << objectsAligned << " objects aligned." << std::endl;
                 stepsDone++;
                 int p = stepsDone * 100 / stepsRequired;
                 if (p > percentDone)
                 {
                     percentDone = p;
-                    if (!quiet) std::cout << p << "% done." << std::endl;
+                    if (!quiet) Logger::out(0) << p << "% done." << std::endl;
                 }
             }
         }
         else {
-            std::cout << "Population too small - no alignment required." << std::endl;
+            Logger::out(0) << "Population too small - no alignment required." << std::endl;
         }
-        //std::cout << "Alignment complete." << std::endl;
+        //Logger::out(0) << "Alignment complete." << std::endl;
         return SUCCESS;
     }
 }
