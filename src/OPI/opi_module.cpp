@@ -916,9 +916,9 @@ namespace OPI
         return 0;
     }
 
-	int Module::supportsOPILogger()
+	bool Module::supportsOPILogger()
 	{
-		return 0;
+		return false;
 	}
 
 }

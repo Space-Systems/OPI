@@ -208,10 +208,10 @@ namespace OPI
             /**
              * @brief supportsOPILogger Check whether this modules uses the OPI Logger.
              *
-             * @return 0 if this module does not use OPI::Logger for message output (default),
-             * 1 otherwise.
+             * @return false if this module does not use OPI::Logger for message output (default),
+             * true otherwise.
              */
-            virtual int supportsOPILogger();
+            virtual bool supportsOPILogger();
 
 		protected:
 			//! Returns the Host of this propagator
