@@ -597,9 +597,16 @@ namespace OPI
             if (!isZero(pr))
                 o["properties"] = {{"id",pr.id},{"mass",pr.mass},{"dia",pr.diameter},{"a2m",pr.area_to_mass},{"cd",pr.drag_coefficient},{"cr",pr.reflectivity}};
             if (!isZero(c))
-                o["covariance"] = {c.k1_k1, c.k2_k1, c.k2_k2, c.k3_k1, c.k3_k2, c.k3_k3, c.k4_k1, c.k4_k2, c.k4_k3, c.k4_k4, c.k5_k1, c.k5_k2, c.k5_k3, c.k5_k4, c.k5_k5,
-                        c.k6_k1, c.k6_k2, c.k6_k3, c.k6_k4, c.k6_k5, c.k6_k6, c.d1_k1, c.d1_k2, c.d1_k3, c.d1_k4, c.d1_k5, c.d1_k6, c.d1_d1,
-                        c.d2_k1, c.d2_k2, c.d2_k3, c.d2_k4, c.d2_k5, c.d2_k6, c.d2_d1, c.d2_d2};
+                o["covariance"] = {
+                    {"k1_k1",c.k1_k1},
+                    {"k2_k1",c.k2_k1}, {"k2_k2",c.k2_k2},
+                    {"k3_k1",c.k3_k1}, {"k3_k2",c.k3_k2}, {"k3_k3",c.k3_k3},
+                    {"k4_k1",c.k4_k1}, {"k4_k2",c.k4_k2}, {"k4_k3",c.k4_k3}, {"k4_k4",c.k4_k4},
+                    {"k5_k1",c.k5_k1}, {"k5_k2",c.k5_k2}, {"k5_k3",c.k5_k3}, {"k5_k4",c.k5_k4}, {"k5_k5",c.k5_k5},
+                    {"k6_k1",c.k6_k1}, {"k6_k2",c.k6_k2}, {"k6_k3",c.k6_k3}, {"k6_k4",c.k6_k4}, {"k6_k5",c.k6_k5}, {"k6_k6",c.k6_k6},
+                    {"d1_k1",c.d1_k1}, {"d1_k2",c.d1_k2}, {"d1_k3",c.d1_k3}, {"d1_k4",c.d1_k4}, {"d1_k5",c.d1_k5}, {"d1_k6",c.d1_k6}, {"d1_d1",c.d1_d1},
+                    {"d2_k1",c.d2_k1}, {"d2_k2",c.d2_k2}, {"d2_k3",c.d2_k3}, {"d2_k4",c.d2_k4}, {"d2_k5",c.d2_k5}, {"d2_k6",c.d2_k6}, {"d2_d1",c.d2_d1}, {"d2_d2",c.d2_d2}
+                };
             objects.push_back(o);
         }
         json jp;
