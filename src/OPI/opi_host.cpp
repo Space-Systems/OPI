@@ -32,6 +32,7 @@ namespace OPI
 			std::vector<PropagatorIntegrator*> integratorlist;
 			std::vector<DistanceQuery*> querylist;
 			std::vector<CollisionDetection*> detectionlist;
+            std::string pluginPath;
 			OPI_ErrorCallback errorCallback;
 			void* errorCallbackParameter;
 			mutable ErrorCode lastError;
@@ -47,6 +48,8 @@ namespace OPI
 
 		impl->gpuSupport = 0;
 		impl->gpuSupportPluginHandle = 0;
+
+        impl->pluginPath = "";
 	}
 
 	Host::~Host()
@@ -158,6 +161,7 @@ namespace OPI
 		// check if plugindir is a directory
 		if(dir != 0)
 		{
+            impl->pluginPath = std::string(plugindir);
 			dirent* dir_entry = 0;
 			// iterate over all directory entries
 			while((dir_entry = readdir(dir)))
@@ -362,6 +366,11 @@ namespace OPI
             Logger::out(0) << "Skipping unknown plugin " << plugin->getInfo().name << "." << std::endl;
         }
 
+    }
+
+    const char* Host::getPluginPath() const
+    {
+        return impl->pluginPath.c_str();
     }
 
     Propagator* Host::getPropagator(const char* name) const

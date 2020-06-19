@@ -99,6 +99,9 @@ namespace OPI
 			//! Returns the major capability number of the currently selected CUDA device.
 			OPI_API_EXPORT int getCurrentCudaDeviceCapability() const;
 
+            //! Returns the current plugin path.
+            OPI_API_EXPORT const char* getPluginPath() const;
+
 			//! Get a Propagator by index.
 			/** After loading the available plugins this function can
 			 * be used to get the Propagator with the given index. Indices are assigned in the order
