@@ -6,7 +6,7 @@
 #include "opi_pimpl_helper.h"
 namespace OPI
 {
-	class IndexListImpl;
+    class IndexListImpl;
 	class Host;
 	struct IndexPair;
 
@@ -17,7 +17,11 @@ namespace OPI
 		public:
 			//! The host object must be valid
 			OPI_API_EXPORT IndexList(Host& host);
+            OPI_API_EXPORT IndexList(const IndexList& source);
 			OPI_API_EXPORT ~IndexList();
+
+            OPI_API_EXPORT IndexList& operator+=(const IndexList& other);
+            OPI_API_EXPORT IndexList operator+(const IndexList& other);
 
 			//! Adds an index to the list
 			OPI_API_EXPORT void add(int index);

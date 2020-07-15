@@ -9,7 +9,19 @@ namespace OPI
 	{
 		public:
 			IndexListImpl(Host& host): data(host) {}
-			SynchronizedData<int> data;
+            IndexListImpl(IndexListImpl& source): data(source.data) {}
+            SynchronizedData<int> data;
+            IndexListImpl operator+(IndexListImpl& other)
+            {
+                IndexListImpl out(*this);
+                out += other;
+                return out;
+            }
+            IndexListImpl& operator+=(IndexListImpl& other)
+            {
+                data.add(other.data);
+                return *this;
+            }
 	};
 	/**
 	 * @endcond
@@ -20,9 +32,27 @@ namespace OPI
 	{
 	}
 
+    IndexList::IndexList(const IndexList &source):
+        impl(source.impl)
+    {
+    }
+
 	IndexList::~IndexList()
 	{
 	}
+
+    IndexList IndexList::operator+(const IndexList& other)
+    {
+        IndexList p(*this);
+        p.impl += other.impl;
+        return p;
+    }
+
+    IndexList& IndexList::operator+=(const IndexList& other)
+    {
+        impl += other.impl;
+        return *this;
+    }
 
 	void IndexList::add(int index)
 	{
