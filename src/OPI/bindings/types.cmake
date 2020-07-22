@@ -51,6 +51,8 @@ COMMENT( "Epoch for which the object data is valid" )
 STRUCTURE_VARIABLE(double current_epoch)
 COMMENT( "Epoch at which the data for this object was created")
 STRUCTURE_VARIABLE(double original_epoch)
+COMMENT( "Epoch at the start of propagation")
+STRUCTURE_VARIABLE(double initial_epoch)
 END_STRUCTURE( Epoch )
 
 COMMENT("This type represents a covariance matrix")

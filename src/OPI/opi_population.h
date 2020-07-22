@@ -12,8 +12,9 @@
  * 002 - Added description field
  * 003 - Added reference frame
  * 004 - Added original_epoch field
+ * 005 - Added initial_epoch field
  */
-#define OPI_DATA_REVISION_NUMBER 4
+#define OPI_DATA_REVISION_NUMBER 5
 
 namespace OPI
 {

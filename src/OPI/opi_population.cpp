@@ -519,6 +519,17 @@ namespace OPI
                                             Epoch* ep = &(getEpoch(DEVICE_HOST, true)[i]);
                                             in.read(reinterpret_cast<char*>(ep), s);
                                             ep->original_epoch = 0.0;
+                                            ep->initial_epoch = 0.0;
+                                        }
+                                    }
+                                    else if (versionNumber < 4)
+                                    {
+                                        size_t s = sizeof(double) * 4;
+                                        for (int i=0; i<number_of_objects; i++)
+                                        {
+                                            Epoch* ep = &(getEpoch(DEVICE_HOST, true)[i]);
+                                            in.read(reinterpret_cast<char*>(ep), s);
+                                            ep->initial_epoch = 0.0;
                                         }
                                     }
                                     else {
@@ -593,7 +604,7 @@ namespace OPI
             if (!isZero(orb))
                 o["orbit"] = {{"sma",orb.semi_major_axis}, {"ecc",orb.eccentricity}, {"inc",orb.inclination}, {"raan",orb.raan}, {"aop",orb.arg_of_perigee}, {"ma",orb.mean_anomaly}};
             if (!isZero(e))
-                o["epoch"] = {{"bol",e.beginning_of_life}, {"eol",e.end_of_life}, {"current",e.current_epoch}, {"original",e.original_epoch}};
+                o["epoch"] = {{"bol",e.beginning_of_life}, {"eol",e.end_of_life}, {"current",e.current_epoch}, {"original",e.original_epoch}, {"initial",e.initial_epoch}};
             if (!isZero(pr))
                 o["properties"] = {{"id",pr.id},{"mass",pr.mass},{"dia",pr.diameter},{"a2m",pr.area_to_mass},{"cd",pr.drag_coefficient},{"cr",pr.reflectivity}};
             if (!isZero(c))
