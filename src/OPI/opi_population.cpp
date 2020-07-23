@@ -522,7 +522,7 @@ namespace OPI
                                             ep->initial_epoch = 0.0;
                                         }
                                     }
-                                    else if (versionNumber < 4)
+                                    else if (versionNumber < 5)
                                     {
                                         size_t s = sizeof(double) * 4;
                                         for (int i=0; i<number_of_objects; i++)

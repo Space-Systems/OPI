@@ -522,7 +522,6 @@ namespace OPI
 		return impl->gpuSupport;
 	}
 
-
 	void Host::sendError(ErrorCode code) const
 	{
 		if(code != SUCCESS)
