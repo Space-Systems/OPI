@@ -184,6 +184,8 @@ namespace OPI
                     percentDone = p;
                     if (!quiet) Logger::out(0) << p << "% done." << std::endl;
                 }
+
+                if (!indices && population.getSize() > loopSize) loopSize = population.getSize();
             }
         }
         else {
