@@ -61,6 +61,28 @@ namespace OPI
              */
             OPI_API_EXPORT ErrorCode propagate(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
+            /** @brief Propagates a given population over a given time span and measures MP/s.
+             *
+             * This function executes a propagation loop for a given population over a given time.
+             * The time frame is given as a start date, duration of the propagation in days, and
+             * time step size in seconds. Together with the number of objects, this is used to calculate
+             * the number of propagation operations. The execution time of the loop is measured
+             * (excluding the first propagation step in which many propagators call additional initialization
+             * functions) to give the benchmark result in megapropagations per second (MP/s).
+             * The population will be updated to contain the propagated values, although no intermediate
+             * results will be available.
+             * @param population The population to be propagated. Its initial object size is used
+             * to calculate the benchmark value when no index list is given.
+             * @param julian_day The starting date for the propagation.
+             * @param days Duration, in days, of the propagation.
+             * @param dt Time step size, in seconds, for the propagation.
+             * @param mode Propagation mode, directly passed to the propagate() function.
+             * @param indices An IndexList containing the objects of the population to be propagated. If
+             * given, its size will be used for calculating the benchmark instead of the population size.
+             * @return A double value representing how many megapropagations per second were executed.
+             */
+            OPI_API_EXPORT double benchmark(Population& population, double julian_day, double days, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+
             //! Assigns a module to this propagator (not yet implemented)
 			/**
 			 * It depends on the used Propagator if the assigned modules will be used

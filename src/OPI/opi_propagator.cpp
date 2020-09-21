@@ -5,6 +5,7 @@
 #include "opi_logger.h"
 #include <iostream>
 #include <iomanip>
+#include <chrono>
 
 namespace OPI
 {
@@ -68,6 +69,44 @@ namespace OPI
         }
 		return status;
 	}
+
+    double Propagator::benchmark(Population& population, double julian_day, double days, double dt, PropagationMode mode, IndexList* indices)
+    {
+        ErrorCode status = SUCCESS;
+        std::chrono::high_resolution_clock::time_point start;
+        const int populationSize = (indices ? indices->getSize() : population.getSize());
+        const int timeSteps = days * 86400.0 / dt;
+
+        for (int i=0; i<timeSteps; i++)
+        {
+            // Skip the first step because it might contain initialization
+            if (i==1) {
+                Logger::out(0) << "Starting OPI Benchmark" << std::endl;
+                start = std::chrono::high_resolution_clock::now();
+            }
+            const double time = julian_day + ((i * dt) / 86400.0);
+            status = propagate(population, time, dt, mode, indices);
+            if (status != SUCCESS) break;
+        }
+        std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
+        const double duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() / 1000.0;
+        double mps = 0.0;
+        if (duration > 0 && status == SUCCESS) mps = (populationSize * timeSteps) / (duration * 1000000.0);
+
+        Logger::out(0) << "OPI Benchmark Results" << std::endl;
+        Logger::out(0) << "---------------------" << std::endl;
+        if (status != SUCCESS) Logger::out(0) << "Propagation failed with error code " << status << std::endl;
+        else {
+            Logger::out(0) << "Population size: " << populationSize << " objects" << std::endl;
+            Logger::out(0) << "Time steps: " << timeSteps << std::endl;
+            Logger::out(0) << "Propagation operations: " << timeSteps*populationSize << std::endl;
+            Logger::out(0) << "---------------------" << std::endl;
+            Logger::out(0) << "Propagation duration: " << duration << " seconds" << std::endl;
+            Logger::out(0) << "Megapropagations per second: " << mps << std::endl;
+        }
+
+        return mps;
+    }
 
 	bool Propagator::backwardPropagation()
 	{
