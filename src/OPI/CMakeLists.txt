@@ -175,7 +175,11 @@ if (ENABLE_PYTHON)
   # Path to SWIG interface file
   set (OPI_INTERFACE_FILE bindings/opi.i)
   # Include SWIG-specific CMake commands.
-  include(${SWIG_USE_FILE})
+  if (${SWIG_USE_FILE})
+    include(${SWIG_USE_FILE})
+  else()
+    include(UseSWIG)
+  endif()
   # Put SWIG in C++ mode.
   set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES CPLUSPLUS ON)
   include_directories(${CMAKE_BINARY_DIR}/generated/OPI)
