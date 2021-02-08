@@ -23,7 +23,8 @@ subroutine OPI_Plugin_init( propagator) bind(c, name="OPI_Plugin_init")
   call OPI_Module_createProperty(propagator, "string", "hello world!")
 end subroutine
 
-function OPI_Plugin_propagate( propagator, data, julian_day, dt, mode, indices) result(error_code) bind(c, name="OPI_Plugin_propagate")
+function propagate(propagator, data, julian_day, dt, mode, indices) &
+    result(error_code) bind(c, name="OPI_Plugin_propagate")
   use OPI
   use OPI_Types
   use ISO_C_BINDING

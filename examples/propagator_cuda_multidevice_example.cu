@@ -37,8 +37,19 @@ class CudaMultideviceExample:
 
 		}
 
-        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
+        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
 		{
+            if (mode == OPI::MODE_INDIVIDUAL_EPOCHS)
+            {
+                // If updating from OPI 2015, move code from runMultiTimePropagation() here instead.
+                return OPI::NOT_IMPLEMENTED;
+            }
+
+            if (indices != nullptr)
+            {
+                // If updating from OPI 2015, move code from runIndexedPropagation() here instead.
+                return OPI::NOT_IMPLEMENTED;
+            }
 
 			int deviceCount;
 			cudaGetDeviceCount(&deviceCount);
@@ -74,7 +85,12 @@ class CudaMultideviceExample:
         }
 
         int minimumOPIVersionRequired() {
-            return 1;
+            return 2019;
+        }
+
+        int minorOPIVersionRequired()
+        {
+            return 8;
         }
 
 };

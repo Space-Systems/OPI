@@ -92,8 +92,20 @@ class PropertiesCPP: public OPI::Propagator
         // It is important to remember that the host can set new property values at any
         // time. If you are using properties that affect the propagation you need to
         // make sure to check for updated values at every propagation step.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
-		{
+        OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
+        {
+            if (mode == OPI::MODE_INDIVIDUAL_EPOCHS)
+            {
+                // If updating from OPI 2015, move code from runMultiTimePropagation() here instead.
+                return OPI::NOT_IMPLEMENTED;
+            }
+
+            if (indices != nullptr)
+            {
+                // If updating from OPI 2015, move code from runIndexedPropagation() here instead.
+                return OPI::NOT_IMPLEMENTED;
+            }
+
 			std::cout << "Test int: " << testproperty_int << std::endl;
 			std::cout << "Test float: " <<  testproperty_float << std::endl;
 			std::cout << "Test string: " << testproperty_string << std::endl;
@@ -144,10 +156,15 @@ class PropertiesCPP: public OPI::Propagator
             return 0;
         }
 
-        // This plugin is written for OPI version 1.0.
+        // This plugin is written for OPI version 2019.8.
         int minimumOPIVersionRequired()
         {
-            return 1;
+            return 2019;
+        }
+
+        int minorOPIVersionRequired()
+        {
+            return 8;
         }
 };
 

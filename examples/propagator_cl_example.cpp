@@ -1,3 +1,4 @@
+#define CL_TARGET_OPENCL_VERSION 120
 #include "OPI/opi_cpp.h"
 #include "CL/cl.h"
 
@@ -86,15 +87,15 @@ public:
 
     virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
     {
-        // We have not implemented indexed propagation in this plugin.
-        if (indices == nullptr)
+        if (mode == OPI::MODE_INDIVIDUAL_EPOCHS)
         {
+            // If updating from OPI 2015, move code from runMultiTimePropagation() here instead.
             return OPI::NOT_IMPLEMENTED;
         }
 
-        // We have only implemented single epoch propagation in this plugin.
-        if (mode != OPI::MODE_SINGLE_EPOCH)
+        if (indices != nullptr)
         {
+            // If updating from OPI 2015, move code from runIndexedPropagation() here instead.
             return OPI::NOT_IMPLEMENTED;
         }
 
@@ -155,9 +156,15 @@ public:
         return 0;
     }
 
+    // This plugin is written for OPI version 2019.8
     int minimumOPIVersionRequired()
     {
-        return 1;
+        return 2019;
+    }
+
+    int minorOPIVersionRequired()
+    {
+        return 8;
     }
 
     OPI::ReferenceFrame referenceFrame()

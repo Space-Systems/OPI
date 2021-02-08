@@ -1,3 +1,4 @@
+#define CL_TARGET_OPENCL_VERSION 120
 #include "OPI/opi_cpp.h"
 #include <string>
 #include <iostream>
@@ -31,6 +32,10 @@ class BasicCL: public OPI::Propagator
 	public:
         BasicCL(OPI::Host& host)
 		{
+            // In general, you should avoid using global variables in a propagator!
+            // It's better to use PropagatorProperties or the Population's byte array. Only
+            // use globals when you know exactly what you're doing! Here, I'm only using them
+            // as a shortcut in order to keep the example shorter.
 			initialized = false;
             baseDay = 0;
 
@@ -78,8 +83,20 @@ class BasicCL: public OPI::Propagator
 		}
 
         // This is the main function every plugin needs to implement to do the actual propagation.
-        virtual OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt )
-		{
+        OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
+		{            
+            if (mode == OPI::MODE_INDIVIDUAL_EPOCHS)
+            {
+                // If updating from OPI 2015, move code from runMultiTimePropagation() here instead.
+                return OPI::NOT_IMPLEMENTED;
+            }
+
+            if (indices != nullptr)
+            {
+                // If updating from OPI 2015, move code from runIndexedPropagation() here instead.
+                return OPI::NOT_IMPLEMENTED;
+            }
+
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
             // look at the seconds that have elapsed since the first call of the propagator. The first
             // time runPropagation() is called, the given day is saved and then subtracted from the
@@ -137,32 +154,11 @@ class BasicCL: public OPI::Propagator
             return OPI::SUCCESS;
 		}
 
-        // Especially with GPU-based propagators, you'll almost certainly also want to override
-        // runIndexedPropagation() and runMultiTimePropagation(). The former propagates only
-        // objects that appear in the given index list while the latter propgates objects to
-        // individual Julian dates given in an array.
-        // OPI provides basic implementations that call the (mandatory) runPropagation()
-        // function in a loop but they are very inefficient and likely to severly impact the
-        // performance of a CUDA- or OpenCL-based propagator.
-        // I'll leave this to you to implement them properly. For runIndexedPropagation() it
-        // is helpful to know that the IndexList synchronizes with the GPU just like the
-        // Population - the functions IndexList::getData() and IndexList::update() work
-        // just like their Population counterparts.
-        OPI::ErrorCode runIndexedPropagation(OPI::Population& population, OPI::IndexList& indices, double julian_day, double dt)
-        {
-            return OPI::NOT_IMPLEMENTED;
-        }
-
-        OPI::ErrorCode runMultiTimePropagation(OPI::Population& population, double* julian_days, int length, double dt)
-        {
-            return OPI::NOT_IMPLEMENTED;
-        }
-
         // Saving a member variable like baseDay in the propagator can lead to problems because
         // the host might change the propagation times or even the entire population without
         // notice. Therefore, plugin authors need to make sure that at least when disabling
         // and subsquently enabling the propagator, hosts can expect the propagator to
-        // reset to its initial state.
+        // reset to its initial state.        
         virtual OPI::ErrorCode runDisable()
         {
             initialized = false;
@@ -214,10 +210,15 @@ class BasicCL: public OPI::Propagator
             return 1;
         }
 
-        // This plugin is written for OPI version 1.0. (Default: 0)
+        // This plugin is written for OPI version 2019.8
         int minimumOPIVersionRequired()
         {
-            return 1;
+            return 2019;
+        }
+
+        int minorOPIVersionRequired()
+        {
+            return 8;
         }
 
 	private:
