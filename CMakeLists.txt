@@ -1,5 +1,5 @@
-# Minimum version required is 3.1 for CMAKE_CXX_STANDARD
-cmake_minimum_required (VERSION 3.1)
+# Minimum version required is 3.10 for built-in CUDA support
+cmake_minimum_required (VERSION 3.10)
 
 # disable in source builds (these must be placed before project)
 if( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
@@ -12,32 +12,21 @@ project(OPI CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 option(ENABLE_FORTRAN_SUPPORT "Enable Fortran (default=ON)" ON)
+option(ENABLE_CUDA_SUPPORT "Enable cuda_support" ON)
 
 enable_language(C OPTIONAL)
 if(ENABLE_FORTRAN_SUPPORT)
   enable_language(Fortran OPTIONAL)
 endif()
-
-# add module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
-
-# find cuda libraries
-option(ENABLE_CUDA_SUPPORT "Enable cuda_support" ON)
 if(ENABLE_CUDA_SUPPORT)
-  if(WIN32)
-	set(CUDA_64_BIT_DEVICE_CODE OFF)
-  endif()
-  find_package( CUDA )
-  if( CUDA_FOUND )
-    message("CUDA Support enabled")
-  else()
-    message("CUDA not found - Support disabled")
-    set(ENABLE_CUDA_SUPPORT OFF)
-  endif()
+  enable_language(CUDA OPTIONAL)
 endif()
 if(NOT ENABLE_CUDA_SUPPORT)
   add_definitions( -DOPI_DISABLE_CUDA )
 endif()
+
+# add module path
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 # find OpenCL
 option(ENABLE_CL_SUPPORT "Enable opencl_support" ON)
@@ -94,8 +83,6 @@ option(ENABLE_PYTHON "Generate Python bindings using SWIG" ON)
   endif()
 endif()
 
-# enable all warnings
-add_definitions( -Wall )
 # add drop down menu for build type to gui
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
