@@ -209,22 +209,29 @@ if (ENABLE_PYTHON)
     if (Python3_FOUND)
       set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python3)
       set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES GENERATED_INCLUDE_DIRECTORIES ${Python3_INCLUDE_DIRS})
-      swig_add_library(OPI TYPE MODULE LANGUAGE python SOURCES ${OPI_INTERFACE_FILE})
+      set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES DEPENDS ${CMAKE_BINARY_DIR}/generated/OPI/opi_types.h)
+      swig_add_library(OPI
+          TYPE MODULE
+          LANGUAGE python
+          SOURCES ${OPI_INTERFACE_FILE})
       swig_link_libraries(OPI ${Python3_LIBRARIES} OPI)
 
       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/python3/OPI.py DESTINATION lib/python3)
       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI.pyd DESTINATION lib/python3/ OPTIONAL)
       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI.so DESTINATION lib/python3/ OPTIONAL)
-    endif()
-    if (Python2_FOUND)
+    elseif (Python2_FOUND)
       set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python2)
       set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES GENERATED_INCLUDE_DIRECTORIES ${Python2_INCLUDE_DIRS})
-      swig_add_library(OPI_py2 TYPE MODULE LANGUAGE python SOURCES ${OPI_INTERFACE_FILE})
-      swig_link_libraries(OPI_py2 ${Python2_LIBRARIES} OPI)
+      set_source_files_properties(${OPI_INTERFACE_FILE} PROPERTIES DEPENDS ${CMAKE_BINARY_DIR}/generated/OPI/opi_types.h)
+      swig_add_library(OPI
+          TYPE MODULE
+          LANGUAGE python
+          SOURCES ${OPI_INTERFACE_FILE})
+      swig_link_libraries(OPI ${Python2_LIBRARIES} OPI)
 
       install(FILES ${CMAKE_CURRENT_BINARY_DIR}/python2/OPI.py DESTINATION lib/python2)
-      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py2.pyd DESTINATION lib/python2/ RENAME _OPI.pyd OPTIONAL)
-      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI_py2.so DESTINATION lib/python2/ RENAME _OPI.so OPTIONAL)
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI.pyd DESTINATION lib/python2/ OPTIONAL)
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/_OPI.so DESTINATION lib/python2/ OPTIONAL)
     endif()
   endif()
 endif()
