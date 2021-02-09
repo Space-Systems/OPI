@@ -127,6 +127,80 @@ OPI::ErrorCode loadPopulation(OPI::Population& population, const char* filename)
 }
 ```
 
+### PropagatorProperties and Resources
+
+Propagators can define configuration variables called `PropagatorProperties` that
+can be set by the host program at runtime, or via a config file. Supported variable
+types are floats/doubles, integers and strings. To declare a PropagatorProperty inside the
+Propagator, use one of the functions `registerProperty()` or `createProperty()`. The
+former will let you bind an existing variable to a Property while the latter will
+let OPI manage the variable internally:
+
+```cpp
+class PropertiesCPP: public OPI::Propagator
+{
+private:
+    int testproperty_int;
+    float testproperty_float;
+    std::string testproperty_string;
+
+public:
+    PropertiesCPP(OPI::Host& host)
+    {
+        testproperty_int = 0;
+        testproperty_float = 0.0f;
+        testproperty_string = "test";
+
+        // Expose the abover member variables as properties
+        registerProperty("ThisIsAnInteger", &testproperty_int);
+        registerProperty("ThisIsAFloat", &testproperty_float);
+        registerProperty("ThisIsAString", &testproperty_string);
+
+        // This creates a string property that's managed by OPI.
+        createProperty("ThisIsAnotherString", "defaultString");
+    }
+```
+
+In order to access Properties from either the host or the propagator, use the appropriate
+setter and getter functions:
+
+```cpp
+setProperty("ThisIsAnInteger", 23);
+int value = getPropertyInt("ThisIsAnInteger");
+```
+
+Another way to set properties and assign default values is via a config file. Simply
+place a file with the same base name and the `.cfg` suffix into the plugin folder and OPI
+will read the properties from there (properties not defined by the propagator will be
+automatically added using the `createProperty()` function). For example, if your plugin is
+`plugins/sgp4.dll`, create a file named `plugins/sgp4.cfg` with the following contents:
+
+```
+# "Operations Mode" - "a" for advanced (default), "i" for improved.
+opsmode = "a"
+
+# Gravity constants - "wgs72" (default), "wgs72old" or "wgs84".
+whichconst = "wgs72"
+```
+
+This will create the string properties `opsmode` and `whichconst` and set them to the
+given default values. Data types in config files are denoted by quotation marks and decimal
+dots (i.e. 1.0 would be parsed as a float, 1 as an integer and "1.0" as a string).
+
+Most propagators rely on additional data in order to function. Similar to config files, OPI
+Propagators can read data from resource archives. If you place a zip archive containing your
+resource files into the plugin folder with the plugin's base name and the suffix `.dat`, you
+can access the files inside that archive from the propagator. For example, if your plugin
+is `plugins/sgp4.dll`, create a zip archive containing the file "test.txt" and place it as
+`plugins/sgp4.dat`. Then, inside the propagator, simply access its contents as follows:
+
+```cpp
+char* buffer;
+size_t size = loadResource("test.txt", &buffer);
+std::cout << buffer << std::endl;
+delete buffer; // Don't forget to free the buffer after you're done with it.
+```
+
 ### Host Application
 
 To implement a basic host in C++, create a class that derives from OPI::Host, or
