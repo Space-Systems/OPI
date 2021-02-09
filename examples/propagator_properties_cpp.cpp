@@ -129,6 +129,15 @@ class PropertiesCPP: public OPI::Propagator
 
         virtual OPI::ErrorCode runEnable()
         {
+            // Load a file "test.txt" from the zip archive
+            // PropagatorPropertiesCPP.dat and display its contents.
+            char* buffer;
+            size_t size = loadResource("test.txt", &buffer);
+            std::cout << buffer << std::endl;
+
+            // Don't forget to free the buffer afterwards.
+            delete buffer;
+
             return OPI::SUCCESS;
         }
 
