@@ -833,7 +833,7 @@ namespace OPI
         data->configFileName = filenameStr;
     }
 
-    size_t Module::loadResource(const char* resname, const char** buffer)
+    size_t Module::loadResource(const char* resname, char** buffer)
     {
         if (data->configFileName.find_first_of(".cfg") != std::string::npos)
         {
@@ -849,7 +849,7 @@ namespace OPI
                     if (mz_zip_reader_file_stat(&archive, index, &file_stat))
                     {
                         size_t fileSize = (size_t)file_stat.m_uncomp_size;
-                        *buffer = (const char*)mz_zip_reader_extract_file_to_heap(&archive, resname, &fileSize, 0);
+                        *buffer = (char*)mz_zip_reader_extract_file_to_heap(&archive, resname, &fileSize, 0);
                         // Buffer must be freed by the caller
                         //mz_free(resBuffer);
                         mz_zip_reader_end(&archive);

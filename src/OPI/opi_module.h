@@ -76,7 +76,7 @@ namespace OPI
              * if returned size is larger than zero.
              * @return The size in bytes of the loaded resource.
              */
-            OPI_API_EXPORT size_t loadResource(const char* resname, const char** buffer);
+            OPI_API_EXPORT size_t loadResource(const char* resname, char** buffer);
 
             /* NOT YET IMPLEMENTED
 			//! Sets the version number of this module
