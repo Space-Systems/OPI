@@ -151,7 +151,7 @@ public:
         testproperty_float = 0.0f;
         testproperty_string = "test";
 
-        // Expose the abover member variables as properties
+        // Expose the above member variables as properties
         registerProperty("ThisIsAnInteger", &testproperty_int);
         registerProperty("ThisIsAFloat", &testproperty_float);
         registerProperty("ThisIsAString", &testproperty_string);
@@ -367,3 +367,9 @@ the CUDA SDK is installed and can be found by CMake.
 
 To start using OPI, take a look at the documentation provided with the library.
 If you have any questions, please contact me (mmoeckel on GitHub).
+
+
+Graphical User Interface
+------------------------
+
+For a graphical OPI host and population editor, check out [OPI Explorer](https://github.com/Space-Systems/OPI-Explorer).
