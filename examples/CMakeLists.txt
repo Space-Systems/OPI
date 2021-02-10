@@ -2,8 +2,9 @@ include_directories( ../src )
 include_directories( ${CMAKE_BINARY_DIR}/src/OPI/)
 include(examples)
 
-configure_file(PropagatorPropertiesCPP.cfg ${CMAKE_BINARY_DIR}/examples/plugins/PropagatorPropertiesCPP.cfg COPYONLY)
-configure_file(PropagatorPropertiesCPP.dat ${CMAKE_BINARY_DIR}/examples/plugins/PropagatorPropertiesCPP.dat COPYONLY)
+configure_file(PropagatorPropertiesCPP.cfg ${CMAKE_BINARY_DIR}/examples/plugins/ COPYONLY)
+configure_file(PropagatorPropertiesCPP.dat ${CMAKE_BINARY_DIR}/examples/plugins/ COPYONLY)
+configure_file(host_python_example.py ${CMAKE_BINARY_DIR}/examples/ COPYONLY)
 
 # a simple cxx example
 add_example(
