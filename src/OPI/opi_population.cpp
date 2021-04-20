@@ -882,6 +882,7 @@ namespace OPI
         data->data_bytes.remove(index*data->byteArraySize, data->byteArraySize);
         data->object_names.erase(data->object_names.begin()+index);        
 		data->size--;
+        rebuildNoradIndex();
 	}
 
 	ErrorCode Population::update(int type, Device device)
