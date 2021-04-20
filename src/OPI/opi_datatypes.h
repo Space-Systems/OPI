@@ -487,7 +487,7 @@ namespace OPI
     }
 
     //! Sets the PartialsMatrix from a C vector (no bounds check!)
-    OPI_CUDA_PREFIX inline PartialsMatrix arrayToPartials(double* v)
+    OPI_CUDA_PREFIX inline PartialsMatrix arrayToPartials(const double* v)
     {
         PartialsMatrix m;
         m.accX_posX = v[0];
@@ -586,7 +586,7 @@ namespace OPI
         v[35] = c.d2_d2;
     }
 
-    OPI_CUDA_PREFIX inline Covariance arrayToCovariance(double* v)
+    OPI_CUDA_PREFIX inline Covariance arrayToCovariance(const double* v)
     {
         Covariance c;
         c.k1_k1 = v[0];
@@ -636,7 +636,7 @@ namespace OPI
         return c;
     }
 
-    inline const char* referenceFrameToString(ReferenceFrame rf)
+    OPI_CUDA_PREFIX inline const char* referenceFrameToString(ReferenceFrame rf)
     {
         switch (rf)
         {
@@ -657,7 +657,7 @@ namespace OPI
         return "";
     }
 
-    inline ReferenceFrame referenceFrameFromString(const char* frame)
+    OPI_CUDA_PREFIX inline ReferenceFrame referenceFrameFromString(const char* frame)
     {
         std::string f(frame);
         if (f == "NONE") return REF_NONE;
