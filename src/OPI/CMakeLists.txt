@@ -129,14 +129,21 @@ if(NOT WIN32)
   target_link_libraries( OPI
     dl
   )
+if(ENABLE_FORTRAN_SUPPORT)
   target_link_libraries( OPI-Fortran
     OPI
     dl
   )
   SET_TARGET_PROPERTIES (OPI OPI-Fortran
-      PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-                 INSTALL_NAME_DIR "@loader_path/../lib"
+    PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+               INSTALL_NAME_DIR "@loader_path/../lib"
   )
+else()
+  SET_TARGET_PROPERTIES (OPI
+    PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+               INSTALL_NAME_DIR "@loader_path/../lib"
+  )
+endif()
 endif()
 
 # install library
