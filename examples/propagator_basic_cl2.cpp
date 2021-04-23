@@ -83,7 +83,7 @@ class BasicCL: public OPI::Propagator
 		}
 
         // This is the main function every plugin needs to implement to do the actual propagation.
-        OPI::ErrorCode runPropagation(OPI::Population& population, double julian_day, double dt, OPI::PropagationMode mode, OPI::IndexList* indices)
+        OPI::ErrorCode runPropagation(OPI::Population& population, OPI::JulianDay epoch, long dt, OPI::PropagationMode mode, OPI::IndexList* indices)
 		{            
             if (mode == OPI::MODE_INDIVIDUAL_EPOCHS)
             {
@@ -100,7 +100,7 @@ class BasicCL: public OPI::Propagator
             // In this simple example, we don't have to fiddle with Julian dates. Instead, we'll just
             // look at the seconds that have elapsed since the first call of the propagator. The first
             // time runPropagation() is called, the given day is saved and then subtracted from the
-            // following days. The remainder is converted to seconds and passed to the CUDA kernel.
+            // following days. The remainder is converted to seconds and passed to the kernel.
             if (baseDay == 0) baseDay = julian_day;
             float seconds = (julian_day-baseDay)*86400.0 + dt;
 

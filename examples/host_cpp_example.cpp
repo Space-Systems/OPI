@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
         data.update(OPI::DATA_BYTES);
 
         // run a propagation
-        propagator->propagate(data, 0, 0);
+        propagator->propagate(data, {0,0}, 0);
 
         // remove some objects
         OPI::IndexList list(host);
@@ -119,9 +119,9 @@ int main(int argc, char* argv[])
 
         for (int i=0; i<50000; i++)
         {
-            propagator->propagate(data2, 0, 0);
-            propagator->propagate(data2, 0, 0);
-            propagator->propagate(data, 0, 0);
+            propagator->propagate(data2, {0,0}, 0);
+            propagator->propagate(data2, {0,0}, 0);
+            propagator->propagate(data, {0,0}, 0);
         }
 
         // refresh data pointer for orbital data again
