@@ -1,5 +1,5 @@
 
-OPI - Orbital Propagation Interface (2019 Version)
+OPI - Orbital Propagation Interface (2021 Version)
 --------------------------------------------------
 
 ![OPI logo](https://raw.githubusercontent.com/ILR/OPI/master/logo/opi_logo_circular_small.png)
@@ -234,14 +234,16 @@ int main(int argc, char* argv[])
     // Initialize the propagator
     myPropagator->enable();
 
-    // Set a start date and time step size for the propagation
-    const double startDate = 2458201.5;
-    const double stepSize = 60.0;
+    // Set a start date for the propagation.
+    const OPI::JulianDay startDate = OPI::fromDouble(2458201.5);
+    // Set the propagation time step in microseconds.
+    const long stepSize = 60000000l;
 
     // Propagate population for one day (1440 time steps at 60 seconds each)
     for (int i=0; i<1440; i++)
     {
-      double currentTime = startDate + i * stepSize / 86400.0;
+      // The + operator will add microseconds to a JulianDay.
+      OPI::JulianDay currentTime = startDate + i * stepSize;
       // Propagate with the default settings (single epoch, no index list)
       OPI::ErrorCode status = myPropagator.propagate(population, currentTime, stepSize);
     }
@@ -256,6 +258,57 @@ int main(int argc, char* argv[])
   return 0;
 }
 ```
+
+Changes From The 2019 Interface
+-------------------------------
+
+It was found that expressing Julian dates as double precision floats can introduce
+inaccuracies in some cases, especially when propagating with very small time steps
+(e.g. milliseconds). In the above example, the OPI 2019 host would have incremented
+the propagation time step like this:
+
+```cpp
+double startDate = 2458201.5;
+double stepSize = 60.0; //seconds
+double propagationTime = startDate + (i*stepSize)/86400.0;
+OPI::ErrorCode status = myPropagator.propagate(population, currentTime, stepSize);
+```
+
+In multi-epoch mode, currentTime would be ignored and the propagator would take care
+of time-keeping, usually like this:
+
+```cpp
+population.getEpoch()[i].current_epoch += (dt/86400.0);
+```
+
+The floating point inaccuracies introduced by these two different methods of incrementing
+the time can lead to different results depending on which mode is used. In order to enable
+OPI to provide guaranteed microsecond accuracy, the OPI::JulianDay format was introduced. It
+breaks up the Julian date into two components:
+
+```cpp
+struct JulianDay {
+  int day; // Full days (integer component of the Julian day)
+  long usec; // Fraction of the day in microseconds
+};
+```
+
+All Epoch fields of OPI::Population have been updated to use this format. The propagate()
+function will now accept a JulianDay for the propagation epoch, and a long for the time
+step; time step units have changed from seconds to microseconds. Functions have been added
+to convert between JulianDay and double, however, since these may introduce the type of
+inaccuracies described above they should be used only when absolutely necessary:
+
+```cpp
+double inputDate = 2458201.5;
+OPI::JulianDay propagationDate = OPI::fromDouble(inputDate);
+double outputDate = OPI::toDouble(propagationDate);
+```
+
+Other changes:
+* Make Population const in PerturbationModule
+* C interface function renamed from `propagateAll` to `propagate`
+
 
 Changes From The 2015 Interface
 -------------------------------
