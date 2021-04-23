@@ -60,6 +60,9 @@ set( OPI_LIBRARY_HEADER
   # helper templates
   opi_pimpl_helper.h
 
+  # OpenCL functions
+  opi_opencl_functions.h
+
   # auto-generated files for bindings
   ${CMAKE_BINARY_DIR}/generated/OPI/opi_types.h
   ${CMAKE_BINARY_DIR}/generated/OPI/opi_c_bindings.h
