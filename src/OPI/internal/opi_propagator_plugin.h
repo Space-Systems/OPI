@@ -19,7 +19,7 @@ namespace OPI
 
 			virtual ErrorCode enable();
 			virtual ErrorCode disable();
-            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt, PropagationMode mode, IndexList* indices);
+            virtual ErrorCode runPropagation(Population& population, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices);
 			virtual int requiresCUDA();
 		private:
 			Plugin* plugin;

@@ -44,9 +44,9 @@ namespace OPI
              * given Population. The propagation result shall reflect the state of the
              * Population at the point in time defined by julian_day + dt seconds.
              * @param population The Population to be propagated.
-             * @param julian_day The base date in Julian date format. Ignored when mode is set to
+             * @param epoch The base date in Julian date format. Ignored when mode is set to
              * individual epochs.
-             * @param dt The time step, in seconds, from last propagation.
+             * @param dt The time step, in microseconds, from last propagation.
              * @param mode Sets the propagation mode to single epoch (default) or individual epochs.
              * In single epoch mode, the propagator assumes that all objects are at the same epoch
              * given with the julian_day parameter. In individual epoch mode, that parameter is
@@ -59,7 +59,7 @@ namespace OPI
              * is unsupported.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
-            OPI_API_EXPORT ErrorCode propagate(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+            OPI_API_EXPORT ErrorCode propagate(Population& population, JulianDay epoch, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
             /** @brief Propagates a given population over a given time span and measures MP/s.
              *
@@ -73,15 +73,15 @@ namespace OPI
              * results will be available.
              * @param population The population to be propagated. Its initial object size is used
              * to calculate the benchmark value when no index list is given.
-             * @param julian_day The starting date for the propagation.
-             * @param days Duration, in days, of the propagation.
-             * @param dt Time step size, in seconds, for the propagation.
+             * @param epoch The starting date for the propagation.
+             * @param seconds Duration, in seconds, of the propagation.
+             * @param dt Time step size, in microseconds, for the propagation.
              * @param mode Propagation mode, directly passed to the propagate() function.
              * @param indices An IndexList containing the objects of the population to be propagated. If
              * given, its size will be used for calculating the benchmark instead of the population size.
              * @return A double value representing how many megapropagations per second were executed.
              */
-            OPI_API_EXPORT double benchmark(Population& population, double julian_day, double days, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+            OPI_API_EXPORT double benchmark(Population& population, JulianDay epoch, long seconds, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
             //! Assigns a module to this propagator (not yet implemented)
 			/**
@@ -160,14 +160,14 @@ namespace OPI
              * if the population does not have all required fields filled out, OPI::SUCCESS if the propagator returns
              * no errors.
              */
-            OPI_API_EXPORT virtual ErrorCode align(Population& population, double dt, IndexList* indices = nullptr, double toEpoch = 0.0, bool quiet = false);
+            OPI_API_EXPORT virtual ErrorCode align(Population& population, long dt, IndexList* indices = nullptr, JulianDay toEpoch = {0,0}, bool quiet = false);
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
 			void useModules();
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
-            virtual ErrorCode runPropagation(Population& population, double julian_day, double dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr) = 0;
+            virtual ErrorCode runPropagation(Population& population, JulianDay epoch, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr) = 0;
 
 		private:
 			Pimpl<PropagatorImpl> data;

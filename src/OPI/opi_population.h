@@ -13,8 +13,9 @@
  * 003 - Added reference frame
  * 004 - Added original_epoch field
  * 005 - Added initial_epoch field
+ * 006 - Convert epochs to new JulianDay type
  */
-#define OPI_DATA_REVISION_NUMBER 5
+#define OPI_DATA_REVISION_NUMBER 6
 
 namespace OPI
 {
@@ -154,14 +155,14 @@ namespace OPI
              * @return 0.0 if any object has an invalid (i.e. lower than Jan 1st, 1950) current epoch set,
              * otherwise the earliest Julian date found.
              */
-            OPI_API_EXPORT double getEarliestEpoch() const;
+            OPI_API_EXPORT JulianDay getEarliestEpoch() const;
 
             /**
              * @brief getLatestEpoch Find the latest epoch from the object's current_epoch fields.
              * @return 0.0 if any object has an invalid (i.e. lower than Jan 1st, 1950) current epoch set,
              * otherwise the latest Julian date found.
              */
-            OPI_API_EXPORT double getLatestEpoch() const;
+            OPI_API_EXPORT JulianDay getLatestEpoch() const;
 
             //! Retrieve an object's index based on the ID given in its ObjectProperties field.
             OPI_API_EXPORT int findByID(int id) const;

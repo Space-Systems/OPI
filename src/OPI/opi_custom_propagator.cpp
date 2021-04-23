@@ -29,7 +29,7 @@ namespace OPI
 		impl->integrator = integrator;
 	}
 
-    ErrorCode CustomPropagator::runPropagation(Population& population, double julian_day, double dt, PropagationMode mode, IndexList* indices)
+    ErrorCode CustomPropagator::runPropagation(Population& population, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices)
 	{
 		return SUCCESS;
 	}

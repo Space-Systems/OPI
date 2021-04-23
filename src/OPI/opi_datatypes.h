@@ -296,7 +296,7 @@ namespace OPI
 
     OPI_CUDA_PREFIX inline bool isZero(const Epoch& e)
     {
-        return (e.beginning_of_life == 0.0 && e.end_of_life == 0.0 && e.current_epoch == 0.0);
+        return (e.beginning_of_life.day == 0 && e.end_of_life.day == 0 && e.current_epoch.day == 0 && e.initial_epoch.day == 0 && e.original_epoch.day == 0);
     }
 
     OPI_CUDA_PREFIX inline bool isZero(const ObjectProperties& p)
@@ -676,6 +676,94 @@ namespace OPI
         else if (f == "UNLISTED") return REF_UNLISTED;
 
         return REF_UNSPECIFIED;
+    }
+
+    OPI_CUDA_PREFIX inline void adjustJD(JulianDay &a)
+    {
+        const long USEC_PER_DAY = 86400000000;
+        if (a.usec >= USEC_PER_DAY || a.usec < 0)
+        {
+            a.day += a.usec / USEC_PER_DAY;
+            a.usec = a.usec % USEC_PER_DAY;
+        }
+    }
+
+    OPI_CUDA_PREFIX inline double toDouble(const JulianDay jd)
+    {
+        return jd.day + (double)(jd.usec / 86400000000.0);
+    }
+
+    OPI_CUDA_PREFIX inline JulianDay fromDouble(const double jd)
+    {
+        JulianDay result;
+        result.day = (int)jd;
+        result.usec = (jd - result.day) * 86400000000;
+        adjustJD(result);
+        return result;
+    }
+
+    OPI_CUDA_PREFIX inline JulianDay& operator+=(JulianDay& jd, const long& usec)
+    {
+        jd.usec += usec;
+        adjustJD(jd);
+        return jd;
+    }
+
+    OPI_CUDA_PREFIX inline JulianDay operator+(const JulianDay& jd, const long& usec)
+    {
+        JulianDay result = jd;
+        result.usec += usec;
+        adjustJD(result);
+        return result;
+    }
+
+    OPI_CUDA_PREFIX inline JulianDay operator-(const JulianDay& a, const JulianDay& b)
+    {
+        JulianDay result;
+        result.day = a.day - b.day;
+        result.usec = a.usec - b.usec;
+        adjustJD(result);
+        return result;
+    }
+
+    OPI_CUDA_PREFIX inline JulianDay operator+(const JulianDay& a, const JulianDay& b)
+    {
+        JulianDay result;
+        result.day = a.day + b.day;
+        result.usec = a.usec + b.usec;
+        adjustJD(result);
+        return result;
+    }
+
+    OPI_CUDA_PREFIX inline bool operator<(const JulianDay a, const JulianDay b)
+    {
+        return (a.day < b.day) || ((a.day == b.day) && (a.usec < b.usec));
+    }
+
+    OPI_CUDA_PREFIX inline bool operator<=(const JulianDay a, const JulianDay b)
+    {
+        return (a.day < b.day) || ((a.day == b.day) && (a.usec <= b.usec));
+    }
+
+    OPI_CUDA_PREFIX inline bool operator>(const JulianDay a, const JulianDay b)
+    {
+        return (a.day > b.day) || ((a.day == b.day) && (a.usec > b.usec));
+    }
+
+    OPI_CUDA_PREFIX inline bool operator>=(const JulianDay a, const JulianDay b)
+    {
+        return (a.day > b.day) || ((a.day == b.day) && (a.usec >= b.usec));
+    }
+
+    OPI_CUDA_PREFIX inline bool operator==(const JulianDay a, const JulianDay b)
+    {
+        return (a.day == b.day) && (a.usec == b.usec);
+    }
+
+    OPI_CUDA_PREFIX inline long deltaUsec(const JulianDay& a, const JulianDay& b)
+    {
+        JulianDay delta = (a>b ? a-b : b-a);
+        return delta.day * 86400000000 + delta.usec;
     }
 
 }

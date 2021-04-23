@@ -513,23 +513,53 @@ namespace OPI
                                     // for backwards compatibility
                                     if (versionNumber < 4)
                                     {
-                                        size_t s = sizeof(double) * 3;
+                                        struct {
+                                            double bol; double eol; double current;
+                                        } epoch3;
+                                        size_t s = sizeof(epoch3);
                                         for (int i=0; i<number_of_objects; i++)
                                         {
+                                            in.read(reinterpret_cast<char*>(&epoch3), s);
                                             Epoch* ep = &(getEpoch(DEVICE_HOST, true)[i]);
-                                            in.read(reinterpret_cast<char*>(ep), s);
-                                            ep->original_epoch = 0.0;
-                                            ep->initial_epoch = 0.0;
+                                            ep->beginning_of_life = fromDouble(epoch3.bol);
+                                            ep->end_of_life = fromDouble(epoch3.eol);
+                                            ep->current_epoch = fromDouble(epoch3.current);
+                                            ep->original_epoch = {0,0};
+                                            ep->initial_epoch = {0,0};
                                         }
                                     }
                                     else if (versionNumber < 5)
                                     {
-                                        size_t s = sizeof(double) * 4;
+                                        struct {
+                                            double bol; double eol; double current; double original;
+                                        } epoch4;
+                                        size_t s = sizeof(epoch4);
                                         for (int i=0; i<number_of_objects; i++)
                                         {
+                                            in.read(reinterpret_cast<char*>(&epoch4), s);
                                             Epoch* ep = &(getEpoch(DEVICE_HOST, true)[i]);
-                                            in.read(reinterpret_cast<char*>(ep), s);
-                                            ep->initial_epoch = 0.0;
+                                            ep->beginning_of_life = fromDouble(epoch4.bol);
+                                            ep->end_of_life = fromDouble(epoch4.eol);
+                                            ep->current_epoch = fromDouble(epoch4.current);
+                                            ep->original_epoch = fromDouble(epoch4.original);
+                                            ep->initial_epoch = {0,0};
+                                        }
+                                    }
+                                    else if (versionNumber < 6)
+                                    {
+                                        struct {
+                                            double bol; double eol; double current; double original; double initial;
+                                        } epoch5;
+                                        size_t s = sizeof(epoch5);
+                                        for (int i=0; i<number_of_objects; i++)
+                                        {
+                                            in.read(reinterpret_cast<char*>(&epoch5), s);
+                                            Epoch* ep = &(getEpoch(DEVICE_HOST, true)[i]);
+                                            ep->beginning_of_life = fromDouble(epoch5.bol);
+                                            ep->end_of_life = fromDouble(epoch5.eol);
+                                            ep->current_epoch = fromDouble(epoch5.current);
+                                            ep->original_epoch = fromDouble(epoch5.original);
+                                            ep->initial_epoch = fromDouble(epoch5.initial);
                                         }
                                     }
                                     else {
@@ -604,7 +634,7 @@ namespace OPI
             if (!isZero(orb))
                 o["orbit"] = {{"sma",orb.semi_major_axis}, {"ecc",orb.eccentricity}, {"inc",orb.inclination}, {"raan",orb.raan}, {"aop",orb.arg_of_perigee}, {"ma",orb.mean_anomaly}};
             if (!isZero(e))
-                o["epoch"] = {{"bol",e.beginning_of_life}, {"eol",e.end_of_life}, {"current",e.current_epoch}, {"original",e.original_epoch}, {"initial",e.initial_epoch}};
+                o["epoch"] = {{"bol",toDouble(e.beginning_of_life)}, {"eol",toDouble(e.end_of_life)}, {"current",toDouble(e.current_epoch)}, {"original",toDouble(e.original_epoch)}, {"initial",toDouble(e.initial_epoch)}};
             if (!isZero(pr))
                 o["properties"] = {{"id",pr.id},{"mass",pr.mass},{"dia",pr.diameter},{"a2m",pr.area_to_mass},{"cd",pr.drag_coefficient},{"cr",pr.reflectivity}};
             if (!isZero(c))
@@ -623,8 +653,8 @@ namespace OPI
         json jp;
         jp["data_revision"] = OPI_DATA_REVISION_NUMBER;
         jp["description"] = getDescription();
-        jp["epoch_earliest"] = getEarliestEpoch();
-        jp["epoch_latest"] = getLatestEpoch();
+        jp["epoch_earliest"] = toDouble(getEarliestEpoch());
+        jp["epoch_latest"] = toDouble(getLatestEpoch());
         jp["objects"] = objects;
         std::string rf = referenceFrameToString(data->frame);
         if (rf != "") jp["frame"] = rf;
@@ -937,37 +967,37 @@ namespace OPI
         return data->host;
     }
 
-    double Population::getLatestEpoch() const
+    JulianDay Population::getLatestEpoch() const
     {
-        const double mjd1950 = 2433282.5;
-        double latestEpoch = 0.0;
+        const JulianDay mjd1950 = {2433282, 43200000000};
+        JulianDay latestEpoch = {0,0};
         for (int i=0; i<getSize(); i++)
         {
-            double currentEpoch = getEpoch()[i].current_epoch;
+            JulianDay currentEpoch = getEpoch()[i].current_epoch;
             if (currentEpoch < mjd1950)
             {
-                return 0.0;
+                return {0,0};
             }
             else {
-                latestEpoch = std::max(latestEpoch, currentEpoch);
+                latestEpoch = (latestEpoch >= currentEpoch ? latestEpoch : currentEpoch);
             }
         }
         return latestEpoch;
     }
 
-    double Population::getEarliestEpoch() const
+    JulianDay Population::getEarliestEpoch() const
     {
-        const double mjd1950 = 2433282.5;
-        double earliestEpoch = 9999999.0;
+        const JulianDay mjd1950 = {2433282, 43200000000};
+        JulianDay earliestEpoch = {9999999,0};
         for (int i=0; i<getSize(); i++)
         {
-            double currentEpoch = getEpoch()[i].current_epoch;
+            JulianDay currentEpoch = getEpoch()[i].current_epoch;
             if (currentEpoch < mjd1950)
             {
-                return 0.0;
+                return {0,0};
             }
             else {
-                earliestEpoch = std::min(earliestEpoch, currentEpoch);
+                earliestEpoch = (earliestEpoch <= currentEpoch ? earliestEpoch : currentEpoch);
             }
         }
         return earliestEpoch;
@@ -977,7 +1007,7 @@ namespace OPI
     {
         if (index < 0 || index >= getSize()) return false;
         Epoch e = getEpoch()[index];
-        return (e.end_of_life > 0.0 && e.current_epoch > 0.0 && e.end_of_life >= e.current_epoch);
+        return (e.end_of_life.day > 0.0 && e.current_epoch.day > 0.0 && e.end_of_life.day >= e.current_epoch.day && e.end_of_life.usec >= e.current_epoch.usec);
     }
 
     std::string Population::validate(IndexList& invalidObjects) const
@@ -1034,7 +1064,7 @@ namespace OPI
             // check orbit and epoch
             Orbit orbit = getOrbit(DEVICE_HOST)[i];
             Epoch epoch = getEpoch(DEVICE_HOST)[i];
-            const double mjd1950 = 2433282.5;
+            const JulianDay mjd1950 = {2433282, 43200000000};
             if (data->data_orbit.hasData() && !isZero(orbit))
             {
                 if (hasNaN(orbit))
@@ -1042,7 +1072,7 @@ namespace OPI
                     report << i << "/" << id << "/Orbit: NaN detected" << std::endl;
                     valid = false;
                 }
-                if (orbit.semi_major_axis < 6378.0 && epoch.end_of_life <= 0.0) {
+                if (orbit.semi_major_axis < 6378.0 && epoch.end_of_life.day <= 0) {
                     report << i << "/" << id << "/Orbit: SMA too small, and object has not been marked as decayed (EOL = 0)" << std::endl;
                     valid = false;
                 }
@@ -1059,7 +1089,7 @@ namespace OPI
                     report << i << "/" << id << "/Orbit: One or more angles outside radian range" << std::endl;
                     valid = false;
                 }
-                if (epoch.end_of_life > 0.0 && epoch.beginning_of_life > 0.0 && epoch.end_of_life < epoch.beginning_of_life)
+                if (epoch.end_of_life.day > 0 && epoch.beginning_of_life.day > 0 && epoch.end_of_life < epoch.beginning_of_life)
                 {
                     report << i << "/" << id << "/Orbit: EOL date precedes BOL date" << std::endl;
                     valid = false;
@@ -1082,7 +1112,7 @@ namespace OPI
             {
                 if (data->data_velocity.hasData() && !isZero(vel))
                 {
-                    if (length(pos) <= 6378.0 && epoch.end_of_life <= 0.0)
+                    if (length(pos) <= 6378.0 && epoch.end_of_life.day <= 0)
                     {
                         report << i << "/" << id << "/StateVector: Object is inside Earth and has not been marked as decayed (EOL = 0)" << std::endl;
                         valid = false;

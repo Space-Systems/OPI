@@ -54,14 +54,14 @@ namespace OPI
 		return data->perturbationModules.size();
 	}
 
-    ErrorCode Propagator::propagate(Population& population, double julian_day, double dt, PropagationMode mode, IndexList* indices)
+    ErrorCode Propagator::propagate(Population& population, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices)
 	{
 		ErrorCode status = SUCCESS;
 		// ensure this propagator is enabled
 		status = enable();
 		// an error occured?
 		if(status == SUCCESS)
-            status = runPropagation(population, julian_day, dt, mode, indices);
+            status = runPropagation(population, epoch, dt, mode, indices);
 		getHost()->sendError(status);
         if (status == SUCCESS && population.getLastPropagatorName() != getName())
         {
@@ -70,12 +70,12 @@ namespace OPI
 		return status;
 	}
 
-    double Propagator::benchmark(Population& population, double julian_day, double days, double dt, PropagationMode mode, IndexList* indices)
+    double Propagator::benchmark(Population& population, JulianDay epoch, long seconds, long dt, PropagationMode mode, IndexList* indices)
     {
         ErrorCode status = SUCCESS;
         std::chrono::high_resolution_clock::time_point start;
         const int populationSize = (indices ? indices->getSize() : population.getSize());
-        const int timeSteps = days * 86400.0 / dt;
+        const long timeSteps = (seconds * 1000000l) / dt;
 
         for (int i=0; i<timeSteps; i++)
         {
@@ -84,7 +84,7 @@ namespace OPI
                 Logger::out(0) << "Starting OPI Benchmark" << std::endl;
                 start = std::chrono::high_resolution_clock::now();
             }
-            const double time = julian_day + ((i * dt) / 86400.0);
+            const JulianDay time = epoch + (i * dt);
             status = propagate(population, time, dt, mode, indices);
             if (status != SUCCESS) break;
         }
@@ -137,7 +137,7 @@ namespace OPI
         return NOT_IMPLEMENTED;
     }  
 
-    ErrorCode Propagator::align(Population& population, double dt, IndexList* indices, double toEpoch, bool quiet)
+    ErrorCode Propagator::align(Population& population, long dt, IndexList* indices, JulianDay toEpoch, bool quiet)
     {
         int loopSize = (indices ? indices->getSize() : population.getSize());
         if (loopSize > 1)
@@ -145,9 +145,9 @@ namespace OPI
             // Find the target epoch to align the population to.
             // TODO: Latest and earliest epoch will still consider the whole population,
             // even if an index list is given. This may throw off the percentage counter.
-            const double mjd1950 = 2433282.5;
-            double latestEpoch = population.getLatestEpoch();
-            double earliestEpoch = population.getEarliestEpoch();
+            const JulianDay mjd1950 = {2433282,43200000000};
+            JulianDay latestEpoch = population.getLatestEpoch();
+            JulianDay earliestEpoch = population.getEarliestEpoch();
             if (latestEpoch < mjd1950)
             {
                 Logger::out(0) << "Cannot align: Current epoch must be set for all objects." << std::endl;
@@ -157,13 +157,13 @@ namespace OPI
             {
                 latestEpoch = toEpoch;
             }
-            else if (toEpoch > 0.0)
+            else if (toEpoch.day > 0)
             {
                 Logger::out(0) << "Given epoch is too small. Using latest epoch from the population instead." << std::endl;
             }
-            Logger::out(0) << "Aligning " << loopSize << " objects to epoch " << std::setprecision(15) << latestEpoch << ". This may take a while." << std::endl;
+            Logger::out(0) << "Aligning " << loopSize << " objects to epoch " << std::setprecision(15) << toDouble(latestEpoch) << ". This may take a while." << std::endl;
 
-            int stepsRequired = int((latestEpoch - earliestEpoch)*86400.0 / dt) + 1;
+            int stepsRequired = int(deltaUsec(latestEpoch, earliestEpoch) / dt) + 1;
             int stepsDone = 0;
             int percentDone = -1;
 
@@ -179,30 +179,30 @@ namespace OPI
                     int i = (indices ? indices->getData(DEVICE_HOST)[k] : k);
 
                     // Find objects that are trailing behind the object with the latest current epoch.
-                    const double currentEpoch = population.getEpoch()[i].current_epoch;
-                    const double deltaSeconds = (latestEpoch - currentEpoch) * 86400.0;
-                    if (deltaSeconds < 1)
+                    const JulianDay currentEpoch = population.getEpoch()[i].current_epoch;
+                    const long delta = deltaUsec(latestEpoch, currentEpoch);
+                    if (delta < 1)
                     {
                         // Current object is already aligned.
                         objectsAligned++;
                     }
-                    else if (deltaSeconds >= dt)
+                    else if (delta >= dt)
                     {
                         // Current object is trailing by more than the given dt. Add to list.
                         trailingObjects.add(i);
                     }
-                    else if (deltaSeconds < dt)
+                    else if (delta < dt)
                     {
                         // Object is close to the target epoch. Propagate individually.
                         IndexList thisObject(population.getHostPointer());
                         thisObject.add(i);
-                        Logger::out(0) << "Object " << i << " closing in. Propagating for " << deltaSeconds << " seconds." << std::endl;
-                        error = propagate(population, 0.0, deltaSeconds, MODE_INDIVIDUAL_EPOCHS, &thisObject);
+                        Logger::out(0) << "Object " << i << " closing in. Propagating for " << delta/1000000.0 << " seconds." << std::endl;
+                        error = propagate(population, {0,0}, delta, MODE_INDIVIDUAL_EPOCHS, &thisObject);
                     }
                 }
 
                 // Propagate all trailing objects.
-                if (trailingObjects.getSize() > 0) error = propagate(population, 0.0, dt, MODE_INDIVIDUAL_EPOCHS, &trailingObjects);
+                if (trailingObjects.getSize() > 0) error = propagate(population, {0,0}, dt, MODE_INDIVIDUAL_EPOCHS, &trailingObjects);
 
                 // Check for errors
                 if (error == NOT_IMPLEMENTED)
