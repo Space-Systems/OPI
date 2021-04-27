@@ -46,7 +46,7 @@ BEGIN_STRUCTURE( JulianDay )
   COMMENT("Full day number")
   STRUCTURE_VARIABLE(int day)
   COMMENT("Fraction of day in microseconds")
-  STRUCTURE_VARIABLE(long usec)
+  STRUCTURE_VARIABLE("long long" usec)
 END_STRUCTURE( JulianDay )
 
 COMMENT("This type contains the object's time information")
