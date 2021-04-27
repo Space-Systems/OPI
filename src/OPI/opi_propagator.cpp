@@ -54,7 +54,7 @@ namespace OPI
 		return data->perturbationModules.size();
 	}
 
-    ErrorCode Propagator::propagate(Population& population, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices)
+    ErrorCode Propagator::propagate(Population& population, JulianDay epoch, long long dt, PropagationMode mode, IndexList* indices)
 	{
 		ErrorCode status = SUCCESS;
 		// ensure this propagator is enabled
@@ -70,12 +70,12 @@ namespace OPI
 		return status;
 	}
 
-    double Propagator::benchmark(Population& population, JulianDay epoch, long seconds, long dt, PropagationMode mode, IndexList* indices)
+    double Propagator::benchmark(Population& population, JulianDay epoch, long long seconds, long long dt, PropagationMode mode, IndexList* indices)
     {
         ErrorCode status = SUCCESS;
         std::chrono::high_resolution_clock::time_point start;
         const int populationSize = (indices ? indices->getSize() : population.getSize());
-        const long timeSteps = (seconds * 1000000l) / dt;
+        const long long timeSteps = (seconds * 1000000l) / dt;
 
         for (int i=0; i<timeSteps; i++)
         {
@@ -137,7 +137,7 @@ namespace OPI
         return NOT_IMPLEMENTED;
     }  
 
-    ErrorCode Propagator::align(Population& population, long dt, IndexList* indices, JulianDay toEpoch, bool quiet)
+    ErrorCode Propagator::align(Population& population, long long dt, IndexList* indices, JulianDay toEpoch, bool quiet)
     {
         int loopSize = (indices ? indices->getSize() : population.getSize());
         if (loopSize > 1)
@@ -180,7 +180,7 @@ namespace OPI
 
                     // Find objects that are trailing behind the object with the latest current epoch.
                     const JulianDay currentEpoch = population.getEpoch()[i].current_epoch;
-                    const long delta = deltaUsec(latestEpoch, currentEpoch);
+                    const long long delta = deltaUsec(latestEpoch, currentEpoch);
                     if (delta < 1)
                     {
                         // Current object is already aligned.

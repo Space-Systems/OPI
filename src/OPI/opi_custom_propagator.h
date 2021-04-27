@@ -26,7 +26,7 @@ namespace OPI
 
 		protected:
 			/// Override the propagation method
-            virtual ErrorCode runPropagation(Population& population, JulianDay epoch, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+            virtual ErrorCode runPropagation(Population& population, JulianDay epoch, long long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 			virtual int requiresCUDA();
 
 		private:

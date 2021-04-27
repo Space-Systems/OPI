@@ -680,7 +680,7 @@ namespace OPI
 
     OPI_CUDA_PREFIX inline void adjustJD(JulianDay &a)
     {
-        const long USEC_PER_DAY = 86400000000;
+        const long long USEC_PER_DAY = 86400000000;
         if (a.usec >= USEC_PER_DAY || a.usec < 0)
         {
             a.day += a.usec / USEC_PER_DAY;
@@ -702,14 +702,14 @@ namespace OPI
         return result;
     }
 
-    OPI_CUDA_PREFIX inline JulianDay& operator+=(JulianDay& jd, const long& usec)
+    OPI_CUDA_PREFIX inline JulianDay& operator+=(JulianDay& jd, const long long& usec)
     {
         jd.usec += usec;
         adjustJD(jd);
         return jd;
     }
 
-    OPI_CUDA_PREFIX inline JulianDay operator+(const JulianDay& jd, const long& usec)
+    OPI_CUDA_PREFIX inline JulianDay operator+(const JulianDay& jd, const long long& usec)
     {
         JulianDay result = jd;
         result.usec += usec;
@@ -760,7 +760,7 @@ namespace OPI
         return (a.day == b.day) && (a.usec == b.usec);
     }
 
-    OPI_CUDA_PREFIX inline long deltaUsec(const JulianDay& a, const JulianDay& b)
+    OPI_CUDA_PREFIX inline long long deltaUsec(const JulianDay& a, const JulianDay& b)
     {
         JulianDay delta = (a>b ? a-b : b-a);
         return delta.day * 86400000000l + delta.usec;

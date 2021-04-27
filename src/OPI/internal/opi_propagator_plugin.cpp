@@ -37,7 +37,7 @@ namespace OPI
 		return plugin->disable();
 	}
 
-    ErrorCode PropagatorPlugin::runPropagation(Population& population, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices)
+    ErrorCode PropagatorPlugin::runPropagation(Population& population, JulianDay epoch, long long dt, PropagationMode mode, IndexList* indices)
 	{
 		if(proc_propagate)
             return proc_propagate(this, (void*)(&population), epoch, dt, mode, indices);

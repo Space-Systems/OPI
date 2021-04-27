@@ -29,7 +29,7 @@ namespace OPI
 	// cpp propagator interface function
 	typedef Propagator* (*pluginPropagatorFunction)(OPI_Host host);
 	// c interface propagation function
-    typedef ErrorCode (*pluginPropagateFunction)(OPI_Propagator propagator, OPI_Population population, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices);
+    typedef ErrorCode (*pluginPropagateFunction)(OPI_Propagator propagator, OPI_Population population, JulianDay epoch, long long dt, PropagationMode mode, IndexList* indices);
 
 	// cpp distance query interface function
 	typedef DistanceQuery* (*pluginDistanceQueryFunction)(OPI_Host host);

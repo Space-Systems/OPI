@@ -15,12 +15,12 @@ namespace OPI
 	{
 	}
 
-    ErrorCode PerturbationModule::calculate(const Population& population, Perturbations& delta, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices)
+    ErrorCode PerturbationModule::calculate(const Population& population, Perturbations& delta, JulianDay epoch, long long dt, PropagationMode mode, IndexList* indices)
 	{
         return runCalculation(population, delta, epoch, dt, mode, indices);
 	}
 
-    ErrorCode PerturbationModule::runCalculation(const Population& population, Perturbations& delta, JulianDay epoch, long dt, PropagationMode mode, IndexList* indices)
+    ErrorCode PerturbationModule::runCalculation(const Population& population, Perturbations& delta, JulianDay epoch, long long dt, PropagationMode mode, IndexList* indices)
 	{
 		return NOT_IMPLEMENTED;
 	}

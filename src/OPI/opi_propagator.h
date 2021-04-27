@@ -59,7 +59,7 @@ namespace OPI
              * is unsupported.
              * @return OPI::SUCCESS if propagation was successful, or other error code.
              */
-            OPI_API_EXPORT ErrorCode propagate(Population& population, JulianDay epoch, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+            OPI_API_EXPORT ErrorCode propagate(Population& population, JulianDay epoch, long long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
             /** @brief Propagates a given population over a given time span and measures MP/s.
              *
@@ -81,7 +81,7 @@ namespace OPI
              * given, its size will be used for calculating the benchmark instead of the population size.
              * @return A double value representing how many megapropagations per second were executed.
              */
-            OPI_API_EXPORT double benchmark(Population& population, JulianDay epoch, long seconds, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+            OPI_API_EXPORT double benchmark(Population& population, JulianDay epoch, long long seconds, long long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
             //! Assigns a module to this propagator (not yet implemented)
 			/**
@@ -160,14 +160,14 @@ namespace OPI
              * if the population does not have all required fields filled out, OPI::SUCCESS if the propagator returns
              * no errors.
              */
-            OPI_API_EXPORT virtual ErrorCode align(Population& population, long dt, IndexList* indices = nullptr, JulianDay toEpoch = {0,0}, bool quiet = false);
+            OPI_API_EXPORT virtual ErrorCode align(Population& population, long long dt, IndexList* indices = nullptr, JulianDay toEpoch = {0,0}, bool quiet = false);
 
 		protected:
 			//! Defines that this propagator (can) use Perturbation Modules
 			void useModules();
 			//! The actual propagation implementation
 			//! The C Namespace equivalent for this function is OPI_Plugin_propagate
-            virtual ErrorCode runPropagation(Population& population, JulianDay epoch, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr) = 0;
+            virtual ErrorCode runPropagation(Population& population, JulianDay epoch, long long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr) = 0;
 
 		private:
 			Pimpl<PropagatorImpl> data;

@@ -255,7 +255,7 @@ namespace OPI
         out.read(bytes, uncompressedSize);
 
         // Compress char array using miniz and write to file.
-        unsigned long compressedSize = compressBound(uncompressedSize);
+        unsigned long long compressedSize = compressBound(uncompressedSize);
         unsigned char* compressedData = new unsigned char[compressedSize];
         int status = compress(compressedData, (mz_ulong*)&compressedSize, (const unsigned char *)bytes, (mz_ulong)uncompressedSize);
         if (status == Z_OK)

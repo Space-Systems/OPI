@@ -29,10 +29,10 @@ namespace OPI
 			/**
              * The calculated perturbation forces will be added to the values present in delta
 			 */
-            OPI_API_EXPORT ErrorCode calculate(const Population& population, Perturbations& delta, JulianDay epoch, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+            OPI_API_EXPORT ErrorCode calculate(const Population& population, Perturbations& delta, JulianDay epoch, long long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
 		protected:
-            virtual ErrorCode runCalculation(const Population& population, Perturbations& delta, JulianDay epoch, long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
+            virtual ErrorCode runCalculation(const Population& population, Perturbations& delta, JulianDay epoch, long long dt, PropagationMode mode = MODE_SINGLE_EPOCH, IndexList* indices = nullptr);
 
 		private:
 			Pimpl<PerturbationModuleImpl> impl;
