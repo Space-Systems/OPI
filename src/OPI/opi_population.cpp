@@ -178,7 +178,7 @@ namespace OPI
             thisAcc[i] = acc[listdata[i]];
             thisEp[i] = ep[listdata[i]];
             thisCov[i] = cov[listdata[i]];
-            data->object_names[i] = source.getObjectName(i);
+            data->object_names[i] = source.getObjectName(listdata[i]);
             for (int j=0; j<b; j++)
             {
                 thisBytes[i*b+j] = bytes[listdata[i]*b+j];
