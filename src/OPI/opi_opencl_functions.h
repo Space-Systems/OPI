@@ -5,7 +5,7 @@
 namespace OPI
 {
 
-std::string OPENCL_FUNCTIONS = R"(
+static std::string OPENCL_FUNCTIONS = R"(
 // Equivalent of OPI::Vector3 in OpenCL
 typedef struct OPI_Vector3 {
     double x;
