@@ -246,9 +246,10 @@ namespace OPI
 		}
         else if (pluginMajor < OPI_API_VERSION_MAJOR)
         {
-            Logger::out(0) << "Warning: " << plugin->getName() << " was made for a previous version of OPI. "
-                      << "It may not function correctly and should be removed from the plugin folder." << std::endl;
-			support = true;
+            Logger::out(0) << "Warning: " << plugin->getName() << " was made for OPI " << pluginMajor
+                      << " and is incompatible with OPI " << OPI_API_VERSION_MAJOR << ". "
+                      << "It should be updated or removed from the plugin folder." << std::endl;
+            support = false;
         }
         else if (pluginMajor > OPI_API_VERSION_MAJOR)
         {
