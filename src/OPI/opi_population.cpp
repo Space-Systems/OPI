@@ -595,6 +595,10 @@ namespace OPI
                                 }
                             }
                         }
+                        if (versionNumber < OPI_DATA_REVISION_NUMBER)
+                        {
+                            Logger::out(0) << "Warning: Population was read from an older data file format. Some fields may be missing. Epoch information may be less accurate." << std::endl;
+                        }
                     }
                     else Logger::out(0) << "Unknown file version" << std::endl;
                 }
