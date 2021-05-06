@@ -21,6 +21,7 @@ set( OPI_SOURCE_FILES
   opi_indexlist.cpp
   opi_collisiondetection.cpp
   opi_module.cpp
+  opi_opencl_functions.cpp
 
   opi_perturbation_module.cpp
 
