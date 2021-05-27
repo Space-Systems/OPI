@@ -77,6 +77,18 @@
         return OPI::operator==(*($self), b);
     }
 }
+
+%extend OPI::Covariance {
+    OPI::Covariance operator*(const double& a)
+    {
+        return OPI::operator*(*($self), a);
+    }
+    OPI::Covariance operator/(const double& a)
+    {
+        return OPI::operator/(*($self), a);
+    }
+}
+
 // In python, the population getters are changed from C arrays to indexed setters and getters.
 // So instead of getOrbit()[i] in C++, use getOrbitByIndex(i) in python.
 // Alternatively, orbit_getitem(population.getOrbit(), i) will work.

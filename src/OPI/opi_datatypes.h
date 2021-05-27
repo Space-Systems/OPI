@@ -636,6 +636,92 @@ namespace OPI
         return c;
     }
 
+    OPI_CUDA_PREFIX inline Covariance operator*(const Covariance& c, const double& a)
+    {
+        Covariance result;
+        result.k1_k1 = c.k1_k1 * (a * a);
+        result.k2_k1 = c.k2_k1 * (a * a);
+        result.k2_k2 = c.k2_k2 * (a * a);
+        result.k3_k1 = c.k3_k1 * (a * a);
+        result.k3_k2 = c.k3_k2 * (a * a);
+        result.k3_k3 = c.k3_k3 * (a * a);
+        result.k4_k1 = c.k4_k1 * (a * a);
+        result.k4_k2 = c.k4_k2 * (a * a);
+        result.k4_k3 = c.k4_k3 * (a * a);
+        result.k4_k4 = c.k4_k4 * (a * a);
+        result.k5_k1 = c.k5_k1 * (a * a);
+        result.k5_k2 = c.k5_k2 * (a * a);
+        result.k5_k3 = c.k5_k3 * (a * a);
+        result.k5_k4 = c.k5_k4 * (a * a);
+        result.k5_k5 = c.k5_k5 * (a * a);
+        result.k6_k1 = c.k6_k1 * (a * a);
+        result.k6_k2 = c.k6_k2 * (a * a);
+        result.k6_k3 = c.k6_k3 * (a * a);
+        result.k6_k4 = c.k6_k4 * (a * a);
+        result.k6_k5 = c.k6_k5 * (a * a);
+        result.k6_k6 = c.k6_k6 * (a * a);
+        result.d1_k1 = c.d1_k1 * a;
+        result.d1_k2 = c.d1_k2 * a;
+        result.d1_k3 = c.d1_k3 * a;
+        result.d1_k4 = c.d1_k4 * a;
+        result.d1_k5 = c.d1_k5 * a;
+        result.d1_k6 = c.d1_k6 * a;
+        result.d1_d1 = c.d1_d1;
+        result.d2_k1 = c.d2_k1 * a;
+        result.d2_k2 = c.d2_k2 * a;
+        result.d2_k3 = c.d2_k3 * a;
+        result.d2_k4 = c.d2_k4 * a;
+        result.d2_k5 = c.d2_k5 * a;
+        result.d2_k6 = c.d2_k6 * a;
+        result.d2_d1 = c.d2_d1;
+        result.d2_d2 = c.d2_d2;
+
+        return result;
+    }
+
+    OPI_CUDA_PREFIX inline Covariance operator/(const Covariance& c, const double& a)
+    {
+        Covariance result;
+        result.k1_k1 = c.k1_k1 / (a * a);
+        result.k2_k1 = c.k2_k1 / (a * a);
+        result.k2_k2 = c.k2_k2 / (a * a);
+        result.k3_k1 = c.k3_k1 / (a * a);
+        result.k3_k2 = c.k3_k2 / (a * a);
+        result.k3_k3 = c.k3_k3 / (a * a);
+        result.k4_k1 = c.k4_k1 / (a * a);
+        result.k4_k2 = c.k4_k2 / (a * a);
+        result.k4_k3 = c.k4_k3 / (a * a);
+        result.k4_k4 = c.k4_k4 / (a * a);
+        result.k5_k1 = c.k5_k1 / (a * a);
+        result.k5_k2 = c.k5_k2 / (a * a);
+        result.k5_k3 = c.k5_k3 / (a * a);
+        result.k5_k4 = c.k5_k4 / (a * a);
+        result.k5_k5 = c.k5_k5 / (a * a);
+        result.k6_k1 = c.k6_k1 / (a * a);
+        result.k6_k2 = c.k6_k2 / (a * a);
+        result.k6_k3 = c.k6_k3 / (a * a);
+        result.k6_k4 = c.k6_k4 / (a * a);
+        result.k6_k5 = c.k6_k5 / (a * a);
+        result.k6_k6 = c.k6_k6 / (a * a);
+        result.d1_k1 = c.d1_k1 / a;
+        result.d1_k2 = c.d1_k2 / a;
+        result.d1_k3 = c.d1_k3 / a;
+        result.d1_k4 = c.d1_k4 / a;
+        result.d1_k5 = c.d1_k5 / a;
+        result.d1_k6 = c.d1_k6 / a;
+        result.d1_d1 = c.d1_d1;
+        result.d2_k1 = c.d2_k1 / a;
+        result.d2_k2 = c.d2_k2 / a;
+        result.d2_k3 = c.d2_k3 / a;
+        result.d2_k4 = c.d2_k4 / a;
+        result.d2_k5 = c.d2_k5 / a;
+        result.d2_k6 = c.d2_k6 / a;
+        result.d2_d1 = c.d2_d1;
+        result.d2_d2 = c.d2_d2;
+
+        return result;
+    }
+
     OPI_CUDA_PREFIX inline const char* referenceFrameToString(ReferenceFrame rf)
     {
         switch (rf)
