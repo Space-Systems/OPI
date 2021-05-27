@@ -35,6 +35,44 @@
 %array_functions(OPI::Covariance, covariance)
 %array_functions(OPI::Epoch, epoch)
 
+%extend OPI::JulianDay {
+    OPI::JulianDay operator+(const long long& usec)
+    {
+        return OPI::operator+(OPI::JulianDay($self->day, $self->usec), usec);
+    }
+    OPI::JulianDay operator-(const long long& usec)
+    {
+        return OPI::operator-(OPI::JulianDay($self->day, $self->usec), usec);
+    }
+    OPI::JulianDay operator+(const OPI::JulianDay& b)
+    {
+        return OPI::operator+(OPI::JulianDay($self->day, $self->usec), b);
+    }
+    OPI::JulianDay operator-(const OPI::JulianDay& b)
+    {
+        return OPI::operator-(OPI::JulianDay($self->day, $self->usec), b);
+    }
+    bool operator>(const OPI::JulianDay b)
+    {
+        return OPI::operator>(*($self), b);
+    }
+    bool operator<(const OPI::JulianDay b)
+    {
+        return OPI::operator<(*($self), b);
+    }
+    bool operator>=(const OPI::JulianDay b)
+    {
+        return OPI::operator>=(*($self), b);
+    }
+    bool operator<=(const OPI::JulianDay b)
+    {
+        return OPI::operator<=(*($self), b);
+    }
+    bool operator==(const OPI::JulianDay b)
+    {
+        return OPI::operator==(*($self), b);
+    }
+}
 // In python, the population getters are changed from C arrays to indexed setters and getters.
 // So instead of getOrbit()[i] in C++, use getOrbitByIndex(i) in python.
 // Alternatively, orbit_getitem(population.getOrbit(), i) will work.
