@@ -35,6 +35,10 @@
 %array_functions(OPI::Covariance, covariance)
 %array_functions(OPI::Epoch, epoch)
 
+// Because the operators for JulianDay are defined outside the struct
+// (in opi_datatypes.h), we need to wrap them here so SWIG will pick
+// them up correctly.
+// TODO: Do the same for Vector3, etc.
 %extend OPI::JulianDay {
     OPI::JulianDay operator+(const long long& usec)
     {
