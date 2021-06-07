@@ -27,25 +27,25 @@ void Logger::setVerboseLevel(int level)
 	verboseLevel = level;
 }
 
-void Logger::setPrefix(std::string newPrefix)
+void Logger::setPrefix(const char* newPrefix)
 {
     if (newPrefix == "")
     {
-        prefix = newPrefix;
+        prefix = std::string(newPrefix);
     }
     else {
-        prefix = "[" + newPrefix + "] ";
+        prefix = "[" + std::string(newPrefix) + "] ";
     }
 }
 
-void Logger::setMode(mode newMode, std::string fileName, std::ostream* redirectTo, bool append)
+void Logger::setMode(mode newMode, const char* fileName, std::ostream* redirectTo, bool append)
 {
     currentMode = newMode;
     if (logFile.is_open()) {
         logFile.flush();
         logFile.close();
     }
-    if (((newMode == LOGMODE_FILE) || (newMode == LOGMODE_BINARY)) && fileName != "") {
+    if (((newMode == LOGMODE_FILE) || (newMode == LOGMODE_BINARY)) && std::string(fileName) != "") {
         if (append)
         {
             logFile.open(fileName, std::ofstream::out | std::ofstream::app);
@@ -65,12 +65,12 @@ int Logger::getVerboseLevel()
 	return verboseLevel;
 }
 
-std::string Logger::getBuffer()
+const char* Logger::getBuffer()
 {
     std::string contents = messageBuffer.str();
     messageBuffer.str(std::string());
     messageBuffer.clear();
-    return contents;
+    return contents.c_str();
 }
 
 std::ostream& Logger::out(int minVerboseLevel)

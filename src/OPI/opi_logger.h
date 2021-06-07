@@ -67,7 +67,7 @@ class Logger
         /// to a GUI or any other custom message handler.
         /// With REDIRECT, a pointer to another ostream can be given that all output
         /// will be sent to.
-        OPI_API_EXPORT static void setMode(mode newMode, std::string fileName = "", std::ostream* redirectTo = nullptr, bool append = true);
+        OPI_API_EXPORT static void setMode(mode newMode, const char* fileName = "", std::ostream* redirectTo = nullptr, bool append = true);
 
         /// \brief Use this function to control how many messages are shown.
         ///
@@ -91,7 +91,7 @@ class Logger
         /// Use this function to change the prefix to something different. If the new
         /// prefix is empty (""), the brackets are omitted.
         /// \param newPrefix A string to be prepended to all future messages.
-        OPI_API_EXPORT static void setPrefix(std::string newPrefix);
+        OPI_API_EXPORT static void setPrefix(const char* newPrefix);
 
         /// \brief Get the current verbose level.
         ///
@@ -106,7 +106,7 @@ class Logger
         /// the contents of the buffer, then clear it.
         /// \returns A string containing all buffered messages since the last call to
         /// this function.
-        OPI_API_EXPORT static std::string getBuffer();
+        OPI_API_EXPORT static const char* getBuffer();
 
         /// \brief Return a pointer to the current output stream.        
         OPI_API_EXPORT static std::ostream* getStream();
