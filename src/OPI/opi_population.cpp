@@ -1064,6 +1064,9 @@ namespace OPI
                     valid = false;
                 }
             }
+            else {
+                report << i << "/" << id << "/Properties: No object properties set" << std::endl;
+            }
 
             // check orbit and epoch
             Orbit orbit = getOrbit(DEVICE_HOST)[i];
@@ -1093,6 +1096,10 @@ namespace OPI
                     report << i << "/" << id << "/Orbit: One or more angles outside radian range" << std::endl;
                     valid = false;
                 }
+            }
+
+            if (data->data_epoch.hasData())
+            {
                 if (epoch.end_of_life.day > 0 && epoch.beginning_of_life.day > 0 && epoch.end_of_life < epoch.beginning_of_life)
                 {
                     report << i << "/" << id << "/Orbit: EOL date precedes BOL date" << std::endl;
