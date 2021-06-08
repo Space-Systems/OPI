@@ -866,9 +866,15 @@ namespace OPI
         return (a.day == b.day) && (a.usec == b.usec);
     }
 
-    OPI_CUDA_PREFIX inline long long deltaUsec(const JulianDay& a, const JulianDay& b)
+    OPI_CUDA_PREFIX inline long long absDeltaUsec(const JulianDay& a, const JulianDay& b)
     {
         JulianDay delta = (a>b ? a-b : b-a);
+        return delta.day * 86400000000l + delta.usec;
+    }
+
+    OPI_CUDA_PREFIX inline long long deltaUsec(const JulianDay& a, const JulianDay& b)
+    {
+        JulianDay delta = a-b;
         return delta.day * 86400000000l + delta.usec;
     }
 
