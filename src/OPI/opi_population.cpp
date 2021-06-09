@@ -1038,22 +1038,22 @@ namespace OPI
                     report << i << "/" << id << "/Properties: NaN detected" << std::endl;
                     valid = false;
                 }
-                if (props.drag_coefficient < 1e-32)
+                if (props.drag_coefficient < 0.0)
                 {
                     report << i << "/" << id << "/Properties: Invalid drag coefficient" << std::endl;
                     valid = false;
                 }
-                if (props.mass < 1e-12)
+                if (props.mass < 0.0)
                 {
                     report << i << "/" << id << "/Properties: Invalid mass" << std::endl;
                     valid = false;
                 }
-                if (props.diameter < 1e-12)
+                if (props.diameter < 0.0)
                 {
                     report << i << "/" << id << "/Properties: Invalid diameter" << std::endl;
                     valid = false;
                 }
-                if (props.area_to_mass <= 0.0)
+                if (props.area_to_mass < 0.0)
                 {
                     report << i << "/" << id << "/Properties: Invalid area to mass ratio" << std::endl;
                     valid = false;
