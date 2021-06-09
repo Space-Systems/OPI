@@ -1,4 +1,5 @@
 #include "opi_cl_support.h"
+#include "../OPI/opi_logger.h"
 
 ClSupportImpl::ClSupportImpl()
 {
@@ -12,7 +13,7 @@ ClSupportImpl::~ClSupportImpl()
 
 void ClSupportImpl::init(int platformNumber, int deviceNumber)
 {
-	std::cout << "Calling CL init function" << std::endl;
+    OPI::Logger::out(1) << "Calling CL init function" << std::endl;
 	cl_platform_id platforms[8];
 	cl_uint nPlatforms;
 	cl_int error;
@@ -24,7 +25,7 @@ void ClSupportImpl::init(int platformNumber, int deviceNumber)
             char vendor[32], name[64];
             clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 32, &vendor, &actualLength);
             clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME,   64, &name,   &actualLength);
-            std::cout << "Platform " << i << ": " << string(vendor) << " " << string(name) << std::endl;
+            OPI::Logger::out(1) << "Platform " << i << ": " << string(vendor) << " " << string(name) << std::endl;
 
             clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 0, NULL, &nDevices);
             devices = new cl_device_id[nDevices];
@@ -32,7 +33,7 @@ void ClSupportImpl::init(int platformNumber, int deviceNumber)
             for (unsigned int j = 0; j < nDevices; j++) {
                 char devName[64];
                 clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 64, devName, &actualLength);
-                std::cout << "Device " << j << ": " << string(devName) << std::endl;
+                OPI::Logger::out(1) << "Device " << j << ": " << string(devName) << std::endl;
             }
         }
 
@@ -48,7 +49,7 @@ void ClSupportImpl::init(int platformNumber, int deviceNumber)
         if (error != CL_SUCCESS) std::cerr << "Error creating queue: " << error << std::endl;
     }
     else {
-        std::cerr << "Unable to get OpenCL platform IDs: " << error << std::endl;
+        OPI::Logger::out(0) << "Unable to get OpenCL platform IDs: " << error << std::endl;
     }
 }
 
@@ -56,15 +57,15 @@ void ClSupportImpl::allocate(void** a, size_t size)
 {
 	cl_int error;
 	*a = clCreateBuffer(context, CL_MEM_READ_WRITE, size, NULL, &error);
-	if (error != CL_SUCCESS) std::cout << "Error allocating OpenCL buffer memory: " << error << std::endl;
-    //else cout << "Allocated " << size << " bytes at " << *a << endl;
+    if (error != CL_SUCCESS) OPI::Logger::out(0) << "Error allocating OpenCL buffer memory: " << error << std::endl;
+    else OPI::Logger::out(4) << "Allocated " << size << " bytes at " << *a << endl;
 }
 
 void ClSupportImpl::free(void *mem)
 {
     cl_int error = clReleaseMemObject(static_cast<cl_mem>(mem));
-    if (error != CL_SUCCESS) std::cout << "Error freeing OpenCL buffer memory: " << error << std::endl;
-    //else cout << "Freed memory object at " << static_cast<cl_mem>(mem) << endl;
+    if (error != CL_SUCCESS) OPI::Logger::out(0) << "Error freeing OpenCL buffer memory: " << error << std::endl;
+    else OPI::Logger::out(4) << "Freed memory object at " << static_cast<cl_mem>(mem) << endl;
 }
 
 void ClSupportImpl::copy(void *destination, void *source, size_t size, unsigned int num_objects, bool host_to_device)
@@ -73,14 +74,14 @@ void ClSupportImpl::copy(void *destination, void *source, size_t size, unsigned 
 	if (host_to_device) {
 		cl_mem destinationBuffer = static_cast<cl_mem>(destination);
         error = clEnqueueWriteBuffer(defaultQueue, destinationBuffer, CL_TRUE, 0, size*num_objects, source, 0, NULL, NULL);
-		if (error != CL_SUCCESS) std::cout << "Error copying Population data to OpenCL device: " << error << std::endl;
-        //else cout << "Copied " << size << " bytes to device at " << destinationBuffer << endl;
+        if (error != CL_SUCCESS) OPI::Logger::out(0) << "Error copying Population data to OpenCL device: " << error << std::endl;
+        else OPI::Logger::out(4) << "Copied " << size << " bytes to device at " << destinationBuffer << endl;
 	}
 	else {
 		cl_mem sourceBuffer = static_cast<cl_mem>(source);
         error = clEnqueueReadBuffer(defaultQueue, sourceBuffer, CL_TRUE, 0, size*num_objects, destination, 0, NULL, NULL);
-		if (error != CL_SUCCESS) std::cout << "Error downloading Population data from OpenCL device: " << error << std::endl;
-        //else cout << "Downloaded " << size << " bytes from device (" << sourceBuffer << " to " << destination << ")" << endl;
+        if (error != CL_SUCCESS) OPI::Logger::out(0) << "Error downloading Population data from OpenCL device: " << error << std::endl;
+        else OPI::Logger::out(4) << "Downloaded " << size << " bytes from device (" << sourceBuffer << " to " << destination << ")" << endl;
     }
 }
 
@@ -97,7 +98,7 @@ void ClSupportImpl::selectDevice(int device)
         if (device < nDevices) {
             //FIXME: Device switching not yet supported
         }
-        else std::cout << "Invalid OpenCL device number - please select a number between 0 and "
+        else OPI::Logger::out(0) << "Invalid OpenCL device number - please select a number between 0 and "
             << nDevices - 1 << "." << std::endl;
     }
 }

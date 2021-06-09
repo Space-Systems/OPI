@@ -1,4 +1,5 @@
 #include "../OPI/opi_gpusupport.h"
+#include "../OPI/opi_logger.h"
 
 #include <cuda_runtime.h>
 #include <iostream>
@@ -55,11 +56,11 @@ void CudaSupportImpl::init(int platformNumber, int deviceNumber)
 	// currently, only the first device is used
 	cudaGetDeviceCount(&deviceCount);
 	if (deviceCount == 0) {
-		cout << "  No CUDA-capable devices found." << endl;
+        OPI::Logger::out(0) << "  No CUDA-capable devices found." << endl;
 	}
 	else {
 		CUDAProperties = new cudaDeviceProp[deviceCount];
-		cout << "  Found " << deviceCount << " CUDA capable device(s): " << endl << endl;
+        OPI::Logger::out(1) << "  Found " << deviceCount << " CUDA capable device(s): " << endl << endl;
 		for (int i=0; i<deviceCount; i++) {
 			cudaGetDeviceProperties(&(CUDAProperties[i]), i);
 			cudaDeviceProp& deviceProp = CUDAProperties[i];
@@ -70,17 +71,17 @@ void CudaSupportImpl::init(int platformNumber, int deviceNumber)
 				bs[j] = deviceProp.maxThreadsDim[j];
 				gs[j] = deviceProp.maxGridSize[j];
 			}
-			cout << "  Device Number:      " << i << endl;
-			cout << "  Name:               " << deviceProp.name << endl;
-			cout << "  Compute Capability: " << deviceProp.major << "." << deviceProp.minor << endl;
-			cout << "  Total Memory:       " << (deviceProp.totalGlobalMem/(1024*1024)) << "MB" << endl;
-			cout << "  Clock Speed:        " << (deviceProp.clockRate/1000) << "MHz" << endl;
-			cout << "  Threads per Block:  " << tpb << endl;
-			cout << "  Block Dimensions:   " << bs[0] << "/" << bs[1] << "/" << bs[2] << endl;
-			cout << "  Grid Dimensions:    " << gs[0] << "/" << gs[1] << "/" << gs[2] << endl;
-			cout << "  Warp Size:          " << deviceProp.warpSize << endl;
-			cout << "  MP Count:           " << deviceProp.multiProcessorCount << endl;
-			cout << endl;
+            OPI::Logger::out(1) << "  Device Number:      " << i << endl;
+            OPI::Logger::out(1) << "  Name:               " << deviceProp.name << endl;
+            OPI::Logger::out(1) << "  Compute Capability: " << deviceProp.major << "." << deviceProp.minor << endl;
+            OPI::Logger::out(1) << "  Total Memory:       " << (deviceProp.totalGlobalMem/(1024*1024)) << "MB" << endl;
+            OPI::Logger::out(1) << "  Clock Speed:        " << (deviceProp.clockRate/1000) << "MHz" << endl;
+            OPI::Logger::out(1) << "  Threads per Block:  " << tpb << endl;
+            OPI::Logger::out(1) << "  Block Dimensions:   " << bs[0] << "/" << bs[1] << "/" << bs[2] << endl;
+            OPI::Logger::out(1) << "  Grid Dimensions:    " << gs[0] << "/" << gs[1] << "/" << gs[2] << endl;
+            OPI::Logger::out(1) << "  Warp Size:          " << deviceProp.warpSize << endl;
+            OPI::Logger::out(1) << "  MP Count:           " << deviceProp.multiProcessorCount << endl;
+            OPI::Logger::out(1) << endl;
 		}
 
 		deviceNumber = 0;
