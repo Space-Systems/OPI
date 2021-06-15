@@ -29,12 +29,13 @@ void Logger::setVerboseLevel(int level)
 
 void Logger::setPrefix(const char* newPrefix)
 {
-    if (newPrefix == "")
+    std::string p = std::string(newPrefix);
+    if (p == "")
     {
-        prefix = std::string(newPrefix);
+        prefix = p;
     }
     else {
-        prefix = "[" + std::string(newPrefix) + "] ";
+        prefix = "[" + p + "] ";
     }
 }
 
