@@ -1,5 +1,7 @@
 #include "opi_logger.h"
 
+#include <cstring>
+
 namespace OPI
 {
 
@@ -66,12 +68,14 @@ int Logger::getVerboseLevel()
 	return verboseLevel;
 }
 
-const char* Logger::getBuffer()
+int Logger::getBuffer(char*& buffer)
 {
-    std::string contents = messageBuffer.str();
+    int size = messageBuffer.str().size();
+    buffer = new char[size];
+    strcpy(buffer, messageBuffer.str().c_str());
     messageBuffer.str(std::string());
     messageBuffer.clear();
-    return contents.c_str();
+    return size;
 }
 
 std::ostream& Logger::out(int minVerboseLevel)

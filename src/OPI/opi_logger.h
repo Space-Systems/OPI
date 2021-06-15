@@ -106,7 +106,7 @@ class Logger
         /// the contents of the buffer, then clear it.
         /// \returns A string containing all buffered messages since the last call to
         /// this function.
-        OPI_API_EXPORT static const char* getBuffer();
+        OPI_API_EXPORT static int getBuffer(char*& buffer);
 
         /// \brief Return a pointer to the current output stream.        
         OPI_API_EXPORT static std::ostream* getStream();
