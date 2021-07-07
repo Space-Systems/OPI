@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: Install dependencies
-      run: sudo apt install nvidia-cuda-dev nvidia-opencl-dev gfortran swig doxygen graphviz
+      run: sudo apt install nvidia-cuda-dev nvidia-opencl-dev nvidia-cuda-toolkit gfortran swig doxygen graphviz python3-dev
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
