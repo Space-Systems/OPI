@@ -4,7 +4,7 @@ include_directories(${OpenCL_INCLUDE_DIR})
 add_library(
   OPI-cl
   SHARED
-  opi_cl_support.cpp
+  opi_cl_support.cpp ../OPI/opi_logger.cpp
 )
 
 set_target_properties( OPI-cl PROPERTIES

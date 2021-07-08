@@ -4,7 +4,7 @@ include_directories(${CUDA_INCLUDE_DIRS})
 add_library(
   OPI-cuda
   MODULE
-  opi_cuda_support.cpp
+  opi_cuda_support.cpp ../OPI/opi_logger.cpp
 )
 
 set_target_properties( OPI-cuda PROPERTIES
