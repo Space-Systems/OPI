@@ -198,6 +198,15 @@ namespace OPI
                         thisObject.add(i);
                         Logger::out(0) << "Object " << i << " closing in. Propagating for " << delta/1000000.0 << " seconds." << std::endl;
                         error = propagate(population, {0,0}, delta, MODE_INDIVIDUAL_EPOCHS, &thisObject);
+
+                        //check
+                        const JulianDay currentEpochCheck = population.getEpoch()[i].current_epoch;
+                        const long long deltaCheck = deltaUsec(latestEpoch, currentEpochCheck);
+                        if (deltaCheck >= 1)
+                        {
+                            Logger::out(0) << "Warning: Propagation of object " << i << " failed to reach alignment." << std::endl;
+                            Logger::out(0) << "Object is now " << deltaCheck << " microseconds away from target epoch." << std::endl;
+                        }
                     }
                 }
 
