@@ -422,6 +422,80 @@ To start using OPI, take a look at the documentation provided with the library.
 If you have any questions, please contact me (mmoeckel on GitHub).
 
 
+OPI Population Data Format
+--------------------------
+
+OPI Populations can be read from and written to files using the functions
+Population::read() and Population::write(), respectively. The resulting files,
+commonly given the suffix ".opi", contain zlib-compressed binary data. When
+uncompressed, the data is divided into three sections: A header, a population
+info block, and an object info block. (Note that all integers are signed unless
+otherwise specified.)
+
+The header contains three values:
+* A 32-bit integer containing the magic number 47627. This is used for identification.
+* A 32-bit integer containing the file format revision number. This number is incremented
+ with every OPI release that makes changes to the file format and is used to provide
+ backwards compatibility with files that have been written using older versions of OPI.
+* A 32-bit integer containing the population size (i.e. number of objects in the population).
+ This is used for correct interpretation of data in the object info block.
+
+The population info block contains three value pairs, each consisting of a 32-bit integer
+containing the length of the following character string, and the character string itself,
+holding the actual information. The values are:
+* Name of the propagator that this population was last propagated with, or "None",
+* a user-defined population description (format revision number 2 or higher),
+* a string representation of the reference frame the population is in (format revision
+ number 3 or higher).
+
+The object info block starts with object names. These consist of a number of 32-bit
+integer/character string pairs corresponding to the population size:
+* A 32-bit integer containing the length of the string for the first object name, or
+ zero if no object name is given,
+* if integer is larger than zero, a corresponding number of characters containing the
+ name of the first object.
+* Repeat for population size.
+
+Next follow blocks of object data (orbits, properties, state vectors, and so on),
+each with the following format:
+* A 32-bit integer containing the block identification number,
+* A 32-bit integer containing the size of the corresponding data type,
+* The vector containing the actual object data.
+
+The block identification number is necessary because not
+every population uses all data types (e.g. some may use orbits and no state vectors while
+others use state vectors exclusively, and some may have both types set), so the data blocks
+do not have a fixed order. Instead, the block identification number states which type of data
+is next in the file. It corresponds to the DataType enum:
+```
+DATA_ORBIT = 0,
+DATA_PROPERTIES = 1,
+DATA_POSITION = 2,
+DATA_VELOCITY = 3,
+DATA_ACCELERATION = 4,
+DATA_EPOCH = 5,
+DATA_COVARIANCE = 6,
+DATA_BYTES = 7
+```
+Following the block identification number is another 32-bit integer containing the size
+of the corresponding data type (OPI::Orbit, OPI::Vector3, and so on). If the block ID is
+7 (DATA_BYTES) then this integer contains the number of bytes allocated for each object.
+With this information, the data vector can be interpreted. Its size is given by the population
+size from the header multiplied by the data type size. For example, if the block ID is 2, the
+block contains position data. Since this is of type OPI::Vector3, the next integer will be 24
+(the size of three 64-bit doubles). If the population size given in the header is 10 objects then
+the next 10 x 24 = 240 bytes need to be read into the population's position vector.
+
+Data type sizes can change between file format revisions. For example, revisions 4
+and 5 each add one field to the Epoch type while revision 6 changes the format in which
+Epoch fields are stored from double to the JulianDay type. In other words, the size of
+the Epoch data type is:
+* three doubles in revision 3 and lower,
+* four doubles in revision 4,
+* five doubles in revision 5,
+* five pairs of two 64-bit long integers in revision 6 and up.
+
+
 Graphical User Interface
 ------------------------
 
