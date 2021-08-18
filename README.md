@@ -469,14 +469,14 @@ others use state vectors exclusively, and some may have both types set), so the 
 do not have a fixed order. Instead, the block identification number states which type of data
 is next in the file. It corresponds to the DataType enum:
 ```
-DATA_ORBIT = 0,
-DATA_PROPERTIES = 1,
-DATA_POSITION = 2,
-DATA_VELOCITY = 3,
-DATA_ACCELERATION = 4,
-DATA_EPOCH = 5,
-DATA_COVARIANCE = 6,
-DATA_BYTES = 7
+0: DATA_ORBIT (type OPI::Orbit)
+1: DATA_PROPERTIES (type OPI::ObjectProperties)
+2: DATA_POSITION (type OPI::Vector3)
+3: DATA_VELOCITY (type OPI::Vector3)
+4: DATA_ACCELERATION (type OPI::Vector3)
+5: DATA_EPOCH (type OPI::Epoch)
+6: DATA_COVARIANCE (type OPI::Covariance)
+7: DATA_BYTES (type char)
 ```
 Following the block identification number is another 32-bit integer containing the size
 of the corresponding data type (OPI::Orbit, OPI::Vector3, and so on). If the block ID is
