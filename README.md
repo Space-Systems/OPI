@@ -443,16 +443,17 @@ The header contains three values:
 The population info block contains three value pairs, each consisting of a 32-bit integer
 containing the length of the following character string, and the character string itself,
 holding the actual information. The values are:
-* Name of the propagator that this population was last propagated with, or "None",
-* a user-defined population description (format revision number 2 or higher),
-* a string representation of the reference frame the population is in (format revision
+* Name of the propagator that this population was last propagated with, or "None".
+* A user-defined population description (format revision number 2 or higher). The description
+ can be empty, denoted by a length of zero bytes.
+* A string representation of the reference frame the population is in (format revision
  number 3 or higher).
 
 The object info block starts with object names. These consist of a number of 32-bit
 integer/character string pairs corresponding to the population size:
 * A 32-bit integer containing the length of the string for the first object name, or
  zero if no object name is given,
-* if integer is larger than zero, a corresponding number of characters containing the
+* if the length is larger than zero, a corresponding number of characters containing the
  name of the first object.
 * Repeat for population size.
 
