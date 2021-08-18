@@ -422,8 +422,8 @@ To start using OPI, take a look at the documentation provided with the library.
 If you have any questions, please contact me (mmoeckel on GitHub).
 
 
-OPI Population Data Format
---------------------------
+OPI Population Data Format (OPI-2019 and above)
+-----------------------------------------------
 
 OPI Populations can be read from and written to files using the functions
 Population::read() and Population::write(), respectively. The resulting files,
