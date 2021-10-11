@@ -12,9 +12,11 @@
 #include "opi_propagator.h"
 #include "opi_custom_propagator.h"
 #include "opi_perturbation_module.h"
+#include "opi_propagation_record.h"
 %}
 
 %include <std_string.i>
+%include <std_vector.i>
 
 #define OPI_CUDA_PREFIX
 %include "opi_common.h"
@@ -29,6 +31,7 @@
 %include "opi_propagator.h"
 %include "opi_custom_propagator.h"
 %include "opi_perturbation_module.h"
+%include "opi_propagation_record.h"
 
 %include <carrays.i>
 %array_functions(OPI::Orbit, orbit)
@@ -36,6 +39,11 @@
 %array_functions(OPI::ObjectProperties, props)
 %array_functions(OPI::Covariance, covariance)
 %array_functions(OPI::Epoch, epoch)
+
+namespace std {
+%template(DoubleVector) vector<double>;
+%template(JulianVector) vector<OPI::JulianDay>;
+}
 
 // Because the operators for JulianDay are defined outside the struct
 // (in opi_datatypes.h), we need to wrap them here so SWIG will pick
