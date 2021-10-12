@@ -53,6 +53,7 @@ set( OPI_LIBRARY_HEADER
   opi_collisiondetection.h
   opi_module.h
   opi_gpusupport.h
+  opi_propagation_record.h
 
   # plugin types
   opi_propagator.h
