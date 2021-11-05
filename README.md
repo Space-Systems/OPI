@@ -432,6 +432,12 @@ uncompressed, the data is divided into three sections: A header, a population
 info block, and an object info block. (Note that all integers are signed unless
 otherwise specified.)
 
+![Population Data Layout](doc/opi_format_table.png?raw=true)
+
+The table above shows an example with a population size of two objects that have
+position, velocity and properties set. Each row represents 24 bytes. The header is
+bytes 0-11, population info block is bytes 12-31, object info block is bytes 32-263.
+
 The header contains three values:
 * A 32-bit integer containing the magic number 47627. This is used for identification.
 * A 32-bit integer containing the file format revision number. This number is incremented
